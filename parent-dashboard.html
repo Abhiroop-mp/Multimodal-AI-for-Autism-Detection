@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard - ASD Support Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --card-bg: #ffffff;
+            --sidebar-bg: #2d3e50;
+            --text-light: #6c757d;
+        }
+
+        .high-contrast {
+            --primary: #000000;
+            --secondary: #333333;
+            --accent: #666666;
+            --success: #00ff00;
+            --warning: #ff0000;
+            --light: #000000;
+            --dark: #ffffff;
+            --card-bg: #222222;
+            --sidebar-bg: #111111;
+            --text-light: #cccccc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+
+        .nav-links {
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            margin: 0.5rem 0;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .nav-item i {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .user-profile {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-top: auto;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-message p {
+            color: var(--text-light);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .progress-ring {
+            width: 80px;
+            height: 80px;
+            margin: 1rem auto;
+        }
+
+        /* Patients Section */
+        .patients-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .patients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .patient-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .patient-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(-45deg);
+        }
+
+        .patient-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .patient-avatar {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .patient-info h3 {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .patient-info p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .patient-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .patient-stat {
+            text-align: center;
+        }
+
+        .patient-stat-number {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .patient-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Recent Activity */
+        .activity-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content h4 {
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+
+        .activity-content p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .activity-time {
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        /* Accessibility Menu */
+        .accessibility-menu {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .accessibility-toggle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .accessibility-options {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            width: 200px;
+        }
+
+        .accessibility-options.show {
+            display: block;
+        }
+
+        .accessibility-options button {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 8px;
+            background: var(--light);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-options button:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .accessibility-options button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+            }
+            .sidebar-header h1, .sidebar-header p, .nav-item span {
+                display: none;
+            }
+            .nav-item {
+                justify-content: center;
+                padding: 1rem;
+            }
+            .nav-item i {
+                margin-right: 0;
+            }
+            .user-profile {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+            }
+            .nav-links {
+                display: flex;
+                gap: 0.5rem;
+            }
+            .nav-item {
+                flex: 1;
+                justify-content: center;
+            }
+            .main-content {
+                padding: 1rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .patients-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .reduced-motion * {
+            transition: none !important;
+            animation: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>ASD Care</h1>
+            <p>Parent Dashboard</p>
+        </div>
+
+        <nav class="nav-links">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Patients</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Progress</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>Activities</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-comments"></i>
+                <span>Messages</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <h3 id="parent-name">Parent Name</h3>
+            <p id="parent-email">parent@email.com</p>
+            <button onclick="logout()" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; margin-top: 1rem; cursor: pointer;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-message">
+                <h1>Welcome back, <span id="parent-name-header">Parent</span>!</h1>
+                <p>Here's the latest update on your patients' progress</p>
+            </div>
+            <div class="header-actions">
+                <button style="background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer;">
+                    <i class="fas fa-plus"></i> Add Patient
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-number">87%</div>
+                <div class="stat-label">Average Completion</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-number">24</div>
+                <div class="stat-label">Sessions Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number">12h</div>
+                <div class="stat-label">Total Engagement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-number">+18%</div>
+                <div class="stat-label">This Week's Progress</div>
+            </div>
+        </div>
+
+        <!-- Patients Section -->
+        <div class="patients-section">
+            <div class="section-header">
+                <h2 class="section-title">Your Patients</h2>
+                <span style="color: var(--text-light);">3 Patients</span>
+            </div>
+            <div class="patients-grid" id="patients-container">
+                <!-- Patients will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="activity-section">
+            <div class="section-header">
+                <h2 class="section-title">Recent Activity</h2>
+            </div>
+            <ul class="activity-list">
+                <li class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Memory Game Completed</h4>
+                        <p>John scored 85% in the memory challenge</p>
+                    </div>
+                    <div class="activity-time">2 hours ago</div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Eye Tracking Session</h4>
+                        <p>Sarah showed improved focus duration</p>
+                    </div>
+                    <div class="activity-time">5 hours ago</div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Progress Report Generated</h4>
+                        <p>Weekly progress report is available</p>
+                    </div>
+                    <div class="activity-time">1 day ago</div>
+                </li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Accessibility Menu -->
+    <div class="accessibility-menu">
+        <button class="accessibility-toggle" onclick="toggleAccessibilityMenu()">
+            <i class="fas fa-universal-access"></i>
+        </button>
+        <div class="accessibility-options" id="accessibility-options">
+            <button onclick="toggleHighContrast()" id="high-contrast-btn">High Contrast</button>
+            <button onclick="toggleReadAloud()" id="read-aloud-btn">Read Aloud</button>
+            <button onclick="reduceAnimations()" id="reduce-motions-btn">Reduce Motions</button>
+            <button onclick="increaseFontSize()">Larger Text</button>
+            <button onclick="decreaseFontSize()">Smaller Text</button>
+        </div>
+    </div>
+
+    <script>
+        // Load user data
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        const token = localStorage.getItem('authToken');
+
+        if (!token || userData.userType !== 'parent') {
+            window.location.href = 'loginpage.html';
+        }
+
+        // Update UI with user data
+        document.querySelectorAll('#parent-name, #parent-name-header').forEach(el => {
+            el.textContent = userData.name || 'Parent';
+        });
+        document.getElementById('parent-email').textContent = userData.email || '';
+
+        // Load patients
+        async function loadPatients() {
+            try {
+                const response = await fetch(`http://localhost:5000/api/relationships/parent-patients/${userData.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const patients = await response.json();
+                    const container = document.getElementById('patients-container');
+                    
+                    if (patients.length === 0) {
+                        container.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-light);">
+                                <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <h3>No Patients Yet</h3>
+                                <p>Patients will appear here when they register with your email</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = patients.map(patient => `
+                        <div class="patient-card">
+                            <div class="patient-header">
+                                <div class="patient-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="patient-info">
+                                    <h3>${patient.name}</h3>
+                                    <p>${patient.email}</p>
+                                </div>
+                            </div>
+                            <div class="patient-stats">
+                                <div class="patient-stat">
+                                    <div class="patient-stat-number">${Math.floor(Math.random() * 100)}%</div>
+                                    <div class="patient-stat-label">Progress</div>
+                                </div>
+                                <div class="patient-stat">
+                                    <div class="patient-stat-number">${Math.floor(Math.random() * 20)}</div>
+                                    <div class="patient-stat-label">Sessions</div>
+                                </div>
+                            </div>
+                            <button onclick="viewPatient('${patient._id}')" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 0.5rem 1rem; border-radius: 8px; margin-top: 1rem; width: 100%; cursor: pointer;">
+                                View Progress
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading patients:', error);
+            }
+        }
+
+        // Load patients on page load
+        loadPatients();
+
+        // Add your existing accessibility functions here...
+        // [Include all the accessibility functions from previous implementation]
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('loginTime');
+            window.location.href = 'loginpage.html';
+        }
+
+        function viewPatient(patientId) {
+            window.location.href = `patient-progress.html?patientId=${patientId}`;
+        }
+    </script>
+</body>
+</html>

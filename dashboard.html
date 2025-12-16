@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - ASD Support Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --animation-duration: 0.3s;
+            --primary-color: #4a8db7;
+            --secondary-color: #3a7ca5;
+            --background-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: #ffffff;
+        }
+
+        .high-contrast {
+            --primary-color: #000000;
+            --secondary-color: #333333;
+            --background-color: #000000;
+            --text-color: #ffffff;
+            --card-bg: #222222;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all var(--animation-duration) ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, var(--background-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: var(--secondary-color);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Main Content */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .welcome-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Activities Section */
+        .activities-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .activity-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Games Section */
+        .games-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Accessibility Menu */
+        .accessibility-menu {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-radius: 50px;
+            padding: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .accessibility-toggle {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .accessibility-options {
+            display: none;
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 200px;
+        }
+
+        .accessibility-options.show {
+            display: block;
+        }
+
+        .accessibility-options button {
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 5px;
+            background: #e0e0e0;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .accessibility-options button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .activity-grid, .game-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .reduced-motion * {
+            transition: none !important;
+            animation: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-brain"></i> ASD Support Platform
+        </div>
+        
+        <div class="nav-links">
+            <a href="#dashboard"><i class="fas fa-home"></i> Home</a>
+            <a href="#activities"><i class="fas fa-gamepad"></i> Activities</a>
+            <a href="#games"><i class="fas fa-puzzle-piece"></i> Games</a>
+            <a href="#messages"><i class="fas fa-comments"></i> Messages</a>
+        </div>
+
+        <div class="user-menu">
+            <span id="user-name">Welcome, User</span>
+            <button onclick="logout()" style="background: none; border: none; color: white; cursor: pointer;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="welcome-icon">
+                <i class="fas fa-smile"></i>
+            </div>
+            <h1>Hello, <span id="patient-name">Friend</span>!</h1>
+            <p>Ready for some fun activities today? Choose what you'd like to do!</p>
+        </div>
+
+        <!-- Daily Activities Section -->
+        <div class="activities-section">
+            <h2 class="section-title"><i class="fas fa-calendar-day"></i> Today's Activities</h2>
+            <div class="activity-grid">
+                <div class="activity-card" onclick="startActivity('eye-tracking')">
+                    <div class="activity-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Focus Practice</h3>
+                    <p>Eye tracking exercises</p>
+                </div>
+                <div class="activity-card" onclick="startActivity('breathing')">
+                    <div class="activity-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h3>Calm Breathing</h3>
+                    <p>Relaxation exercises</p>
+                </div>
+                <div class="activity-card" onclick="startActivity('movement')">
+                    <div class="activity-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <h3>Movement Fun</h3>
+                    <p>Physical activities</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Games Section -->
+        <div class="games-section">
+            <h2 class="section-title"><i class="fas fa-gamepad"></i> Learning Games</h2>
+            <div class="game-grid">
+                <div class="game-card" onclick="startGame('memory')">
+                    <div class="game-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Memory Match</h3>
+                    <p>Find matching pairs</p>
+                </div>
+                <div class="game-card" onclick="startGame('puzzle')">
+                    <div class="game-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>Pattern Puzzles</h3>
+                    <p>Complete the pattern</p>
+                </div>
+                <div class="game-card" onclick="startGame('colors')">
+                    <div class="game-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Color World</h3>
+                    <p>Sort and match colors</p>
+                </div>
+                <div class="game-card" onclick="startGame('sounds')">
+                    <div class="game-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3>Sound Explorer</h3>
+                    <p>Identify different sounds</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accessibility Menu -->
+    <div class="accessibility-menu">
+        <button class="accessibility-toggle" onclick="toggleAccessibilityMenu()">
+            <i class="fas fa-universal-access"></i>
+        </button>
+        <div class="accessibility-options" id="accessibility-options">
+            <button onclick="toggleHighContrast()" id="high-contrast-btn">High Contrast</button>
+            <button onclick="toggleReadAloud()" id="read-aloud-btn">Read Aloud</button>
+            <button onclick="reduceAnimations()" id="reduce-motions-btn">Reduce Animations</button>
+            <button onclick="increaseFontSize()">Larger Text</button>
+            <button onclick="decreaseFontSize()">Smaller Text</button>
+        </div>
+    </div>
+
+    <script>
+        // Accessibility Settings
+        let accessibilitySettings = {
+            highContrast: false,
+            readAloud: false,
+            reducedMotion: false,
+            fontSize: 100
+        };
+
+        // Load user data
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        const token = localStorage.getItem('authToken');
+
+        if (!token || userData.userType !== 'patient') {
+            window.location.href = 'loginpage.html';
+        }
+
+        // Update UI with user data
+        document.getElementById('patient-name').textContent = userData.name || 'Friend';
+        document.getElementById('user-name').textContent = `Welcome, ${userData.name || 'User'}`;
+
+        // Load accessibility settings
+        function loadAccessibilitySettings() {
+            const saved = localStorage.getItem('accessibilitySettings');
+            if (saved) {
+                accessibilitySettings = JSON.parse(saved);
+                applyAccessibilitySettings();
+            }
+        }
+
+        // Apply accessibility settings
+        function applyAccessibilitySettings() {
+            // High contrast
+            if (accessibilitySettings.highContrast) {
+                document.body.classList.add('high-contrast');
+            } else {
+                document.body.classList.remove('high-contrast');
+            }
+
+            // Reduced motion
+            if (accessibilitySettings.reducedMotion) {
+                document.body.classList.add('reduced-motion');
+            } else {
+                document.body.classList.remove('reduced-motion');
+            }
+
+            // Font size
+            document.body.style.fontSize = accessibilitySettings.fontSize + '%';
+
+            // Update button states
+            updateAccessibilityButtonStates();
+        }
+
+        // Update button states
+        function updateAccessibilityButtonStates() {
+            const buttons = {
+                'high-contrast-btn': 'highContrast',
+                'read-aloud-btn': 'readAloud',
+                'reduce-motions-btn': 'reducedMotion'
+            };
+
+            Object.keys(buttons).forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    if (accessibilitySettings[buttons[btnId]]) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        // Accessibility functions
+        function toggleHighContrast() {
+            accessibilitySettings.highContrast = !accessibilitySettings.highContrast;
+            applyAccessibilitySettings();
+            saveAccessibilitySettings();
+        }
+
+        function toggleReadAloud() {
+            accessibilitySettings.readAloud = !accessibilitySettings.readAloud;
+            
+            if (accessibilitySettings.readAloud && 'speechSynthesis' in window) {
+                const text = "Welcome to your activities. Choose what you would like to play today.";
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.rate = 0.8;
+                window.speechSynthesis.speak(speech);
+            } else {
+                window.speechSynthesis.cancel();
+            }
+            
+            saveAccessibilitySettings();
+            updateAccessibilityButtonStates();
+        }
+
+        function reduceAnimations() {
+            accessibilitySettings.reducedMotion = !accessibilitySettings.reducedMotion;
+            applyAccessibilitySettings();
+            saveAccessibilitySettings();
+        }
+
+        function increaseFontSize() {
+            accessibilitySettings.fontSize = Math.min(150, accessibilitySettings.fontSize + 10);
+            applyAccessibilitySettings();
+            saveAccessibilitySettings();
+        }
+
+        function decreaseFontSize() {
+            accessibilitySettings.fontSize = Math.max(80, accessibilitySettings.fontSize - 10);
+            applyAccessibilitySettings();
+            saveAccessibilitySettings();
+        }
+
+        function toggleAccessibilityMenu() {
+            const options = document.getElementById('accessibility-options');
+            options.classList.toggle('show');
+        }
+
+        function saveAccessibilitySettings() {
+            localStorage.setItem('accessibilitySettings', JSON.stringify(accessibilitySettings));
+        }
+
+        // Activity functions
+        function startActivity(activityType) {
+            const activities = {
+                'eye-tracking': 'Focus Practice with eye tracking',
+                'breathing': 'Calm Breathing exercises',
+                'movement': 'Movement Fun activities'
+            };
+            alert(`Starting ${activities[activityType]}...`);
+            // Implement activity starting logic here
+        }
+
+        function startGame(gameType) {
+            const games = {
+                'memory': 'Memory Match game',
+                'puzzle': 'Pattern Puzzles game',
+                'colors': 'Color World game',
+                'sounds': 'Sound Explorer game'
+            };
+            alert(`Starting ${games[gameType]}...`);
+            // Implement game starting logic here
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('loginTime');
+            window.location.href = 'loginpage.html';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAccessibilitySettings();
+            
+            // Close accessibility menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const options = document.getElementById('accessibility-options');
+                const toggle = document.querySelector('.accessibility-toggle');
+                
+                if (options && toggle && !options.contains(event.target) && !toggle.contains(event.target)) {
+                    options.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
