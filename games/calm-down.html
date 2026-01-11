@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calm Down Time - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #e91e63;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e91e63, #f06292);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Breathing Exercise */
+        .breathing-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+            transition: all 4s ease-in-out;
+        }
+
+        .breathing-circle.inhale {
+            transform: scale(1.3);
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            box-shadow: 0 12px 35px rgba(72, 219, 251, 0.4);
+        }
+
+        .breathing-circle.hold {
+            transform: scale(1.3);
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            box-shadow: 0 12px 35px rgba(254, 202, 87, 0.4);
+        }
+
+        .breathing-circle.exhale {
+            transform: scale(1);
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .breathing-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            min-height: 2rem;
+        }
+
+        .breathing-instruction {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Calming Activities */
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(233, 30, 99, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .activity-card:hover::before {
+            left: 100%;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #e91e63;
+        }
+
+        .activity-card.completed {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            transform: scale(1.02);
+        }
+
+        .activity-icon {
+            font-size: 3rem;
+            color: #e91e63;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .activity-card:hover .activity-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .activity-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* Emotion Selector */
+        .emotion-selector {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .emotion-selector h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .emotion-options {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .emotion-btn {
+            padding: 0.8rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .emotion-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .emotion-btn.selected {
+            background: linear-gradient(135deg, #e91e63, #f06292);
+            color: white;
+            border-color: #e91e63;
+            transform: scale(1.05);
+        }
+
+        .emotion-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e91e63, #f06292);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .breathing-circle {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+
+            .activities-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .emotion-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-heart"></i>
+            <h1>Calm Down Time</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Calm Down Together!</h2>
+                <p>Choose activities to help you feel calm and peaceful</p>
+            </div>
+
+            <div class="emotion-selector">
+                <h3>How are you feeling right now?</h3>
+                <div class="emotion-options">
+                    <button class="emotion-btn" onclick="selectEmotion('sad', 'fa-sad-tear', '#3498db')">
+                        <i class="fas fa-sad-tear emotion-icon"></i> Sad
+                    </button>
+                    <button class="emotion-btn" onclick="selectEmotion('angry', 'fa-angry', '#e74c3c')">
+                        <i class="fas fa-angry emotion-icon"></i> Angry
+                    </button>
+                    <button class="emotion-btn" onclick="selectEmotion('worried', 'fa-meh', '#f39c12')">
+                        <i class="fas fa-meh emotion-icon"></i> Worried
+                    </button>
+                    <button class="emotion-btn" onclick="selectEmotion('excited', 'fa-laugh', '#27ae60')">
+                        <i class="fas fa-laugh emotion-icon"></i> Excited
+                    </button>
+                </div>
+            </div>
+
+            <div class="breathing-container">
+                <div class="breathing-circle" id="breathingCircle">
+                    <i class="fas fa-wind"></i>
+                </div>
+                <div class="breathing-text" id="breathingText">Ready to breathe</div>
+                <div class="breathing-instruction" id="breathingInstruction">
+                    Click "Start Breathing" to begin your calm down exercise
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="activities-grid" id="activitiesGrid">
+                <!-- Activities will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="breatheBtn" onclick="startBreathing()">
+                    <i class="fas fa-wind"></i> Start Breathing
+                </button>
+                <button class="btn btn-secondary" onclick="nextActivity()">
+                    <i class="fas fa-arrow-right"></i> Next Activity
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 6,
+            currentRound: 0,
+            currentEmotion: null,
+            completedActivities: [],
+            breathingActive: false,
+            breathingPhase: 'ready',
+            activities: [
+                {
+                    id: 'hug',
+                    title: 'Get a Hug',
+                    description: 'Ask someone for a warm hug',
+                    icon: 'fa-hands-holding-heart',
+                    color: '#e91e63',
+                    points: 15
+                },
+                {
+                    id: 'music',
+                    title: 'Listen to Music',
+                    description: 'Play your favorite calm song',
+                    icon: 'fa-music',
+                    color: '#9c27b0',
+                    points: 10
+                },
+                {
+                    id: 'water',
+                    title: 'Drink Water',
+                    description: 'Take slow sips of cool water',
+                    icon: 'fa-tint',
+                    color: '#2196f3',
+                    points: 5
+                },
+                {
+                    id: 'stretch',
+                    title: 'Gentle Stretches',
+                    description: 'Reach up high and stretch slowly',
+                    icon: 'fa-child-reaching',
+                    color: '#4caf50',
+                    points: 10
+                },
+                {
+                    id: 'count',
+                    title: 'Count to Ten',
+                    description: 'Slowly count from 1 to 10',
+                    icon: 'fa-sort-numeric-up',
+                    color: '#ff9800',
+                    points: 5
+                },
+                {
+                    id: 'draw',
+                    title: 'Draw Feelings',
+                    description: 'Draw how you feel right now',
+                    icon: 'fa-paint-brush',
+                    color: '#795548',
+                    points: 15
+                },
+                {
+                    id: 'quiet',
+                    title: 'Quiet Time',
+                    description: 'Sit quietly for one minute',
+                    icon: 'fa-volume-mute',
+                    color: '#607d8b',
+                    points: 10
+                },
+                {
+                    id: 'bubble',
+                    title: 'Blow Bubbles',
+                    description: 'Blow gentle bubbles and watch them float',
+                    icon: 'fa-circle',
+                    color: '#00bcd4',
+                    points: 15
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            generateActivities();
+        }
+
+        // Select Emotion
+        function selectEmotion(emotion, icon, color) {
+            gameState.currentEmotion = emotion;
+            
+            // Update emotion buttons
+            document.querySelectorAll('.emotion-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.emotion-btn').classList.add('selected');
+            
+            // Update breathing circle color
+            const breathingCircle = document.getElementById('breathingCircle');
+            breathingCircle.style.background = `linear-gradient(135deg, ${color}, ${color}dd)`;
+            
+            // Show feedback
+            showFeedback(`It's okay to feel ${emotion}. Let's help you feel better!`, 'info');
+            
+            updateScore(5); // Points for identifying emotion
+        }
+
+        // Start Breathing Exercise
+        function startBreathing() {
+            if (gameState.breathingActive) return;
+            
+            gameState.breathingActive = true;
+            const breathingCircle = document.getElementById('breathingCircle');
+            const breathingText = document.getElementById('breathingText');
+            const breathingInstruction = document.getElementById('breathingInstruction');
+            const breatheBtn = document.getElementById('breatheBtn');
+            
+            breatheBtn.disabled = true;
+            breatheBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Breathing...';
+            
+            // Breathing cycle: Inhale (4s) -> Hold (4s) -> Exhale (4s)
+            let phase = 0;
+            const phases = [
+                { name: 'inhale', text: 'Breathe In', instruction: 'Slowly breathe in through your nose', duration: 4000 },
+                { name: 'hold', text: 'Hold', instruction: 'Hold your breath gently', duration: 4000 },
+                { name: 'exhale', text: 'Breathe Out', instruction: 'Slowly breathe out through your mouth', duration: 4000 }
+            ];
+            
+            function runBreathingPhase() {
+                if (phase >= phases.length) {
+                    // Complete one full breathing cycle
+                    gameState.breathingActive = false;
+                    breathingCircle.className = 'breathing-circle';
+                    breathingText.textContent = 'Great job!';
+                    breathingInstruction.textContent = 'You completed a breathing exercise!';
+                    breatheBtn.disabled = false;
+                    breatheBtn.innerHTML = '<i class="fas fa-wind"></i> Start Breathing';
+                    
+                    showFeedback('Excellent breathing! You are doing great!', 'success');
+                    updateScore(20); // Points for completing breathing
+                    return;
+                }
+                
+                const currentPhase = phases[phase];
+                breathingCircle.className = `breathing-circle ${currentPhase.name}`;
+                breathingText.textContent = currentPhase.text;
+                breathingInstruction.textContent = currentPhase.instruction;
+                
+                phase++;
+                setTimeout(runBreathingPhase, currentPhase.duration);
+            }
+            
+            runBreathingPhase();
+        }
+
+        // Generate Activities
+        function generateActivities() {
+            const activitiesGrid = document.getElementById('activitiesGrid');
+            activitiesGrid.innerHTML = '';
+            
+            // Shuffle activities for variety
+            const shuffledActivities = [...gameState.activities].sort(() => Math.random() - 0.5);
+            
+            // Display 4 random activities
+            const selectedActivities = shuffledActivities.slice(0, 4);
+            
+            selectedActivities.forEach(activity => {
+                const activityCard = document.createElement('div');
+                activityCard.className = 'activity-card';
+                activityCard.onclick = () => completeActivity(activity);
+                
+                if (gameState.completedActivities.includes(activity.id)) {
+                    activityCard.classList.add('completed');
+                }
+                
+                activityCard.innerHTML = `
+                    <div class="activity-icon">
+                        <i class="fas ${activity.icon}"></i>
+                    </div>
+                    <div class="activity-title">${activity.title}</div>
+                    <div class="activity-description">${activity.description}</div>
+                `;
+                
+                activitiesGrid.appendChild(activityCard);
+            });
+        }
+
+        // Complete Activity
+        function completeActivity(activity) {
+            if (gameState.completedActivities.includes(activity.id)) return;
+            
+            gameState.completedActivities.push(activity.id);
+            
+            // Update card styling
+            event.target.closest('.activity-card').classList.add('completed');
+            
+            // Show feedback
+            showFeedback(`Great job! ${activity.title} helps you feel calm!`, 'success');
+            
+            // Update score
+            updateScore(activity.points);
+            
+            // Track progress
+            trackProgress(activity);
+        }
+
+        // Next Activity Set
+        function nextActivity() {
+            gameState.currentRound++;
+            
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            
+            // Reset completed activities for new round
+            gameState.completedActivities = [];
+            
+            // Generate new activities
+            generateActivities();
+            
+            hideFeedback();
+        }
+
+        // Update Score
+        function updateScore(points) {
+            gameState.score += points;
+            updateStats();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = message;
+            feedback.className = `feedback ${type} show`;
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 3000);
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(activity) {
+            const progressData = {
+                gameName: 'Calm Down Time',
+                round: gameState.currentRound + 1,
+                emotion: gameState.currentEmotion,
+                activity: activity.title,
+                points: activity.points,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Calm Down Time Complete!</h2>
+                    <p>You did an amazing job learning to calm down!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💖</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Calm Points</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.totalRounds}</div>
+                            <div style="color: #718096;">Rounds</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${gameState.score >= 100 ? 'Amazing! You are a calm-down expert!' : 
+                              gameState.score >= 50 ? 'Great job! You learned many calming strategies!' :
+                              'Nice work! Calming down takes practice, keep learning!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Remember these calming activities for when you need them!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(totalTime) {
+            const results = {
+                gameName: 'Calm Down Time',
+                finalScore: gameState.score,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

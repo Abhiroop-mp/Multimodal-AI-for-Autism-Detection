@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routine Building - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #4ECDC4;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ECDC4, #44A08D);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Visual Styles for Toddlers */
+        .routine-scenario {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 4px solid #f6ad55;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 8px 25px rgba(246, 173, 85, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .routine-scenario::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 20%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-20px, -20px) rotate(180deg); }
+        }
+
+        .scenario-icon {
+            font-size: 4rem;
+            color: #d69e2e;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: bounce 2s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .scenario-text {
+            font-size: 1.4rem;
+            color: #92400e;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .routine-question {
+            font-size: 1.2rem;
+            color: #78350f;
+            margin-top: 1rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Enhanced Routine Steps */
+        .routine-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .routine-step {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #4a5568;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .routine-step.empty {
+            border: 3px dashed #cbd5e0;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); border-color: #cbd5e0; }
+            50% { transform: scale(1.05); border-color: #4ECDC4; }
+        }
+
+        .routine-step.filled {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .routine-step.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .routine-step.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(78, 205, 196, 0.4);
+            border: 2px solid white;
+        }
+
+        /* Enhanced Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+
+        .routine-option {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .routine-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(78, 205, 196, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .routine-option:hover::before {
+            left: 100%;
+        }
+
+        .routine-option:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            border-color: #4ECDC4;
+        }
+
+        .routine-option.selected {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-color: #f6ad55;
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(246, 173, 85, 0.3);
+        }
+
+        .routine-option.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+            box-shadow: 0 12px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        .routine-option.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+            box-shadow: 0 12px 30px rgba(220, 53, 69, 0.3);
+        }
+
+        .option-icon {
+            font-size: 3.5rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .routine-option:hover .option-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .option-text {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, #f6ad55, #ed8936);
+            color: white;
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(246, 173, 85, 0.4);
+        }
+
+        /* Animations */
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Routine Instructions */
+        .routine-instructions {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .routine-instructions i {
+            color: #4ECDC4;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .routine-steps {
+                gap: 0.5rem;
+            }
+
+            .routine-step {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-clock"></i>
+            <h1>Routine Building</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Build Routines!</h2>
+                <p>Put the daily activities in the right order</p>
+            </div>
+
+            <div class="routine-instructions">
+                <i class="fas fa-list-ol"></i>
+                <p>Drag and drop the activities to make the correct daily routine</p>
+            </div>
+
+            <div class="routine-display">
+                <div class="routine-scenario">
+                    <div class="scenario-icon" id="scenarioIcon">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <div class="scenario-text" id="scenarioText">Morning Routine</div>
+                    <div class="routine-question">Put these activities in the right order:</div>
+                </div>
+            </div>
+
+            <div class="routine-steps" id="routineSteps">
+                <!-- Routine steps will be generated by JavaScript -->
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="options-grid" id="optionsGrid">
+                <!-- Options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()">
+                    <i class="fas fa-check"></i> Check Answer
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextRound()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State - More Variety for Toddlers
+        let gameState = {
+            currentRound: 0,
+            score: 0,
+            level: 1,
+            totalRounds: 8,
+            correctAnswers: 0,
+            currentRoutine: null,
+            selectedSteps: [],
+            usedRoutines: [], // Track used routines to avoid repetition
+            isAnswered: false,
+            startTime: Date.now(),
+            roundStartTime: Date.now()
+        };
+
+        /* Expanded Routines Data - Unique Questions for Each Round! */
+        const routines = [
+            {
+                name: 'Morning Time',
+                icon: 'fa-sun',
+                color: '#f6ad55',
+                steps: [
+                    { icon: 'fa-bed', text: 'Wake up', order: 1 },
+                    { icon: 'fa-utensils', text: 'Eat breakfast', order: 2 }
+                ]
+            },
+            {
+                name: 'Getting Ready',
+                icon: 'fa-shirt',
+                color: '#3182ce',
+                steps: [
+                    { icon: 'fa-tshirt', text: 'Get dressed', order: 1 },
+                    { icon: 'fa-shoe-prints', text: 'Put on shoes', order: 2 }
+                ]
+            },
+            {
+                name: 'Bedtime',
+                icon: 'fa-moon',
+                color: '#4299e1',
+                steps: [
+                    { icon: 'fa-tooth', text: 'Brush teeth', order: 1 },
+                    { icon: 'fa-bed', text: 'Go to sleep', order: 2 }
+                ]
+            },
+            {
+                name: 'Story Time',
+                icon: 'fa-book',
+                color: '#805ad5',
+                steps: [
+                    { icon: 'fa-book-open', text: 'Read book', order: 1 },
+                    { icon: 'fa-bed', text: 'Go to bed', order: 2 }
+                ]
+            },
+            {
+                name: 'Play Time',
+                icon: 'fa-gamepad',
+                color: '#48bb78',
+                steps: [
+                    { icon: 'fa-box', text: 'Get toys', order: 1 },
+                    { icon: 'fa-smile', text: 'Play fun', order: 2 }
+                ]
+            },
+            {
+                name: 'Clean Up',
+                icon: 'fa-broom',
+                color: '#ed8936',
+                steps: [
+                    { icon: 'fa-puzzle-piece', text: 'Play with toys', order: 1 },
+                    { icon: 'fa-box-open', text: 'Put away toys', order: 2 }
+                ]
+            },
+            {
+                name: 'Meal Time',
+                icon: 'fa-utensils',
+                color: '#9f7aea',
+                steps: [
+                    { icon: 'fa-hands-wash', text: 'Wash hands', order: 1 },
+                    { icon: 'fa-utensils', text: 'Eat yummy', order: 2 }
+                ]
+            },
+            {
+                name: 'Snack Time',
+                icon: 'fa-cookie',
+                color: '#f56565',
+                steps: [
+                    { icon: 'fa-chair', text: 'Sit at table', order: 1 },
+                    { icon: 'fa-cookie-bite', text: 'Eat snack', order: 2 }
+                ]
+            },
+            {
+                name: 'Bath Time',
+                icon: 'fa-bath',
+                color: '#38b2ac',
+                steps: [
+                    { icon: 'fa-tshirt', text: 'Take off clothes', order: 1 },
+                    { icon: 'fa-shower', text: 'Take bath', order: 2 }
+                ]
+            },
+            {
+                name: 'Getting Clean',
+                icon: 'fa-soap',
+                color: '#4299e1',
+                steps: [
+                    { icon: 'fa-shower', text: 'Wash body', order: 1 },
+                    { icon: 'fa-towel', text: 'Dry with towel', order: 2 }
+                ]
+            },
+            {
+                name: 'School Time',
+                icon: 'fa-school',
+                color: '#319795',
+                steps: [
+                    { icon: 'fa-backpack', text: 'Pack school bag', order: 1 },
+                    { icon: 'fa-bus', text: 'Go to school', order: 2 }
+                ]
+            },
+            {
+                name: 'Learning Time',
+                icon: 'fa-graduation-cap',
+                color: '#805ad5',
+                steps: [
+                    { icon: 'fa-pencil', text: 'Do homework', order: 1 },
+                    { icon: 'fa-check', text: 'Finish work', order: 2 }
+                ]
+            }
+        ];
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewRound();
+        }
+
+        // Start New Round - Unique Routines Each Time!
+        function startNewRound() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            gameState.isAnswered = false;
+            gameState.selectedSteps = [];
+            gameState.roundStartTime = Date.now();
+            
+            // Select unique routine (avoid repetition)
+            const availableRoutines = routines.filter(r => !gameState.usedRoutines.includes(r.name));
+            let selectedRoutine;
+            
+            if (availableRoutines.length > 0) {
+                selectedRoutine = availableRoutines[Math.floor(Math.random() * availableRoutines.length)];
+            } else {
+                // If all routines used, reset and pick randomly
+                gameState.usedRoutines = [];
+                selectedRoutine = routines[Math.floor(Math.random() * routines.length)];
+            }
+            
+            gameState.currentRoutine = selectedRoutine;
+            gameState.usedRoutines.push(selectedRoutine.name);
+            
+            // Update routine display
+            updateRoutineDisplay();
+            
+            // Generate routine steps
+            generateRoutineSteps();
+            
+            // Generate options
+            generateOptions();
+            
+            // Hide feedback
+            hideFeedback();
+            
+            // Show check button, hide next button
+            document.getElementById('checkBtn').style.display = 'inline-flex';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // Update Routine Display
+        function updateRoutineDisplay() {
+            const scenarioIcon = document.getElementById('scenarioIcon');
+            const scenarioText = document.getElementById('scenarioText');
+            
+            scenarioIcon.innerHTML = `<i class="fas ${gameState.currentRoutine.icon}"></i>`;
+            scenarioText.textContent = gameState.currentRoutine.name;
+        }
+
+        // Generate Routine Steps - Simplified for 2 Steps
+        function generateRoutineSteps() {
+            const routineSteps = document.getElementById('routineSteps');
+            routineSteps.innerHTML = '';
+            
+            // Create 2 empty slots for the routine
+            for (let i = 0; i < 2; i++) {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'routine-step empty';
+                stepDiv.dataset.position = i;
+                stepDiv.onclick = () => removeFromSlot(i);
+                routineSteps.appendChild(stepDiv);
+            }
+        }
+
+        // Generate Options
+        function generateOptions() {
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            // Shuffle the steps for options
+            const shuffledSteps = [...gameState.currentRoutine.steps].sort(() => Math.random() - 0.5);
+            
+            // Create option elements
+            shuffledSteps.forEach((step, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'routine-option';
+                optionDiv.dataset.step = JSON.stringify(step);
+                optionDiv.onclick = () => selectStep(step, optionDiv);
+                
+                optionDiv.innerHTML = `
+                    <div class="option-icon">
+                        <i class="fas ${step.icon}"></i>
+                    </div>
+                    <div class="option-text">${step.text}</div>
+                `;
+                
+                optionsGrid.appendChild(optionDiv);
+            });
+        }
+
+        // Select Step
+        function selectStep(step, element) {
+            if (gameState.isAnswered) return;
+            
+            // Check if step is already selected
+            if (gameState.selectedSteps.find(s => s.order === step.order)) {
+                return;
+            }
+            
+            // Find first empty slot
+            const emptySlots = document.querySelectorAll('.routine-step.empty');
+            if (emptySlots.length === 0) {
+                return;
+            }
+            
+            const emptySlot = emptySlots[0];
+            const position = parseInt(emptySlot.dataset.position);
+            
+            // Add step to selected steps
+            gameState.selectedSteps.push({ ...step, position });
+            
+            // Update slot
+            emptySlot.className = 'routine-step filled';
+            emptySlot.innerHTML = `
+                <div class="step-number">${position + 1}</div>
+                <i class="fas ${step.icon}"></i>
+            `;
+            emptySlot.dataset.step = JSON.stringify(step);
+            
+            // Update option styling
+            element.classList.add('selected');
+            element.onclick = null;
+            
+            // Enable check button if all slots are filled
+            if (gameState.selectedSteps.length === 2) {
+                document.getElementById('checkBtn').style.display = 'inline-flex';
+            }
+        }
+
+        // Remove from Slot
+        function removeFromSlot(position) {
+            if (gameState.isAnswered) return;
+            
+            const slot = document.querySelector(`[data-position="${position}"]`);
+            if (!slot.dataset.step) return;
+            
+            const step = JSON.parse(slot.dataset.step);
+            
+            // Remove from selected steps
+            gameState.selectedSteps = gameState.selectedSteps.filter(s => s.order !== step.order);
+            
+            // Clear slot
+            slot.className = 'routine-step empty';
+            slot.innerHTML = '';
+            delete slot.dataset.step;
+            
+            // Re-enable option
+            const options = document.querySelectorAll('.routine-option');
+            options.forEach(option => {
+                const optionStep = JSON.parse(option.dataset.step);
+                if (optionStep.order === step.order) {
+                    option.classList.remove('selected');
+                    option.onclick = () => selectStep(optionStep, option);
+                }
+            });
+        }
+
+        // Check Answer - Simplified for 2 Steps
+        function checkAnswer() {
+            if (gameState.isAnswered || gameState.selectedSteps.length !== 2) return;
+            
+            gameState.isAnswered = true;
+            const roundTime = Date.now() - gameState.roundStartTime;
+            
+            // Check if order is correct
+            const isCorrect = gameState.selectedSteps.every(step => step.order === step.position + 1);
+            
+            // Update step styling
+            const slots = document.querySelectorAll('.routine-step');
+            slots.forEach((slot, index) => {
+                if (slot.dataset.step) {
+                    const step = JSON.parse(slot.dataset.step);
+                    if (step.order === index + 1) {
+                        slot.classList.add('correct');
+                    } else {
+                        slot.classList.add('incorrect');
+                    }
+                }
+            });
+            
+            // Update option styling
+            const options = document.querySelectorAll('.routine-option');
+            options.forEach(option => {
+                const step = JSON.parse(option.dataset.step);
+                if (isCorrect) {
+                    option.classList.add('correct');
+                } else {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Update score
+            if (isCorrect) {
+                gameState.correctAnswers++;
+                gameState.score += calculateScore(roundTime);
+            }
+            
+            // Show feedback
+            showFeedback(isCorrect);
+            
+            // Update stats
+            updateStats();
+            
+            // Show next button, hide check button
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            
+            // Track progress
+            trackProgress(isCorrect, roundTime);
+        }
+
+        // Calculate Score
+        function calculateScore(timeMs) {
+            const baseScore = 100;
+            const timeBonus = Math.max(0, 50 - Math.floor(timeMs / 1000)); // Up to 50 bonus points for speed
+            return baseScore + timeBonus;
+        }
+
+        // Show Feedback
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = `
+                    <div>🎉 Perfect! You got the routine right!</div>
+                    <small>Great job understanding daily routines!</small>
+                `;
+                feedback.className = 'feedback correct show';
+            } else {
+                feedback.innerHTML = `
+                    <div>Not quite right. Let's try again! 💪</div>
+                    <small>Think about what you do first in your routine</small>
+                `;
+                feedback.className = 'feedback incorrect show';
+            }
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+        }
+
+        // Next Round
+        function nextRound() {
+            gameState.currentRound++;
+            startNewRound();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Track Progress
+        function trackProgress(isCorrect, timeMs) {
+            // This would normally save to database
+            const progressData = {
+                gameName: 'Routine Building',
+                round: gameState.currentRound + 1,
+                routine: gameState.currentRoutine.name,
+                isCorrect: isCorrect,
+                timeMs: timeMs,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const accuracy = (gameState.correctAnswers / gameState.totalRounds) * 100;
+            const totalTime = Date.now() - gameState.startTime;
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Game Complete!</h2>
+                    <p>Great job building daily routines!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Accuracy</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Total Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Amazing! You understand routines perfectly!' : 
+                              accuracy >= 60 ? 'Great job! You know your daily routines well!' :
+                              'Nice work! Routine building takes practice, keep learning!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Understanding routines helps with predictability and daily life skills!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(accuracy, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(accuracy, totalTime) {
+            const results = {
+                gameName: 'Routine Building',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                correctAnswers: gameState.correctAnswers,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "patient-001": [
+    {
+      "id": "d32e51d8-afc4-4018-ab88-8e4e98517e12",
+      "patientId": "patient-001",
+      "sessionType": "therapy",
+      "therapist": "Dr. Smith",
+      "goals": [
+        "Improve social interaction",
+        "Enhance sensory processing"
+      ],
+      "notes": "Test therapy session",
+      "startTime": "2026-01-09T02:17:46.597Z",
+      "status": "completed",
+      "endTime": "2026-01-09T02:17:47.588Z"
+    }
+  ]
+}

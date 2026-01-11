@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem Solving - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #f5576c; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb, #f5576c); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 1000px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .problem-container { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .problem-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .problem-content { font-size: 1.1rem; color: #4a5568; line-height: 1.6; margin-bottom: 1.5rem; min-height: 120px; }
+        .problem-visual { margin: 1.5rem 0; font-size: 3rem; color: #f5576c; }
+        .problem-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .problem-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .problem-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #f5576c; }
+        .problem-option.selected { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-color: #f5576c; transform: scale(1.02); }
+        .problem-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .problem-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .option-icon { font-size: 2.5rem; color: #f5576c; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .problem-option:hover .option-icon { transform: scale(1.2) rotate(10deg); }
+        .option-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .option-description { font-size: 0.9rem; color: #4a5568; line-height: 1.4; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(240,147,251,0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .problem-options { grid-template-columns: 1fr; }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-puzzle-piece"></i>
+            <h1>Problem Solving</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Solve the Problem!</h2>
+                <p>Think carefully and choose the best solution</p>
+            </div>
+
+            <div class="problem-container">
+                <div class="problem-title" id="problemTitle">Math Problem</div>
+                <div class="problem-content" id="problemContent">
+                    Loading problem...
+                </div>
+                <div class="problem-visual" id="problemVisual">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="problem-options" id="problemOptions">
+                <!-- Options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextProblem()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Problem
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, currentProblem: null, isAnswered: false,
+            problems: [
+                {
+                    title: "Math Logic",
+                    content: "If 3 apples cost $6, how much do 5 apples cost?",
+                    visual: "<i class='fas fa-apple-alt'></i>",
+                    options: [
+                        { title: "$8", description: "5 × $2 = $10", icon: "fa-dollar-sign", correct: false },
+                        { title: "$10", description: "5 × $2 = $10", icon: "fa-dollar-sign", correct: true },
+                        { title: "$12", description: "5 × $2.40 = $12", icon: "fa-dollar-sign", correct: false },
+                        { title: "$15", description: "5 × $3 = $15", icon: "fa-dollar-sign", correct: false }
+                    ]
+                },
+                {
+                    title: "Pattern Logic",
+                    content: "A farmer has 17 sheep. All but 9 die. How many are left?",
+                    visual: "<i class='fas fa-sheep'></i>",
+                    options: [
+                        { title: "8", description: "17 - 9 = 8", icon: "fa-hashtag", correct: false },
+                        { title: "9", description: "All but 9 die = 9 left", icon: "fa-hashtag", correct: true },
+                        { title: "17", description: "None actually died", icon: "fa-hashtag", correct: false },
+                        { title: "0", description: "All sheep died", icon: "fa-hashtag", correct: false }
+                    ]
+                },
+                {
+                    title: "Time Problem",
+                    content: "If a train leaves at 3:00 PM and travels for 2.5 hours, when does it arrive?",
+                    visual: "<i class='fas fa-train'></i>",
+                    options: [
+                        { title: "5:00 PM", description: "3:00 + 2 hours = 5:00", icon: "fa-clock", correct: false },
+                        { title: "5:30 PM", description: "3:00 + 2.5 hours = 5:30", icon: "fa-clock", correct: true },
+                        { title: "6:00 PM", description: "3:00 + 3 hours = 6:00", icon: "fa-clock", correct: false },
+                        { title: "4:30 PM", description: "3:00 + 1.5 hours = 4:30", icon: "fa-clock", correct: false }
+                    ]
+                },
+                {
+                    title: "Division Logic",
+                    content: "24 cookies are shared equally among 6 friends. How many cookies does each friend get?",
+                    visual: "<i class='fas fa-cookie'></i>",
+                    options: [
+                        { title: "3", description: "24 ÷ 8 = 3", icon: "fa-cookie-bite", correct: false },
+                        { title: "4", description: "24 ÷ 6 = 4", icon: "fa-cookie-bite", correct: true },
+                        { title: "5", description: "24 ÷ 5 = 4.8", icon: "fa-cookie-bite", correct: false },
+                        { title: "6", description: "24 ÷ 4 = 6", icon: "fa-cookie-bite", correct: false }
+                    ]
+                },
+                {
+                    title: "Age Problem",
+                    content: "Tom is 8 years old. His sister is twice his age. How old will Tom be when his sister is 20?",
+                    visual: "<i class='fas fa-birthday-cake'></i>",
+                    options: [
+                        { title: "12", description: "20 - 8 = 12", icon: "fa-child", correct: true },
+                        { title: "16", description: "8 × 2 = 16", icon: "fa-child", correct: false },
+                        { title: "20", description: "Same as sister", icon: "fa-child", correct: false },
+                        { title: "24", description: "8 + 16 = 24", icon: "fa-child", correct: false }
+                    ]
+                },
+                {
+                    title: "Money Problem",
+                    content: "You have $50. You buy a book for $15 and a toy for $12. How much money is left?",
+                    visual: "<i class='fas fa-wallet'></i>",
+                    options: [
+                        { title: "$23", description: "$50 - $15 - $12 = $23", icon: "fa-money-bill", correct: true },
+                        { title: "$25", description: "$50 - $25 = $25", icon: "fa-money-bill", correct: false },
+                        { title: "$27", description: "$50 - $23 = $27", icon: "fa-money-bill", correct: false },
+                        { title: "$35", description: "$50 - $15 = $35", icon: "fa-money-bill", correct: false }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            startNewProblem();
+        }
+
+        function startNewProblem() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.isAnswered = false;
+            gameState.currentProblem = gameState.problems[gameState.currentRound];
+            updateProblemDisplay();
+            generateOptions();
+            hideFeedback();
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updateProblemDisplay() {
+            const problem = gameState.currentProblem;
+            document.getElementById('problemTitle').textContent = problem.title;
+            document.getElementById('problemContent').textContent = problem.content;
+            document.getElementById('problemVisual').innerHTML = problem.visual;
+        }
+
+        function generateOptions() {
+            const problemOptions = document.getElementById('problemOptions');
+            problemOptions.innerHTML = '';
+            const shuffledOptions = [...gameState.currentProblem.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'problem-option';
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                optionDiv.innerHTML = `
+                    <div class="option-icon"><i class="fas ${option.icon}"></i></div>
+                    <div class="option-title">${option.title}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                problemOptions.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(option, element) {
+            if (gameState.isAnswered) return;
+            gameState.isAnswered = true;
+            const isCorrect = option.correct;
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                document.querySelectorAll('.problem-option').forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentProblem.options.find(o => o.correct).title)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            return 100 + Math.floor(Math.random() * 30);
+        }
+
+        function nextProblem() {
+            gameState.currentRound++;
+            startNewProblem();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Excellent problem solving!</div>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not quite right. Think it through! 🤔</div>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Problem Solving',
+                round: gameState.currentRound + 1,
+                problem: gameState.currentProblem.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 130)) * 100;
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Problem Solving Complete!</h2>
+                    <p>Amazing critical thinking skills!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🧩</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Accuracy</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You are a problem-solving expert!' : 
+                              accuracy >= 60 ? 'Excellent! You solve problems very well!' :
+                              'Good job! Problem solving takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Problem solving helps with math, logic, and critical thinking skills!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            const results = {
+                gameName: 'Problem Solving',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

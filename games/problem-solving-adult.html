@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex Problem Solving - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #f5576c; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb, #f5576c); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 1200px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .problem-challenge { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .challenge-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1.5rem; }
+        .problem-display { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem; min-height: 400px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .problem-content { font-size: 1.5rem; color: #4a5568; text-align: center; line-height: 1.6; }
+        .problem-timer { position: absolute; top: 1rem; right: 1rem; font-size: 1.2rem; font-weight: bold; color: #f5576c; }
+        .problem-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .problem-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .problem-option::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(240,147,251,0.1), transparent); transition: left 0.5s ease; }
+        .problem-option:hover::before { left: 100%; }
+        .problem-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #f5576c; }
+        .problem-option.selected { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-color: #f5576c; transform: scale(1.02); }
+        .problem-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .problem-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .option-icon { font-size: 2rem; color: #f5576c; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .problem-option:hover .option-icon { transform: scale(1.2) rotate(10deg); }
+        .option-text { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .option-description { font-size: 0.9rem; color: #4a5568; line-height: 1.4; }
+        .skills-container { background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; text-align: center; }
+        .skills-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .skill-item { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; text-align: center; transition: all 0.3s ease; }
+        .skill-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .skill-icon { font-size: 1.5rem; color: #f5576c; margin-bottom: 0.5rem; }
+        .skill-name { font-size: 0.9rem; color: #4a5568; font-weight: 600; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(240,147,251,0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .problem-options { grid-template-columns: repeat(2, 1fr); }
+            .skills-grid { grid-template-columns: repeat(2, 1fr); }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-lightbulb"></i>
+            <h1>Complex Problem Solving</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Master Complex Problem Solving!</h2>
+                <p>Solve challenging multi-step problems with strategic thinking</p>
+            </div>
+
+            <div class="problem-challenge">
+                <div class="challenge-title" id="challengeTitle">Strategic Problem Analysis</div>
+                <div class="problem-display">
+                    <div class="problem-content" id="problemContent">
+                        Loading complex problem...
+                    </div>
+                    <div class="problem-timer" id="problemTimer">60s</div>
+                </div>
+            </div>
+
+            <div class="skills-container">
+                <div class="skills-title">Complex Problem Solving Skills Being Trained</div>
+                <div class="skills-grid" id="skillsGrid">
+                    <!-- Skills will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="problem-options" id="problemOptions">
+                <!-- Problem options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="startBtn" onclick="startProblem()">
+                    <i class="fas fa-play"></i> Start Problem
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextProblem()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Problem
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, currentProblem: null, isAnswered: false,
+            problems: [
+                {
+                    title: "Resource Allocation Challenge",
+                    content: "You have limited resources to complete a complex project. Optimize your strategy.",
+                    scenario: "A construction project requires: 10 workers, 5 machines, $5000 budget, 3 weeks deadline. Each decision affects multiple variables.",
+                    skills: ["Strategic Planning", "Resource Management", "Optimization"],
+                    options: [
+                        { text: "Prioritize critical path", description: "Focus on bottleneck tasks first", correct: true },
+                        { text: "Balance all resources", description: "Distribute resources evenly", correct: false },
+                        { text: "Maximize budget usage", description: "Spend all available funds", correct: false },
+                        { text: "Minimize time", description: "Rush completion without quality", correct: false }
+                    ]
+                },
+                {
+                    title: "Multi-Variable Optimization",
+                    content: "Find the optimal solution considering multiple competing factors.",
+                    scenario: "Choose the best investment strategy considering: Risk (High/Med/Low), Return (5-15%), Time (1-5 years), and Liquidity (Immediate/1 year/5 years).",
+                    skills: ["Multi-Criteria Analysis", "Risk Assessment", "Decision Optimization"],
+                    options: [
+                        { text: "Balanced portfolio", description: "Moderate risk, good return, some liquidity", correct: true },
+                        { text: "High risk, high return", description: "Maximum return potential", correct: false },
+                        { text: "Low risk, low return", description: "Conservative approach", correct: false },
+                        { text: "High liquidity", description: "Easy access to funds", correct: false }
+                    ]
+                },
+                {
+                    title: "Network Flow Problem",
+                    content: "Optimize the flow through a complex network with constraints.",
+                    scenario: "Products must flow from 3 suppliers through 2 processing centers to 5 retailers. Each has capacity limits and costs. Minimize total cost while meeting demand.",
+                    skills: ["Network Optimization", "Flow Analysis", "Cost Minimization"],
+                    options: [
+                        { text: "Direct shortest paths", description: "Minimize transportation costs", correct: true },
+                        { text: "Balance loads evenly", description: "Distribute work equally", correct: false },
+                        { text: "Maximize throughput", description: "Process as much as possible", correct: false },
+                        { text: "Use all available routes", description: "Utilize full network capacity", correct: false }
+                    ]
+                },
+                {
+                    title: "Scheduling Conflict Resolution",
+                    content: "Resolve complex scheduling conflicts with multiple constraints.",
+                    scenario: "Schedule 5 meetings with: 10 participants, 3 rooms, time slots (9am, 11am, 2pm, 4pm), and constraints: Person A can't attend 2pm, Room 2 only available until 3pm, Meeting 4 must be before Meeting 2.",
+                    skills: ["Constraint Satisfaction", "Conflict Resolution", "Optimal Scheduling"],
+                    options: [
+                        { text: "Constraint-based optimization", description: "Find solution satisfying all constraints", correct: true },
+                        { text: "Priority-based scheduling", description: "Schedule most important meetings first", correct: false },
+                        { text: "Room availability first", description: "Optimize room usage", correct: false },
+                        { text: "Time slot preference", description: "Use preferred time slots", correct: false }
+                    ]
+                },
+                {
+                    title: "Multi-Stage Project Planning",
+                    content: "Plan a complex project with interdependent stages.",
+                    scenario: "Design a product launch with: Research (2 weeks), Design (3 weeks), Prototyping (2 weeks), Testing (1 week), Marketing (2 weeks), Launch (1 week). Each stage affects others and has resource constraints.",
+                    skills: ["Project Planning", "Dependency Management", "Resource Allocation"],
+                    options: [
+                        { text: "Critical path method", description: "Identify and optimize critical tasks", correct: true },
+                        { text: "Parallel processing", description: "Run stages simultaneously where possible", correct: false },
+                        { text: "Sequential completion", description: "Complete stages one by one", correct: false },
+                        { text: "Resource leveling", description: "Balance resource usage across stages", correct: false }
+                    ]
+                },
+                {
+                    title: "System Optimization Problem",
+                    content: "Optimize a complex system with interconnected components.",
+                    scenario: "A manufacturing system has: 4 machines with different speeds, 3 product types, quality requirements, and maintenance schedules. Maximize output while meeting quality and maintenance constraints.",
+                    skills: ["System Analysis", "Optimization Theory", "Quality Management"],
+                    options: [
+                        { text: "Bottleneck elimination", description: "Identify and resolve system constraints", correct: true },
+                        { text: "Throughput maximization", description: "Maximize total production", correct: false },
+                        { text: "Quality-first approach", description: "Prioritize quality over quantity", correct: false },
+                        { text: "Balanced utilization", description: "Use all resources equally", correct: false }
+                    ]
+                },
+                {
+                    title: "Strategic Decision Tree",
+                    content: "Navigate a complex decision tree with uncertain outcomes.",
+                    scenario: "Choose between: Job A (certain $50k, low growth), Job B (70% chance $80k, high growth), or Job C (90% chance $120k, very high growth). Consider risk tolerance and career goals.",
+                    skills: ["Decision Analysis", "Risk Assessment", "Strategic Thinking"],
+                    options: [
+                        { text: "Expected value calculation", description: "Calculate weighted outcomes based on probabilities", correct: true },
+                        { text: "Risk-averse choice", description: "Choose certain, lower payoff", correct: false },
+                        { text: "High-risk, high-reward", description: "Maximize potential upside", correct: false },
+                        { text: "Balanced approach", description: "Mix of risk and reward", correct: false }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            setupProblem();
+        }
+
+        function setupProblem() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.isAnswered = false;
+            gameState.currentProblem = gameState.problems[gameState.currentRound];
+            updateProblemDisplay();
+            generateProblemOptions();
+            hideFeedback();
+            document.getElementById('startBtn').style.display = 'inline-flex';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updateProblemDisplay() {
+            const problem = gameState.currentProblem;
+            document.getElementById('challengeTitle').textContent = problem.title;
+            document.getElementById('problemContent').innerHTML = `
+                <div style="font-size: 1.2rem; margin-bottom: 1rem;">${problem.content}</div>
+                <div style="font-size: 1rem; color: #718096; font-style: italic;">${problem.scenario}</div>
+            `;
+            
+            // Generate skills
+            const skillsGrid = document.getElementById('skillsGrid');
+            skillsGrid.innerHTML = '';
+            problem.skills.forEach(skill => {
+                const skillDiv = document.createElement('div');
+                skillDiv.className = 'skill-item';
+                skillDiv.innerHTML = `
+                    <div class="skill-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="skill-name">${skill}</div>
+                `;
+                skillsGrid.appendChild(skillDiv);
+            });
+        }
+
+        function generateProblemOptions() {
+            const problemOptions = document.getElementById('problemOptions');
+            problemOptions.innerHTML = '';
+            const shuffledOptions = [...gameState.currentProblem.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'problem-option';
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                optionDiv.innerHTML = `
+                    <div class="option-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="option-text">${option.text}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                problemOptions.appendChild(optionDiv);
+            });
+        }
+
+        function startProblem() {
+            gameState.isAnswered = true;
+            document.getElementById('startBtn').style.display = 'none';
+            
+            // Start timer
+            startTimer();
+        }
+
+        function startTimer() {
+            const timer = document.getElementById('problemTimer');
+            let timeLeft = 60;
+            timer.textContent = `${timeLeft}s`;
+            
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timer.textContent = `${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    endProblem();
+                }
+            }, 1000);
+        }
+
+        function endProblem() {
+            document.getElementById('problemTimer').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+        }
+
+        function selectAnswer(option, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            const isCorrect = option.correct;
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                document.querySelectorAll('.problem-option').forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentProblem.options.find(o => o.correct).text)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            return 200 + gameState.level * 40 + Math.floor(Math.random() * 40);
+        }
+
+        function nextProblem() {
+            gameState.currentRound++;
+            if (gameState.currentRound % 2 === 0) gameState.level++;
+            updateStats();
+            setupProblem();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Excellent strategic thinking!</div><small>Your complex problem-solving skills are outstanding!</small>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not quite right. Keep analyzing! 🧠</div><small>The green option shows the correct answer.</small>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Complex Problem Solving',
+                round: gameState.currentRound + 1,
+                challenge: gameState.currentProblem.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 280)) * 100;
+            
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Complex Problem Solving Complete!</h2>
+                    <p>Outstanding strategic and analytical thinking!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🧠</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Problem Solving Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Problem Solving Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You have exceptional complex problem-solving skills!' : 
+                              accuracy >= 60 ? 'Excellent! Your strategic thinking is very strong!' :
+                              'Good job! Complex problem solving takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Excellent complex problem-solving helps with strategic planning, analytical thinking, and decision-making under pressure!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            const results = {
+                gameName: 'Complex Problem Solving',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+===============================================================================
+                        AUTISM DETECTION SYSTEM - GAMES DATABASE
+===============================================================================
+
+Total Games: 32 games across 4 age groups and 4 therapeutic domains
+
+Age Groups: Toddler (0-4 years), Child (5-12 years), Adolescent (13-17 years), Adult (18+ years)
+Domains: Social Communication, Behavioral Patterns, Sensory Processing, Cognitive Abilities
+
+===============================================================================
+TODDLER GAMES (Age 0-4 years) - 8 Games
+===============================================================================
+
+SOCIAL COMMUNICATION (2 Games):
+1. Social Smiles
+   - Difficulty: Beginner
+   - Duration: 5-10 minutes
+   - Icon: fa-smile
+   - Skills: Social interaction, Facial recognition
+   - Domain: Social Communication
+
+2. Peek-a-Boo
+   - Difficulty: Beginner
+   - Duration: 8-12 minutes
+   - Icon: fa-eye
+   - Skills: Object permanence, Social bonding
+   - Domain: Social Communication
+
+BEHAVIORAL PATTERNS (2 Games):
+3. Routine Building
+   - Difficulty: Beginner
+   - Duration: 10-15 minutes
+   - Icon: fa-clock
+   - Skills: Daily routines, Predictability
+   - Domain: Behavioral Patterns
+
+4. Calm Down Time
+   - Difficulty: Beginner
+   - Duration: 5-8 minutes
+   - Icon: fa-heart
+   - Skills: Self-regulation, Emotional control
+   - Domain: Behavioral Patterns
+
+SENSORY PROCESSING (2 Games):
+5. Texture Play
+   - Difficulty: Beginner
+   - Duration: 8-12 minutes
+   - Icon: fa-hand
+   - Skills: Tactile exploration, Sensory tolerance
+   - Domain: Sensory Processing
+
+6. Sound Discovery
+   - Difficulty: Beginner
+   - Duration: 6-10 minutes
+   - Icon: fa-music
+   - Skills: Auditory processing, Sound recognition
+   - Domain: Sensory Processing
+
+COGNITIVE ABILITIES (2 Games):
+7. Shape Sorting
+   - Difficulty: Beginner
+   - Duration: 10-15 minutes
+   - Icon: fa-shapes
+   - Skills: Shape recognition, Problem solving
+   - Domain: Cognitive Abilities
+
+8. Color Matching
+   - Difficulty: Beginner
+   - Duration: 8-12 minutes
+   - Icon: fa-palette
+   - Skills: Color recognition, Matching skills
+   - Domain: Cognitive Abilities
+
+===============================================================================
+CHILD GAMES (Age 5-12 years) - 8 Games
+===============================================================================
+
+SOCIAL COMMUNICATION (2 Games):
+9. Team Building
+   - Difficulty: Intermediate
+   - Duration: 20-25 minutes
+   - Icon: fa-users
+   - Skills: Cooperation, Communication
+   - Domain: Social Communication
+
+10. Story Sharing
+    - Difficulty: Intermediate
+    - Duration: 15-20 minutes
+    - Icon: fa-book
+    - Skills: Expressive language, Listening skills
+    - Domain: Social Communication
+
+BEHAVIORAL PATTERNS (2 Games):
+11. Goal Setting
+    - Difficulty: Intermediate
+    - Duration: 25-30 minutes
+    - Icon: fa-target
+    - Skills: Planning, Executive function
+    - Domain: Behavioral Patterns
+
+12. Emotion Regulation
+    - Difficulty: Intermediate
+    - Duration: 20-25 minutes
+    - Icon: fa-brain
+    - Skills: Self-control, Emotional awareness
+    - Domain: Behavioral Patterns
+
+SENSORY PROCESSING (2 Games):
+13. Sensory Exploration
+    - Difficulty: Intermediate
+    - Duration: 15-20 minutes
+    - Icon: fa-hand-sparkles
+    - Skills: Sensory integration, Body awareness
+    - Domain: Sensory Processing
+
+14. Balance Activities
+    - Difficulty: Intermediate
+    - Duration: 20-25 minutes
+    - Icon: fa-balance-scale
+    - Skills: Vestibular processing, Motor coordination
+    - Domain: Sensory Processing
+
+COGNITIVE ABILITIES (2 Games):
+15. Logic Puzzles
+    - Difficulty: Intermediate
+    - Duration: 25-30 minutes
+    - Icon: fa-puzzle-piece
+    - Skills: Logical thinking, Problem solving
+    - Domain: Cognitive Abilities
+
+16. Memory Games
+    - Difficulty: Intermediate
+    - Duration: 20-25 minutes
+    - Icon: fa-memory
+    - Skills: Working memory, Attention
+    - Domain: Cognitive Abilities
+
+===============================================================================
+ADOLESCENT GAMES (Age 13-17 years) - 8 Games
+===============================================================================
+
+SOCIAL COMMUNICATION (2 Games):
+17. Professional Communication
+    - Difficulty: Advanced
+    - Duration: 30-35 minutes
+    - Icon: fa-briefcase
+    - Skills: Professional skills, Networking
+    - Domain: Social Communication
+
+18. Relationship Building
+    - Difficulty: Advanced
+    - Duration: 35-40 minutes
+    - Icon: fa-heart
+    - Skills: Social skills, Relationship management
+    - Domain: Social Communication
+
+BEHAVIORAL PATTERNS (2 Games):
+19. Life Skills
+    - Difficulty: Advanced
+    - Duration: 35-40 minutes
+    - Icon: fa-home
+    - Skills: Independence, Responsibility
+    - Domain: Behavioral Patterns
+
+20. Career Planning
+    - Difficulty: Advanced
+    - Duration: 40-45 minutes
+    - Icon: fa-rocket
+    - Skills: Goal setting, Decision making
+    - Domain: Behavioral Patterns
+
+SENSORY PROCESSING (2 Games):
+21. Sensory Independence
+    - Difficulty: Advanced
+    - Duration: 25-30 minutes
+    - Icon: fa-user-cog
+    - Skills: Self-advocacy, Sensory management
+    - Domain: Sensory Processing
+
+22. Workplace Adaptation
+    - Difficulty: Advanced
+    - Duration: 30-35 minutes
+    - Icon: fa-briefcase
+    - Skills: Professional coping, Environmental adaptation
+    - Domain: Sensory Processing
+
+COGNITIVE ABILITIES (2 Games):
+23. Complex Problem Solving
+    - Difficulty: Advanced
+    - Duration: 40-45 minutes
+    - Icon: fa-chess
+    - Skills: Critical thinking, Analysis
+    - Domain: Cognitive Abilities
+
+24. Academic Skills
+    - Difficulty: Advanced
+    - Duration: 45-50 minutes
+    - Icon: fa-graduation-cap
+    - Skills: Study techniques, Research skills
+    - Domain: Cognitive Abilities
+
+===============================================================================
+ADULT GAMES (Age 18+ years) - 8 Games
+===============================================================================
+
+SOCIAL COMMUNICATION (2 Games):
+25. Relationship Management
+    - Difficulty: Advanced
+    - Duration: 35-40 minutes
+    - Icon: fa-heart
+    - Skills: Communication, Conflict resolution
+    - Domain: Social Communication
+
+26. Community Leadership
+    - Difficulty: Advanced
+    - Duration: 40-45 minutes
+    - Icon: fa-users
+    - Skills: Leadership, Advocacy
+    - Domain: Social Communication
+
+BEHAVIORAL PATTERNS (2 Games):
+27. Adult Independence
+    - Difficulty: Advanced
+    - Duration: 30-35 minutes
+    - Icon: fa-home
+    - Skills: Self-management, Life skills
+    - Domain: Behavioral Patterns
+
+28. Financial Literacy
+    - Difficulty: Advanced
+    - Duration: 35-40 minutes
+    - Icon: fa-dollar-sign
+    - Skills: Budgeting, Financial planning
+    - Domain: Behavioral Patterns
+
+SENSORY PROCESSING (2 Games):
+29. Mature Sensory Balance
+    - Difficulty: Advanced
+    - Duration: 25-30 minutes
+    - Icon: fa-spa
+    - Skills: Wellness, Life integration
+    - Domain: Sensory Processing
+
+30. Workplace Sensory
+    - Difficulty: Advanced
+    - Duration: 30-35 minutes
+    - Icon: fa-briefcase
+    - Skills: Professional adaptation, Stress management
+    - Domain: Sensory Processing
+
+COGNITIVE ABILITIES (2 Games):
+31. Executive Leadership
+    - Difficulty: Advanced
+    - Duration: 45-50 minutes
+    - Icon: fa-crown
+    - Skills: Strategic thinking, Decision making
+    - Domain: Cognitive Abilities
+
+32. Mentorship Skills
+    - Difficulty: Advanced
+    - Duration: 40-45 minutes
+    - Icon: fa-chalkboard-teacher
+    - Skills: Teaching, Guidance
+    - Domain: Cognitive Abilities
+
+===============================================================================
+PREDICTION SYSTEM OVERVIEW
+===============================================================================
+
+How Games Are Selected:
+1. Patient assessment provides 4 domain scores (0-100%):
+   - Social Communication
+   - Behavioral Patterns  
+   - Sensory Processing
+   - Cognitive Abilities
+
+2. ML Model analyzes scores and selects appropriate games:
+   - Low scores (<33%): Selects first game (easiest)
+   - Medium scores (33-66%): Random selection from available games
+   - High scores (>66%): Selects last game (most challenging)
+
+3. Each prediction includes:
+   - Game ID (domain-ageGroup format)
+   - Game name and description
+   - Difficulty level (beginner/intermediate/advanced)
+   - Recommended duration
+   - Target skills development
+   - ML confidence score
+   - Domain score correlation
+
+4. Real ML Model (Random Forest) provides:
+   - 57.58% overall accuracy
+   - Domain prediction: 63.64% accuracy
+   - Priority prediction: 72.73% accuracy
+   - Confidence based on trained patterns
+
+Game Progression by Age:
+- Toddler: Basic sensory and social foundations (5-15 min sessions)
+- Child: Structured learning and cooperation (15-30 min sessions)  
+- Adolescent: Advanced social and cognitive skills (25-45 min sessions)
+- Adult: Professional and life skills (25-50 min sessions)
+
+===============================================================================
+Generated: January 8, 2026
+System: Autism Detection Platform - ML-Powered Game Recommendations
+Total Database Size: 32 unique therapeutic games

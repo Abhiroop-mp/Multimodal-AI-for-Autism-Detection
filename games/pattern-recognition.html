@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Recognition - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Pattern Display */
+        .pattern-container {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .pattern-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+        }
+
+        .pattern-sequence {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pattern-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pattern-item.shape {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .pattern-item.color {
+            border: 3px solid #667eea;
+            background: white;
+        }
+
+        .pattern-item.number {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .pattern-item.missing {
+            background: #e2e8f0;
+            border: 3px dashed #cbd5e0;
+            color: #718096;
+            font-size: 1.5rem;
+        }
+
+        .pattern-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Pattern Options */
+        .pattern-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pattern-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pattern-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .pattern-option:hover::before {
+            left: 100%;
+        }
+
+        .pattern-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .pattern-option.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+        .pattern-option.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .pattern-option.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .option-display {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .option-display.shape {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .option-display.color {
+            border: 3px solid #667eea;
+            background: white;
+        }
+
+        .option-display.number {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .option-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* Pattern Hint */
+        .pattern-hint {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hint-text {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .hint-icon {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .pattern-sequence {
+                gap: 0.5rem;
+            }
+
+            .pattern-item {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+
+            .pattern-options {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-shapes"></i>
+            <h1>Pattern Recognition</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Find the Pattern!</h2>
+                <p>Look at the sequence and find what comes next</p>
+            </div>
+
+            <div class="pattern-container">
+                <div class="pattern-title" id="patternTitle">Complete the Pattern</div>
+                <div class="pattern-sequence" id="patternSequence">
+                    <!-- Pattern items will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="pattern-hint">
+                <div class="hint-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="hint-text" id="hintText">
+                    Look for the repeating pattern or sequence rule!
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="pattern-options" id="patternOptions">
+                <!-- Pattern options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextPattern()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Pattern
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 8,
+            currentRound: 0,
+            currentPattern: null,
+            isAnswered: false,
+            patterns: [
+                {
+                    type: 'shape',
+                    title: 'Shape Pattern',
+                    hint: 'Look for the repeating shapes!',
+                    sequence: ['circle', 'square', 'triangle', 'circle', 'square', '?'],
+                    options: ['triangle', 'circle', 'square', 'star'],
+                    correct: 'triangle',
+                    display: {
+                        circle: '<i class="fas fa-circle"></i>',
+                        square: '<i class="fas fa-square"></i>',
+                        triangle: '<i class="fas fa-play"></i>',
+                        star: '<i class="fas fa-star"></i>'
+                    }
+                },
+                {
+                    type: 'color',
+                    title: 'Color Pattern',
+                    hint: 'Look for the repeating colors!',
+                    sequence: ['red', 'blue', 'green', 'red', 'blue', '?'],
+                    options: ['green', 'red', 'blue', 'yellow'],
+                    correct: 'green',
+                    display: {
+                        red: '<div style="width: 40px; height: 40px; background: #ff6b6b; border-radius: 50%;"></div>',
+                        blue: '<div style="width: 40px; height: 40px; background: #4dabf7; border-radius: 50%;"></div>',
+                        green: '<div style="width: 40px; height: 40px; background: #48dbfb; border-radius: 50%;"></div>',
+                        yellow: '<div style="width: 40px; height: 40px; background: #feca57; border-radius: 50%;"></div>'
+                    }
+                },
+                {
+                    type: 'number',
+                    title: 'Number Pattern',
+                    hint: 'Look for the counting pattern!',
+                    sequence: [2, 4, 6, 8, 10, '?'],
+                    options: [11, 12, 14, 16],
+                    correct: 12,
+                    display: {
+                        2: '2', 4: '4', 6: '6', 8: '8', 10: '10', 11: '11', 12: '12', 14: '14', 16: '16'
+                    }
+                },
+                {
+                    type: 'shape',
+                    title: 'Growing Pattern',
+                    hint: 'Look for the growing pattern!',
+                    sequence: ['star', 'star-star', 'star-star-star', 'star-star-star-star', '?'],
+                    options: ['star-star-star-star-star', 'star', 'star-star', 'star-star-star'],
+                    correct: 'star-star-star-star-star',
+                    display: {
+                        'star': '<i class="fas fa-star"></i>',
+                        'star-star': '<i class="fas fa-star"></i><i class="fas fa-star"></i>',
+                        'star-star-star': '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>',
+                        'star-star-star-star': '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>',
+                        'star-star-star-star-star': '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>'
+                    }
+                },
+                {
+                    type: 'number',
+                    title: 'Skip Counting',
+                    hint: 'Count by 5s!',
+                    sequence: [5, 10, 15, 20, 25, '?'],
+                    options: [26, 30, 35, 40],
+                    correct: 30,
+                    display: {
+                        5: '5', 10: '10', 15: '15', 20: '20', 25: '25', 26: '26', 30: '30', 35: '35', 40: '40'
+                    }
+                },
+                {
+                    type: 'color',
+                    title: 'Alternating Pattern',
+                    hint: 'Look for the alternating colors!',
+                    sequence: ['red', 'yellow', 'red', 'yellow', 'red', '?'],
+                    options: ['red', 'yellow', 'blue', 'green'],
+                    correct: 'yellow',
+                    display: {
+                        red: '<div style="width: 40px; height: 40px; background: #ff6b6b; border-radius: 50%;"></div>',
+                        yellow: '<div style="width: 40px; height: 40px; background: #feca57; border-radius: 50%;"></div>',
+                        blue: '<div style="width: 40px; height: 40px; background: #4dabf7; border-radius: 50%;"></div>',
+                        green: '<div style="width: 40px; height: 40px; background: #48dbfb; border-radius: 50%;"></div>'
+                    }
+                },
+                {
+                    type: 'shape',
+                    title: 'Rotation Pattern',
+                    hint: 'Look for the rotation pattern!',
+                    sequence: ['up', 'right', 'down', 'left', 'up', '?'],
+                    options: ['right', 'up', 'down', 'left'],
+                    correct: 'right',
+                    display: {
+                        up: '<i class="fas fa-arrow-up"></i>',
+                        right: '<i class="fas fa-arrow-right"></i>',
+                        down: '<i class="fas fa-arrow-down"></i>',
+                        left: '<i class="fas fa-arrow-left"></i>'
+                    }
+                },
+                {
+                    type: 'number',
+                    title: 'Subtraction Pattern',
+                    hint: 'Look for the subtraction pattern!',
+                    sequence: [20, 18, 16, 14, 12, '?'],
+                    options: [8, 10, 11, 14],
+                    correct: 10,
+                    display: {
+                        20: '20', 18: '18', 16: '16', 14: '14', 12: '12', 8: '8', 10: '10', 11: '11'
+                    }
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewPattern();
+        }
+
+        // Start New Pattern
+        function startNewPattern() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            gameState.isAnswered = false;
+            gameState.currentPattern = gameState.patterns[gameState.currentRound];
+            
+            // Update pattern display
+            updatePatternDisplay();
+            
+            // Generate options
+            generateOptions();
+            
+            // Hide feedback and next button
+            hideFeedback();
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // Update Pattern Display
+        function updatePatternDisplay() {
+            const pattern = gameState.currentPattern;
+            document.getElementById('patternTitle').textContent = pattern.title;
+            document.getElementById('hintText').textContent = pattern.hint;
+            
+            const sequenceContainer = document.getElementById('patternSequence');
+            sequenceContainer.innerHTML = '';
+            
+            pattern.sequence.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `pattern-item ${pattern.type}`;
+                
+                if (item === '?') {
+                    itemDiv.classList.add('missing');
+                    itemDiv.innerHTML = '?';
+                } else {
+                    itemDiv.innerHTML = pattern.display[item];
+                }
+                
+                sequenceContainer.appendChild(itemDiv);
+            });
+        }
+
+        // Generate Options
+        function generateOptions() {
+            const patternOptions = document.getElementById('patternOptions');
+            patternOptions.innerHTML = '';
+            
+            // Shuffle options for variety
+            const shuffledOptions = [...gameState.currentPattern.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'pattern-option';
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                
+                optionDiv.innerHTML = `
+                    <div class="option-display ${gameState.currentPattern.type}">
+                        ${gameState.currentPattern.display[option]}
+                    </div>
+                    <div class="option-label">Option ${String.fromCharCode(65 + shuffledOptions.indexOf(option))}</div>
+                `;
+                
+                patternOptions.appendChild(optionDiv);
+            });
+        }
+
+        // Select Answer
+        function selectAnswer(option, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            
+            const isCorrect = option === gameState.currentPattern.correct;
+            
+            // Update option styling
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                const options = document.querySelectorAll('.pattern-option');
+                options.forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentPattern.display[gameState.currentPattern.correct])) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Show feedback
+            showFeedback(isCorrect);
+            
+            // Update stats
+            updateStats();
+            
+            // Show next button
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            
+            // Track progress
+            trackProgress(isCorrect);
+        }
+
+        // Calculate Score
+        function calculateScore() {
+            const baseScore = 100;
+            const bonus = Math.floor(Math.random() * 20); // Random bonus for variety
+            return baseScore + bonus;
+        }
+
+        // Next Pattern
+        function nextPattern() {
+            gameState.currentRound++;
+            startNewPattern();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = `
+                    <div>🎉 Excellent! You found the pattern!</div>
+                    <small>Great pattern recognition skills!</small>
+                `;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `
+                    <div>Not quite right. Keep looking for the pattern! 🔍</div>
+                    <small>The correct answer was highlighted in green</small>
+                `;
+                feedback.className = 'feedback info show';
+            }
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Pattern Recognition',
+                round: gameState.currentRound + 1,
+                pattern: gameState.currentPattern.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 120)) * 100; // Max ~120 points per round
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Pattern Recognition Complete!</h2>
+                    <p>Amazing pattern finding skills!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔷</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Pattern Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Accuracy</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You are a pattern expert!' : 
+                              accuracy >= 60 ? 'Excellent! You recognize patterns very well!' :
+                              'Good job! Pattern recognition takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Pattern recognition helps with math, logic, and problem-solving skills!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(accuracy, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(accuracy, totalTime) {
+            const results = {
+                gameName: 'Pattern Recognition',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

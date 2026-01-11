@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Sharing - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #48dbfb; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #48dbfb, #0abde3); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 900px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .story-container { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .story-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .story-content { font-size: 1.1rem; color: #4a5568; line-height: 1.6; margin-bottom: 1.5rem; min-height: 120px; }
+        .story-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .story-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .story-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #48dbfb; }
+        .story-option.selected { background: linear-gradient(135deg, #48dbfb, #0abde3); color: white; border-color: #48dbfb; transform: scale(1.02); }
+        .story-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .story-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .option-icon { font-size: 2.5rem; color: #48dbfb; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .story-option:hover .option-icon { transform: scale(1.2) rotate(10deg); }
+        .option-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .option-description { font-size: 0.9rem; color: #4a5568; line-height: 1.4; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #48dbfb, #0abde3); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(72,219,251,0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .story-options { grid-template-columns: 1fr; }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-book"></i>
+            <h1>Story Sharing</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Share Stories!</h2>
+                <p>Read the story and choose what happens next</p>
+            </div>
+
+            <div class="story-container">
+                <div class="story-title" id="storyTitle">Story: The Lost Puppy</div>
+                <div class="story-content" id="storyContent">
+                    Lily found a little puppy wandering in the park. The puppy looked scared and hungry. Lily wanted to help...
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="story-options" id="storyOptions">
+                <!-- Story options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextStory()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Story
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, currentStory: null, isAnswered: false,
+            stories: [
+                {
+                    title: "The Lost Puppy",
+                    content: "Lily found a little puppy wandering in the park. The puppy looked scared and hungry. Lily wanted to help...",
+                    options: [
+                        { title: "Take Puppy Home", description: "Lily takes the puppy to her home", icon: "fa-home", correct: true },
+                        { title: "Find Owner", description: "Lily looks for the puppy's owner", icon: "fa-search", correct: true },
+                        { title: "Give Food", description: "Lily shares her snack with puppy", icon: "fa-bone", correct: true },
+                        { title: "Play with Puppy", description: "Lily plays fetch with the puppy", icon: "fa-gamepad", correct: false }
+                    ]
+                },
+                {
+                    title: "The Magic Tree",
+                    content: "In the forest, there was a special tree that grew colorful fruits. One day, Emma discovered this tree...",
+                    options: [
+                        { title: "Climb Tree", description: "Emma climbs up to see the fruits", icon: "fa-tree", correct: true },
+                        { title: "Pick Fruits", description: "Emma gathers the magical fruits", icon: "fa-apple-alt", correct: true },
+                        { title: "Tell Friends", description: "Emma shares her discovery", icon: "fa-users", correct: true },
+                        { title: "Cut Tree Down", description: "Emma wants to take the tree home", icon: "fa-axe", correct: false }
+                    ]
+                },
+                {
+                    title: "The Space Adventure",
+                    content: "Tom built a rocket in his backyard. He wanted to visit the moon and see the stars up close...",
+                    options: [
+                        { title: "Fly to Moon", description: "Tom launches his rocket to space", icon: "fa-rocket", correct: true },
+                        { title: "Pack Supplies", description: "Tom prepares for the journey", icon: "fa-backpack", correct: true },
+                        { title: "Invite Friends", description: "Tom asks friends to join", icon: "fa-user-friends", correct: true },
+                        { title: "Go Alone", description: "Tom decides to go by himself", icon: "fa-user-astronaut", correct: false }
+                    ]
+                },
+                {
+                    title: "The Helpful Robot",
+                    content: "Maya received a robot helper for her birthday. The robot could clean, cook, and even tell jokes...",
+                    options: [
+                        { title: "Clean Room", description: "Maya and robot clean together", icon: "fa-broom", correct: true },
+                        { title: "Learn Together", description: "Maya teaches robot new things", icon: "fa-graduation-cap", correct: true },
+                        { title: "Share Robot", description: "Maya lets friends use robot", icon: "fa-share", correct: true },
+                        { title: "Hide Robot", description: "Maya keeps robot secret", icon: "fa-eye-slash", correct: false }
+                    ]
+                },
+                {
+                    title: "The Garden Surprise",
+                    content: "Sam planted a small garden. Every day he watered the plants and watched them grow. One morning he saw something special...",
+                    options: [
+                        { title: "Flowers Bloomed", description: "Beautiful flowers appeared overnight", icon: "fa-spa", correct: true },
+                        { title: "Butterflies Came", description: "Colorful butterflies visited", icon: "fa-dove", correct: true },
+                        { title: "Vegetables Grew", description: "Fresh vegetables were ready", icon: "fa-carrot", correct: true },
+                        { title: "Weeds Took Over", description: "Weeds covered everything", icon: "fa-bug", correct: false }
+                    ]
+                },
+                {
+                    title: "The Beach Discovery",
+                    content: "Alex went to the beach with family. While walking along the shore, Alex found something unusual in the sand...",
+                    options: [
+                        { title: "Beautiful Shell", description: "Found a perfect rainbow shell", icon: "fa-shell", correct: true },
+                        { title: "Message in Bottle", description: "Discovered an old message", icon: "fa-envelope", correct: true },
+                        { title: "Baby Turtle", description: "Helped a baby turtle to sea", icon: "fa-fish", correct: true },
+                        { title: "Trash Everywhere", description: "Found lots of plastic trash", icon: "fa-trash", correct: false }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            startNewStory();
+        }
+
+        function startNewStory() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.isAnswered = false;
+            gameState.currentStory = gameState.stories[gameState.currentRound];
+            updateStoryDisplay();
+            generateOptions();
+            hideFeedback();
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updateStoryDisplay() {
+            document.getElementById('storyTitle').textContent = "Story: " + gameState.currentStory.title;
+            document.getElementById('storyContent').textContent = gameState.currentStory.content;
+        }
+
+        function generateOptions() {
+            const storyOptions = document.getElementById('storyOptions');
+            storyOptions.innerHTML = '';
+            gameState.currentStory.options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'story-option';
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                optionDiv.innerHTML = `
+                    <div class="option-icon"><i class="fas ${option.icon}"></i></div>
+                    <div class="option-title">${option.title}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                storyOptions.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(option, element) {
+            if (gameState.isAnswered) return;
+            gameState.isAnswered = true;
+            const isCorrect = option.correct;
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                document.querySelectorAll('.story-option').forEach(opt => {
+                    if (opt.innerHTML.includes(option.title) && option.correct) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            return 80 + Math.floor(Math.random() * 20);
+        }
+
+        function nextStory() {
+            gameState.currentRound++;
+            startNewStory();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Great choice! That's a kind story ending!</div>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not the best choice. Stories should be helpful and kind!</div>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Story Sharing',
+                round: gameState.currentRound + 1,
+                story: gameState.currentStory.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 100)) * 100;
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Story Sharing Complete!</h2>
+                    <p>Wonderful storytelling and comprehension!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Comprehension</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Amazing! You are a storytelling expert!' : 
+                              accuracy >= 60 ? 'Great job! You understand stories well!' :
+                              'Nice work! Story comprehension takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Story sharing helps with language development and emotional understanding!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            const results = {
+                gameName: 'Story Sharing',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

@@ -3,541 +3,911 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Dashboard - ASD Support Platform</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Patient Dashboard - Autism Detection System</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="shortcut icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="cache-buster" content="2025-01-08-23-03">
     <style>
         :root {
-            --animation-duration: 0.3s;
-            --primary-color: #4a8db7;
-            --secondary-color: #3a7ca5;
-            --background-color: #f5f5f5;
-            --text-color: #333;
-            --card-bg: #ffffff;
-        }
-
-        .high-contrast {
-            --primary-color: #000000;
-            --secondary-color: #333333;
-            --background-color: #000000;
-            --text-color: #ffffff;
-            --card-bg: #222222;
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --white: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #dfe6e9;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            transition: all var(--animation-duration) ease;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e0f7fa 0%, var(--background-color) 100%);
-            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f5dc 0%, #e8e4d9 100%);
             min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
         }
 
-        /* Navigation Bar */
         .navbar {
-            background: var(--primary-color);
-            color: white;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
             padding: 1rem 2rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .nav-links a:hover {
-            background: var(--secondary-color);
-        }
-
-        .user-menu {
             display: flex;
             align-items: center;
             gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
         }
 
-        /* Main Content */
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+        }
+
+        .navbar-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover {
+            background: var(--secondary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: var(--secondary-color);
+            color: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            background: var(--light-bg);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--text-secondary);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
         .welcome-section {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 15px;
+            background: url('bg1.jpg') center/cover;
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
             margin-bottom: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             text-align: center;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
         }
 
         .welcome-icon {
             font-size: 4rem;
-            color: var(--primary-color);
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
             margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
         }
 
-        /* Activities Section */
-        .activities-section {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+        .welcome-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.4rem;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+            min-height: 80px;
         }
 
-        .section-title {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--primary-color);
+        .welcome-subtitle.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .activity-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+        .quote-author {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 1rem;
+            opacity: 0;
+            transition: var(--transition);
         }
 
-        .activity-card {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.3s;
+        .quote-author.show {
+            opacity: 1;
+        }
+
+        .quote-swipe {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            flex-direction: column;
+            gap: 0.5rem;
+            opacity: 0.6;
+        }
+
+        .moving-quotes-container {
+            position: relative;
+            width: 100%;
+            min-height: 80px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1));
+            border-radius: 15px;
+            margin: 1rem 0;
+            display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 200px;
+            padding: 1rem;
         }
 
-        .activity-card:hover {
-            transform: translateY(-5px);
+        .moving-quote {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            line-height: 1.4;
         }
 
-        .activity-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+        .moving-quote-author {
+            font-style: italic;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-left: 0.5rem;
         }
 
-        /* Games Section */
-        .games-section {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        .swipe-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            transition: var(--transition);
         }
 
-        .game-grid {
+        .swipe-dot.active {
+            background: var(--secondary-color);
+            transform: scale(1.2);
+        }
+
+        .patient-summary {
+            background: rgba(255, 255, 255, 0.98) url('bg.jpeg') center/cover;
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            display: none;
+            position: relative;
+        }
+
+        .patient-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 24px;
+            z-index: -1;
+        }
+
+        .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
+            margin-top: 1.5rem;
         }
 
-        .game-card {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 10px;
+        .summary-item {
             text-align: center;
+            padding: 2rem;
+            background: var(--light-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-top: 0.5rem;
+        }
+
+        .activities-section, .games-section {
+            background: rgba(255, 255, 255, 0.98) url('bg.jpeg') center/cover;
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .activities-section::before, .games-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 24px;
+            z-index: -1;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--secondary-color), transparent);
+            margin-left: 1rem;
+        }
+
+        .section-icon {
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+        }
+
+        .activities-grid, .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .activity-card, .game-card {
+            background: rgba(255, 255, 255, 0.95) url('bg.jpeg') center/cover;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
             cursor: pointer;
-            border: 2px solid var(--primary-color);
-            transition: all 0.3s;
+            border: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
         }
 
-        .game-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .activity-card::before, .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 18px;
+            z-index: -1;
         }
 
-        .game-icon {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        /* Accessibility Menu */
-        .accessibility-menu {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--card-bg);
-            border-radius: 50px;
-            padding: 0.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
-
-        .accessibility-toggle {
-            width: 50px;
-            height: 50px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
+        .activity-icon, .game-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: var(--white);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
         }
 
-        .accessibility-options {
-            display: none;
+        .activity-title, .game-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .activity-description, .game-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .activity-meta, .game-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .difficulty {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .difficulty.easy {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .difficulty.medium {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+        }
+
+        .difficulty.hard {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-activities {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .priority-indicator {
             position: absolute;
-            bottom: 60px;
-            right: 0;
-            background: var(--card-bg);
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            width: 200px;
-        }
-
-        .accessibility-options.show {
-            display: block;
-        }
-
-        .accessibility-options button {
-            display: block;
-            width: 100%;
-            padding: 0.5rem;
-            margin: 0.5rem 0;
-            border: none;
-            border-radius: 5px;
-            background: #e0e0e0;
+            top: 15px;
+            right: 15px;
+            background: var(--warning-color);
+            color: var(--white);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: var(--shadow-sm);
+            animation: pulse 2s infinite;
             cursor: pointer;
-            text-align: left;
+            transition: all 0.3s ease;
         }
 
-        .accessibility-options button.active {
-            background: var(--primary-color);
+        .priority-indicator.priority-1 {
+            background: #e74c3c;
+        }
+
+        .priority-indicator.priority-2 {
+            background: #f39c12;
+        }
+
+        .priority-indicator:hover {
+            transform: scale(1.2);
+            z-index: 1000;
+        }
+
+        .priority-tooltip {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
             color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        /* Responsive Design */
+        .priority-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 10px;
+            border: 6px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .priority-indicator:hover .priority-tooltip {
+            opacity: 1;
+            visibility: visible;
+            top: -45px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .skill-tag {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: #1976d2;
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid #90caf9;
+        }
+
+        .skill-tag.game {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+            color: #2e7d32;
+            border-color: #4caf50;
+        }
+
+        .cross-domain {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            color: #f57c00;
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid #ffb74d;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* ML Game Prediction Styles */
+        .ml-game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border-left: 5px solid;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .ml-game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .domain-social { border-left-color: #FF6B6B; }
+        .domain-behavioral { border-left-color: #4ECDC4; }
+        .domain-sensory { border-left-color: #45B7D1; }
+        .domain-cognitive { border-left-color: #96CEB4; }
+
+        .confidence-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .domain-score {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e9ecef;
+            font-size: 0.9rem;
+        }
+
+        .domain-score strong {
+            color: var(--secondary-color);
+        }
+
+        .ml-game-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .ml-game-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .ml-game-title {
+            flex: 1;
+        }
+
+        .ml-game-title h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+
+        .ml-game-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .ml-game-meta-item {
+            background: #f8f9fa;
+            padding: 0.4rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border: 1px solid #e9ecef;
+        }
+
+        .ml-game-meta-item i {
+            margin-right: 0.3rem;
+            color: var(--secondary-color);
+        }
+
         @media (max-width: 768px) {
             .navbar {
-                flex-direction: column;
-                gap: 1rem;
+                padding: 1rem;
             }
 
-            .nav-links {
-                flex-direction: column;
-                gap: 1rem;
+            .navbar-brand {
+                font-size: 1.2rem;
             }
 
-            .activity-grid, .game-grid {
+            .navbar-logo {
+                width: 35px;
+                height: 35px;
+            }
+
+            .navbar-nav {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .activities-grid, .games-grid {
                 grid-template-columns: 1fr;
             }
-        }
 
-        .reduced-motion * {
-            transition: none !important;
-            animation: none !important;
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="navbar-brand">
-            <i class="fas fa-brain"></i> ASD Support Platform
-        </div>
-        
-        <div class="nav-links">
-            <a href="#dashboard"><i class="fas fa-home"></i> Home</a>
-            <a href="#activities"><i class="fas fa-gamepad"></i> Activities</a>
-            <a href="#games"><i class="fas fa-puzzle-piece"></i> Games</a>
-            <a href="#messages"><i class="fas fa-comments"></i> Messages</a>
-        </div>
-
-        <div class="user-menu">
-            <span id="user-name">Welcome, User</span>
-            <button onclick="logout()" style="background: none; border: none; color: white; cursor: pointer;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+        <a href="#" class="navbar-brand">
+            <img src="logo.png" alt="Spectra Care" class="navbar-logo">
+            <span>Spectra Care</span>
+        </a>
+        <div class="navbar-nav">
+            <a href="dashboard.html" class="nav-link active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <div class="user-info">
+                <span id="user-name">Loading...</span>
+                <div class="user-avatar" id="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <button class="btn btn-secondary" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="dashboard-container">
-        <!-- Welcome Section -->
+    <div class="container">
         <div class="welcome-section">
-            <div class="welcome-icon">
-                <i class="fas fa-smile"></i>
+            <div class="welcome-title" id="user-welcome">
+                Welcome back! <span id="user-display-name">User</span>
             </div>
-            <h1>Hello, <span id="patient-name">Friend</span>!</h1>
-            <p>Ready for some fun activities today? Choose what you'd like to do!</p>
+            <p class="welcome-subtitle" id="welcome-message">
+                <span id="quote-text">Loading inspirational message...</span>
+            </p>
+            <p class="quote-author" id="quote-author">
+                <span id="author-name">- Famous Person</span>
+            </p>
+            
+            <!-- Famous Quotes Section -->
+            <div class="moving-quotes-container" id="moving-quotes-container">
+                <div class="moving-quote" id="moving-quote">
+                    Loading inspirational quotes...
+                </div>
+            </div>
+            
+            <div class="quote-swipe">
+                <div class="swipe-dot" id="swipe-dot-1"></div>
+                <div class="swipe-dot" id="swipe-dot-2"></div>
+                <div class="swipe-dot" id="swipe-dot-3"></div>
+            </div>
         </div>
 
-        <!-- Daily Activities Section -->
+        <div class="patient-summary" id="patient-summary" style="display: none;">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Total Games</div>
+                    <div class="summary-value">
+                        <i class="fas fa-gamepad"></i>
+                        <span id="total-games">0</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Games Completed</div>
+                    <div class="summary-value">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="completed-games">0</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Current Session</div>
+                    <div class="summary-value">
+                        <i class="fas fa-play-circle"></i>
+                        <span id="current-session-status">None</span>
+                        <button class="btn btn-primary start-session-btn" id="start-session-btn" style="margin-left: 1rem;">
+                            <i class="fas fa-play"></i> Start Session
+                        </button>
+                        <button class="btn btn-secondary end-session-btn" id="end-session-btn" style="display: none; margin-left: 0.5rem;">
+                            <i class="fas fa-stop"></i> End Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="domain-scores" id="domain-scores">
+                <!-- Domain completion will be populated by JavaScript -->
+            </div>
+            <div class="recent-activity" id="recent-activity">
+                <!-- Recent activity will be populated by JavaScript -->
+            </div>
+        </div>
+
         <div class="activities-section">
-            <h2 class="section-title"><i class="fas fa-calendar-day"></i> Today's Activities</h2>
-            <div class="activity-grid">
-                <div class="activity-card" onclick="startActivity('eye-tracking')">
-                    <div class="activity-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <h3>Focus Practice</h3>
-                    <p>Eye tracking exercises</p>
-                </div>
-                <div class="activity-card" onclick="startActivity('breathing')">
-                    <div class="activity-icon">
-                        <i class="fas fa-wind"></i>
-                    </div>
-                    <h3>Calm Breathing</h3>
-                    <p>Relaxation exercises</p>
-                </div>
-                <div class="activity-card" onclick="startActivity('movement')">
-                    <div class="activity-icon">
-                        <i class="fas fa-running"></i>
-                    </div>
-                    <h3>Movement Fun</h3>
-                    <p>Physical activities</p>
-                </div>
+            <h2 class="section-title">
+                <i class="fas fa-brain section-icon"></i>
+                Game Recommendations
+            </h2>
+            <div id="ml-games-loading" class="loading" style="display: none;">
+            </div>
+            <div id="ml-games-container" class="games-grid" style="display: none;"></div>
+            <div id="no-ml-games" class="no-activities" style="display: none;">
+                <i class="fas fa-info-circle" style="font-size: 2rem; color: #666; margin-bottom: 1rem;"></i>
+                <p>Unable to generate AI recommendations. Showing general games instead.</p>
             </div>
         </div>
 
-        <!-- Games Section -->
-        <div class="games-section">
-            <h2 class="section-title"><i class="fas fa-gamepad"></i> Learning Games</h2>
-            <div class="game-grid">
-                <div class="game-card" onclick="startGame('memory')">
-                    <div class="game-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h3>Memory Match</h3>
-                    <p>Find matching pairs</p>
-                </div>
-                <div class="game-card" onclick="startGame('puzzle')">
-                    <div class="game-icon">
-                        <i class="fas fa-puzzle-piece"></i>
-                    </div>
-                    <h3>Pattern Puzzles</h3>
-                    <p>Complete the pattern</p>
-                </div>
-                <div class="game-card" onclick="startGame('colors')">
-                    <div class="game-icon">
-                        <i class="fas fa-palette"></i>
-                    </div>
-                    <h3>Color World</h3>
-                    <p>Sort and match colors</p>
-                </div>
-                <div class="game-card" onclick="startGame('sounds')">
-                    <div class="game-icon">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <h3>Sound Explorer</h3>
-                    <p>Identify different sounds</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Accessibility Menu -->
-    <div class="accessibility-menu">
-        <button class="accessibility-toggle" onclick="toggleAccessibilityMenu()">
-            <i class="fas fa-universal-access"></i>
-        </button>
-        <div class="accessibility-options" id="accessibility-options">
-            <button onclick="toggleHighContrast()" id="high-contrast-btn">High Contrast</button>
-            <button onclick="toggleReadAloud()" id="read-aloud-btn">Read Aloud</button>
-            <button onclick="reduceAnimations()" id="reduce-motions-btn">Reduce Animations</button>
-            <button onclick="increaseFontSize()">Larger Text</button>
-            <button onclick="decreaseFontSize()">Smaller Text</button>
-        </div>
-    </div>
-
+    <script src="enhanced-dashboard.js"></script>
     <script>
-        // Accessibility Settings
-        let accessibilitySettings = {
-            highContrast: false,
-            readAloud: false,
-            reducedMotion: false,
-            fontSize: 100
-        };
-
-        // Load user data
-        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-        const token = localStorage.getItem('authToken');
-
-        if (!token || userData.userType !== 'patient') {
-            window.location.href = 'loginpage.html';
-        }
-
-        // Update UI with user data
-        document.getElementById('patient-name').textContent = userData.name || 'Friend';
-        document.getElementById('user-name').textContent = `Welcome, ${userData.name || 'User'}`;
-
-        // Load accessibility settings
-        function loadAccessibilitySettings() {
-            const saved = localStorage.getItem('accessibilitySettings');
-            if (saved) {
-                accessibilitySettings = JSON.parse(saved);
-                applyAccessibilitySettings();
-            }
-        }
-
-        // Apply accessibility settings
-        function applyAccessibilitySettings() {
-            // High contrast
-            if (accessibilitySettings.highContrast) {
-                document.body.classList.add('high-contrast');
-            } else {
-                document.body.classList.remove('high-contrast');
-            }
-
-            // Reduced motion
-            if (accessibilitySettings.reducedMotion) {
-                document.body.classList.add('reduced-motion');
-            } else {
-                document.body.classList.remove('reduced-motion');
-            }
-
-            // Font size
-            document.body.style.fontSize = accessibilitySettings.fontSize + '%';
-
-            // Update button states
-            updateAccessibilityButtonStates();
-        }
-
-        // Update button states
-        function updateAccessibilityButtonStates() {
-            const buttons = {
-                'high-contrast-btn': 'highContrast',
-                'read-aloud-btn': 'readAloud',
-                'reduce-motions-btn': 'reducedMotion'
-            };
-
-            Object.keys(buttons).forEach(btnId => {
-                const btn = document.getElementById(btnId);
-                if (btn) {
-                    if (accessibilitySettings[buttons[btnId]]) {
-                        btn.classList.add('active');
+        // Simple initialization - let enhanced-dashboard.js handle everything
+        console.log('🚀 Dashboard loading...');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, checking auth...');
+            
+            // Get current user from localStorage
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            if (token && userData.id && userData.userType === 'patient') {
+                console.log('Valid user found, initializing dashboard manager...');
+                
+                // Wait a bit for dashboard manager to be ready
+                setTimeout(() => {
+                    if (window.dashboardManager) {
+                        console.log('Dashboard manager found, initializing...');
+                        window.dashboardManager.init();
                     } else {
-                        btn.classList.remove('active');
+                        console.error('Dashboard manager not available');
                     }
-                }
-            });
-        }
-
-        // Accessibility functions
-        function toggleHighContrast() {
-            accessibilitySettings.highContrast = !accessibilitySettings.highContrast;
-            applyAccessibilitySettings();
-            saveAccessibilitySettings();
-        }
-
-        function toggleReadAloud() {
-            accessibilitySettings.readAloud = !accessibilitySettings.readAloud;
-            
-            if (accessibilitySettings.readAloud && 'speechSynthesis' in window) {
-                const text = "Welcome to your activities. Choose what you would like to play today.";
-                const speech = new SpeechSynthesisUtterance(text);
-                speech.rate = 0.8;
-                window.speechSynthesis.speak(speech);
+                }, 100);
             } else {
-                window.speechSynthesis.cancel();
+                console.log('No valid user authentication found');
+                window.location.href = 'loginpage.html';
             }
-            
-            saveAccessibilitySettings();
-            updateAccessibilityButtonStates();
-        }
-
-        function reduceAnimations() {
-            accessibilitySettings.reducedMotion = !accessibilitySettings.reducedMotion;
-            applyAccessibilitySettings();
-            saveAccessibilitySettings();
-        }
-
-        function increaseFontSize() {
-            accessibilitySettings.fontSize = Math.min(150, accessibilitySettings.fontSize + 10);
-            applyAccessibilitySettings();
-            saveAccessibilitySettings();
-        }
-
-        function decreaseFontSize() {
-            accessibilitySettings.fontSize = Math.max(80, accessibilitySettings.fontSize - 10);
-            applyAccessibilitySettings();
-            saveAccessibilitySettings();
-        }
-
-        function toggleAccessibilityMenu() {
-            const options = document.getElementById('accessibility-options');
-            options.classList.toggle('show');
-        }
-
-        function saveAccessibilitySettings() {
-            localStorage.setItem('accessibilitySettings', JSON.stringify(accessibilitySettings));
-        }
-
-        // Activity functions
-        function startActivity(activityType) {
-            const activities = {
-                'eye-tracking': 'Focus Practice with eye tracking',
-                'breathing': 'Calm Breathing exercises',
-                'movement': 'Movement Fun activities'
-            };
-            alert(`Starting ${activities[activityType]}...`);
-            // Implement activity starting logic here
-        }
-
-        function startGame(gameType) {
-            const games = {
-                'memory': 'Memory Match game',
-                'puzzle': 'Pattern Puzzles game',
-                'colors': 'Color World game',
-                'sounds': 'Sound Explorer game'
-            };
-            alert(`Starting ${games[gameType]}...`);
-            // Implement game starting logic here
-        }
-
+        });
+        
+        // Logout function
         function logout() {
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
-            localStorage.removeItem('loginTime');
             window.location.href = 'loginpage.html';
         }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            loadAccessibilitySettings();
-            
-            // Close accessibility menu when clicking outside
-            document.addEventListener('click', function(event) {
-                const options = document.getElementById('accessibility-options');
-                const toggle = document.querySelector('.accessibility-toggle');
-                
-                if (options && toggle && !options.contains(event.target) && !toggle.contains(event.target)) {
-                    options.classList.remove('show');
-                }
-            });
-        });
     </script>
 </body>
 </html>

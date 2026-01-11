@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound Discovery - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #ff6b6b;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Sound Player */
+        .sound-player {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sound-display {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: white;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sound-display:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+        }
+
+        .sound-display.playing {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .sound-waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            animation: soundWave 2s ease-out infinite;
+        }
+
+        @keyframes soundWave {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .play-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .play-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Sound Options */
+        .sound-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sound-option {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sound-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 107, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .sound-option:hover::before {
+            left: 100%;
+        }
+
+        .sound-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #ff6b6b;
+        }
+
+        .sound-option.selected {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            transform: scale(1.02);
+        }
+
+        .sound-option.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .sound-option.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .sound-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .sound-option:hover .sound-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .sound-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .sound-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* Instructions Panel */
+        .instructions-panel {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .instructions-panel i {
+            color: #ff6b6b;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .instructions-panel h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions-panel p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .sound-display {
+                width: 150px;
+                height: 150px;
+                font-size: 4rem;
+            }
+
+            .sound-options {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-music"></i>
+            <h1>Sound Discovery</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Discover Sounds!</h2>
+                <p>Listen carefully and identify the sound</p>
+            </div>
+
+            <div class="instructions-panel">
+                <i class="fas fa-headphones"></i>
+                <h3>How to Play</h3>
+                <p>Click the play button to hear a sound, then choose the correct picture that makes that sound!</p>
+            </div>
+
+            <div class="sound-player">
+                <div class="sound-display" id="soundDisplay" onclick="playSound()">
+                    <i class="fas fa-volume-up"></i>
+                    <div class="sound-waves"></div>
+                </div>
+                <button class="play-btn" id="playBtn" onclick="playSound()">
+                    <i class="fas fa-play"></i> Play Sound
+                </button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="sound-options" id="soundOptions">
+                <!-- Sound options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextRound()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Sound
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 8,
+            currentRound: 0,
+            currentSound: null,
+            isAnswered: false,
+            usedSounds: [], // Track used sounds to avoid repetition
+            sounds: [
+                {
+                    id: 'dog',
+                    name: 'Dog',
+                    description: 'Woof woof!',
+                    icon: 'fa-dog',
+                    audioText: 'Woof! Woof!',
+                    color: '#8b4513'
+                },
+                {
+                    id: 'cat',
+                    name: 'Cat',
+                    description: 'Meow meow!',
+                    icon: 'fa-cat',
+                    audioText: 'Meow! Meow!',
+                    color: '#ff6347'
+                },
+                {
+                    id: 'bird',
+                    name: 'Bird',
+                    description: 'Tweet tweet!',
+                    icon: 'fa-dove',
+                    audioText: 'Tweet! Tweet!',
+                    color: '#4169e1'
+                },
+                {
+                    id: 'cow',
+                    name: 'Cow',
+                    description: 'Moo moo!',
+                    icon: 'fa-cow',
+                    audioText: 'Moo! Moo!',
+                    color: '#228b22'
+                },
+                {
+                    id: 'duck',
+                    name: 'Duck',
+                    description: 'Quack quack!',
+                    icon: 'fa-duck',
+                    audioText: 'Quack! Quack!',
+                    color: '#ffd700'
+                },
+                {
+                    id: 'horse',
+                    name: 'Horse',
+                    description: 'Neigh neigh!',
+                    icon: 'fa-horse',
+                    audioText: 'Neigh! Neigh!',
+                    color: '#8b4513'
+                },
+                {
+                    id: 'pig',
+                    name: 'Pig',
+                    description: 'Oink oink!',
+                    icon: 'fa-pig',
+                    audioText: 'Oink! Oink!',
+                    color: '#ff69b4'
+                },
+                {
+                    id: 'sheep',
+                    name: 'Sheep',
+                    description: 'Baa baa!',
+                    icon: 'fa-otter',
+                    audioText: 'Baa! Baa!',
+                    color: '#f0f0f0'
+                },
+                {
+                    id: 'rooster',
+                    name: 'Rooster',
+                    description: 'Cock-a-doodle-doo!',
+                    icon: 'fa-crow',
+                    audioText: 'Cock-a-doodle-doo!',
+                    color: '#ff4500'
+                },
+                {
+                    id: 'owl',
+                    name: 'Owl',
+                    description: 'Hoot hoot!',
+                    icon: 'fa-crow',
+                    audioText: 'Hoot! Hoot!',
+                    color: '#8b4513'
+                },
+                {
+                    id: 'bee',
+                    name: 'Bee',
+                    description: 'Buzz buzz!',
+                    icon: 'fa-bug',
+                    audioText: 'Buzz! Buzz!',
+                    color: '#ffd700'
+                },
+                {
+                    id: 'frog',
+                    name: 'Frog',
+                    description: 'Ribbit ribbit!',
+                    icon: 'fa-frog',
+                    audioText: 'Ribbit! Ribbit!',
+                    color: '#32cd32'
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewRound();
+        }
+
+        // Start New Round
+        function startNewRound() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            gameState.isAnswered = false;
+            
+            // Select unique sound (avoid repetition)
+            const availableSounds = gameState.sounds.filter(s => !gameState.usedSounds.includes(s.id));
+            let selectedSound;
+            
+            if (availableSounds.length > 0) {
+                selectedSound = availableSounds[Math.floor(Math.random() * availableSounds.length)];
+            } else {
+                // If all sounds used, reset and pick randomly
+                gameState.usedSounds = [];
+                selectedSound = gameState.sounds[Math.floor(Math.random() * gameState.sounds.length)];
+            }
+            
+            gameState.currentSound = selectedSound;
+            gameState.usedSounds.push(selectedSound.id);
+            
+            // Update sound display
+            updateSoundDisplay();
+            
+            // Generate options
+            generateOptions();
+            
+            // Hide feedback and next button
+            hideFeedback();
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // Update Sound Display
+        function updateSoundDisplay() {
+            const soundDisplay = document.getElementById('soundDisplay');
+            soundDisplay.style.background = `linear-gradient(135deg, ${gameState.currentSound.color}, ${gameState.currentSound.color}dd)`;
+            soundDisplay.innerHTML = `
+                <i class="fas fa-volume-up"></i>
+                <div class="sound-waves"></div>
+            `;
+        }
+
+        // Play Sound
+        function playSound() {
+            const soundDisplay = document.getElementById('soundDisplay');
+            const playBtn = document.getElementById('playBtn');
+            
+            // Add playing animation
+            soundDisplay.classList.add('playing');
+            playBtn.disabled = true;
+            playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Playing...';
+            
+            // Simulate sound playing with text-to-speech
+            const utterance = new SpeechSynthesisUtterance(gameState.currentSound.audioText);
+            utterance.rate = 0.8;
+            utterance.pitch = 1.2;
+            utterance.volume = 1.0;
+            
+            utterance.onend = () => {
+                soundDisplay.classList.remove('playing');
+                playBtn.disabled = false;
+                playBtn.innerHTML = '<i class="fas fa-play"></i> Play Sound';
+            };
+            
+            speechSynthesis.speak(utterance);
+            
+            // Update score for listening
+            updateScore(2);
+        }
+
+        // Generate Options
+        function generateOptions() {
+            const soundOptions = document.getElementById('soundOptions');
+            soundOptions.innerHTML = '';
+            
+            // Create options array with correct answer and random wrong answers
+            const options = [gameState.currentSound];
+            
+            // Add 3 random wrong answers
+            const wrongAnswers = gameState.sounds.filter(s => s.id !== gameState.currentSound.id);
+            while (options.length < 4) {
+                const randomWrong = wrongAnswers[Math.floor(Math.random() * wrongAnswers.length)];
+                if (!options.find(o => o.id === randomWrong.id)) {
+                    options.push(randomWrong);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            // Create option elements
+            options.forEach((sound, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'sound-option';
+                optionDiv.onclick = () => selectAnswer(sound, optionDiv);
+                
+                optionDiv.innerHTML = `
+                    <div class="sound-icon">
+                        <i class="fas ${sound.icon}"></i>
+                    </div>
+                    <div class="sound-name">${sound.name}</div>
+                    <div class="sound-description">${sound.description}</div>
+                `;
+                
+                soundOptions.appendChild(optionDiv);
+            });
+        }
+
+        // Select Answer
+        function selectAnswer(sound, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            
+            const isCorrect = sound.id === gameState.currentSound.id;
+            
+            // Update option styling
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                const options = document.querySelectorAll('.sound-option');
+                options.forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentSound.name)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Show feedback
+            showFeedback(isCorrect);
+            
+            // Update stats
+            updateStats();
+            
+            // Show next button
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            
+            // Track progress
+            trackProgress(isCorrect);
+        }
+
+        // Calculate Score
+        function calculateScore() {
+            const baseScore = 50;
+            const bonus = Math.floor(Math.random() * 20); // Random bonus for variety
+            return baseScore + bonus;
+        }
+
+        // Next Round
+        function nextRound() {
+            gameState.currentRound++;
+            startNewRound();
+        }
+
+        // Update Score
+        function updateScore(points) {
+            if (points) gameState.score += points;
+            updateStats();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = `
+                    <div>🎉 Excellent! You got it right!</div>
+                    <small>${gameState.currentSound.description}</small>
+                `;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `
+                    <div>Not quite right. Keep listening! 👂</div>
+                    <small>The correct sound was: ${gameState.currentSound.name}</small>
+                `;
+                feedback.className = 'feedback info show';
+            }
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Sound Discovery',
+                round: gameState.currentRound + 1,
+                sound: gameState.currentSound.name,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 70)) * 100; // Max 70 points per round
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Sound Discovery Complete!</h2>
+                    <p>Great job identifying all the animal sounds!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔊</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Accuracy</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Amazing! You are a sound expert!' : 
+                              accuracy >= 60 ? 'Great job! You know your animal sounds well!' :
+                              'Nice work! Sound recognition takes practice, keep learning!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Sound recognition helps with auditory processing and language development!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(accuracy, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(accuracy, totalTime) {
+            const results = {
+                gameName: 'Sound Discovery',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

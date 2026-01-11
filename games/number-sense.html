@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Sense - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #feca57; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #feca57, #ff9ff3); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 900px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .math-container { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .math-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1.5rem; }
+        .math-problem { font-size: 2.5rem; font-weight: bold; color: #4a5568; margin-bottom: 2rem; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        .math-visual { margin: 1.5rem 0; font-size: 3rem; color: #feca57; }
+        .answer-input { width: 200px; padding: 1rem; font-size: 1.5rem; text-align: center; border: 3px solid #e2e8f0; border-radius: 15px; margin-bottom: 2rem; transition: all 0.3s ease; }
+        .answer-input:focus { outline: none; border-color: #feca57; box-shadow: 0 0 0 3px rgba(254,202,87,0.2); }
+        .answer-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .answer-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .answer-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #feca57; }
+        .answer-option.selected { background: linear-gradient(135deg, #feca57, #ff9ff3); color: white; border-color: #feca57; transform: scale(1.05); }
+        .answer-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .answer-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1.05); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #feca57, #ff9ff3); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(254,202,87,0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .math-problem { font-size: 2rem; }
+            .answer-input { width: 150px; font-size: 1.2rem; }
+            .answer-options { grid-template-columns: repeat(2, 1fr); }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-calculator"></i>
+            <h1>Number Sense</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Solve the Math!</h2>
+                <p>Choose the correct answer</p>
+            </div>
+
+            <div class="math-container">
+                <div class="math-title" id="mathTitle">Addition</div>
+                <div class="math-problem" id="mathProblem">
+                    Loading problem...
+                </div>
+                <div class="math-visual" id="mathVisual">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="answer-options" id="answerOptions">
+                <!-- Answer options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextProblem()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Problem
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 8, currentRound: 0, currentProblem: null, isAnswered: false,
+            problems: [
+                { type: 'addition', title: 'Addition', icon: 'fa-plus-circle', generate: () => {
+                    const a = Math.floor(Math.random() * 20) + 1;
+                    const b = Math.floor(Math.random() * 20) + 1;
+                    return { question: `${a} + ${b} = ?`, answer: a + b, visual: `<i class="fas fa-apple-alt"></i> × ${a} + <i class="fas fa-apple-alt"></i> × ${b}` };
+                }},
+                { type: 'subtraction', title: 'Subtraction', icon: 'fa-minus-circle', generate: () => {
+                    const a = Math.floor(Math.random() * 30) + 10;
+                    const b = Math.floor(Math.random() * a) + 1;
+                    return { question: `${a} - ${b} = ?`, answer: a - b, visual: `<i class="fas fa-apple-alt"></i> × ${a} - <i class="fas fa-apple-alt"></i> × ${b}` };
+                }},
+                { type: 'multiplication', title: 'Multiplication', icon: 'fa-times-circle', generate: () => {
+                    const a = Math.floor(Math.random() * 10) + 1;
+                    const b = Math.floor(Math.random() * 10) + 1;
+                    return { question: `${a} × ${b} = ?`, answer: a * b, visual: `<i class="fas fa-apple-alt"></i> × ${a} groups of ${b}` };
+                }},
+                { type: 'division', title: 'Division', icon: 'fa-divide', generate: () => {
+                    const b = Math.floor(Math.random() * 5) + 1;
+                    const a = b * (Math.floor(Math.random() * 10) + 1);
+                    return { question: `${a} ÷ ${b} = ?`, answer: a / b, visual: `${a} items ÷ ${b} groups` };
+                }},
+                { type: 'fractions', title: 'Fractions', icon: 'fa-chart-pie', generate: () => {
+                    const denominator = Math.floor(Math.random() * 8) + 2;
+                    const numerator = Math.floor(Math.random() * denominator) + 1;
+                    return { question: `${numerator}/${denominator} = ? (decimal)`, answer: (numerator/denominator).toFixed(2), visual: `${numerator} parts of ${denominator}` };
+                }},
+                { type: 'comparison', title: 'Comparison', icon: 'fa-balance-scale', generate: () => {
+                    const a = Math.floor(Math.random() * 50) + 10;
+                    const b = Math.floor(Math.random() * 50) + 10;
+                    const operator = a > b ? '>' : a < b ? '<' : '=';
+                    return { question: `${a} _ ${b} (>, <, or =)`, answer: operator, visual: `Compare ${a} and ${b}` };
+                }},
+                { type: 'sequence', title: 'Number Sequence', icon: 'fa-sort-numeric-up', generate: () => {
+                    const start = Math.floor(Math.random() * 10) + 1;
+                    const step = Math.floor(Math.random() * 5) + 1;
+                    const sequence = [start, start + step, start + step*2, start + step*3];
+                    return { question: `${sequence[0]}, ${sequence[1]}, ${sequence[2]}, ?`, answer: sequence[3], visual: `Add ${step} each time` };
+                }},
+                { type: 'word-problem', title: 'Word Problem', icon: 'fa-book', generate: () => {
+                    const apples = Math.floor(Math.random() * 10) + 5;
+                    const eaten = Math.floor(Math.random() * apples) + 1;
+                    return { question: `You have ${apples} apples and eat ${eaten}. How many left?`, answer: apples - eaten, visual: `<i class="fas fa-apple-alt"></i> × ${apples} - ${eaten}` };
+                }}
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            startNewProblem();
+        }
+
+        function startNewProblem() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            
+            gameState.isAnswered = false;
+            const problemType = gameState.problems[gameState.currentRound % gameState.problems.length];
+            gameState.currentProblem = problemType.generate();
+            gameState.currentProblem.type = problemType.type;
+            gameState.currentProblem.title = problemType.title;
+            gameState.currentProblem.icon = problemType.icon;
+            
+            updateProblemDisplay();
+            generateAnswerOptions();
+            hideFeedback();
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updateProblemDisplay() {
+            const problem = gameState.currentProblem;
+            document.getElementById('mathTitle').textContent = problem.title;
+            document.getElementById('mathProblem').textContent = problem.question;
+            document.getElementById('mathVisual').innerHTML = `<i class="fas ${problem.icon}"></i>`;
+        }
+
+        function generateAnswerOptions() {
+            const answerOptions = document.getElementById('answerOptions');
+            answerOptions.innerHTML = '';
+            
+            const correctAnswer = gameState.currentProblem.answer;
+            const options = [correctAnswer];
+            
+            // Generate wrong answers
+            while (options.length < 4) {
+                let wrongAnswer;
+                if (typeof correctAnswer === 'number') {
+                    const offset = Math.floor(Math.random() * 10) + 1;
+                    wrongAnswer = correctAnswer + (Math.random() > 0.5 ? offset : -offset);
+                } else {
+                    const wrongOptions = ['>', '<', '=', '+', '-', '×', '÷'];
+                    wrongAnswer = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+                }
+                
+                if (!options.includes(wrongAnswer)) {
+                    options.push(wrongAnswer);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'answer-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                answerOptions.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(answer, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            const isCorrect = answer === gameState.currentProblem.answer;
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                document.querySelectorAll('.answer-option').forEach(opt => {
+                    if (opt.textContent === String(gameState.currentProblem.answer)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            const baseScore = 100;
+            const levelBonus = gameState.level * 10;
+            const timeBonus = Math.max(0, 50 - Math.floor((Date.now() - gameState.startTime) / 1000));
+            return baseScore + levelBonus + timeBonus;
+        }
+
+        function nextProblem() {
+            gameState.currentRound++;
+            if (gameState.currentRound % 2 === 0) {
+                gameState.level++;
+            }
+            updateStats();
+            startNewProblem();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Correct! Great math skills!</div>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not quite right. Try to think it through! 🤔</div>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Number Sense',
+                round: gameState.currentRound + 1,
+                problemType: gameState.currentProblem.type,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 150)) * 100;
+            
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Number Sense Complete!</h2>
+                    <p>Amazing mathematical thinking!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔢</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Math Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Math Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You are a math expert!' : 
+                              accuracy >= 60 ? 'Excellent! You solve problems very well!' :
+                              'Good job! Math skills improve with practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Number sense helps with logical thinking and problem-solving skills!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            const results = {
+                gameName: 'Number Sense',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

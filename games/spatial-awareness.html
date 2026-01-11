@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spatial Awareness - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #48dbfb; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #48dbfb, #0abde3); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 1200px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .spatial-challenge { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .challenge-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1.5rem; }
+        .spatial-display { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem; min-height: 300px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .spatial-content { font-size: 2rem; color: #4a5568; text-align: center; line-height: 1.6; }
+        .spatial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; width: 100%; max-width: 400px; }
+        .spatial-cell { aspect-ratio: 1; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #4a5568; transition: all 0.3s ease; }
+        .spatial-cell:hover { transform: scale(1.1); background: #e2e8f0; }
+        .spatial-cell.highlight { background: linear-gradient(135deg, #48dbfb, #0abde3); color: white; transform: scale(1.1); }
+        .spatial-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .spatial-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .spatial-option::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(72,219,251,0.1), transparent); transition: left 0.5s ease; }
+        .spatial-option:hover::before { left: 100%; }
+        .spatial-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #48dbfb; }
+        .spatial-option.selected { background: linear-gradient(135deg, #48dbfb, #0abde3); color: white; border-color: #48dbfb; transform: scale(1.02); }
+        .spatial-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .spatial-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .option-icon { font-size: 2rem; color: #48dbfb; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .spatial-option:hover .option-icon { transform: scale(1.2) rotate(10deg); }
+        .option-text { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .option-description { font-size: 0.9rem; color: #4a5568; line-height: 1.4; }
+        .skills-container { background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; text-align: center; }
+        .skills-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .skill-item { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; text-align: center; transition: all 0.3s ease; }
+        .skill-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .skill-icon { font-size: 1.5rem; color: #48dbfb; margin-bottom: 0.5rem; }
+        .skill-name { font-size: 0.9rem; color: #4a5568; font-weight: 600; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #48dbfb, #0abde3); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(72,219,251,0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .spatial-options { grid-template-columns: repeat(2, 1fr); }
+            .skills-grid { grid-template-columns: repeat(2, 1fr); }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-cube"></i>
+            <h1>Spatial Awareness</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Develop Spatial Skills!</h2>
+                <p>Understand positions, directions, and spatial relationships</p>
+            </div>
+
+            <div class="spatial-challenge">
+                <div class="challenge-title" id="challengeTitle">Spatial Memory</div>
+                <div class="spatial-display">
+                    <div class="spatial-content" id="spatialContent">
+                        Loading spatial challenge...
+                    </div>
+                </div>
+            </div>
+
+            <div class="skills-container">
+                <div class="skills-title">Spatial Skills Being Trained</div>
+                <div class="skills-grid" id="skillsGrid">
+                    <!-- Skills will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="spatial-options" id="spatialOptions">
+                <!-- Spatial options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="startBtn" onclick="startChallenge()">
+                    <i class="fas fa-play"></i> Start Challenge
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextChallenge()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Challenge
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, currentChallenge: null, isAnswered: false,
+            challenges: [
+                {
+                    title: "Position Memory",
+                    type: "position",
+                    content: "Remember the position of objects in this 3x3 grid",
+                    grid: [
+                        ["⭐", "🌙", "☀️"],
+                        ["🌟", "💫", "🌠"],
+                        ["✨", "🌌", "⚡"]
+                    ],
+                    skills: ["Position Memory", "Spatial Mapping", "Visual Attention"],
+                    options: [
+                        { text: "Top row: ⭐ 🌙 ☀️", description: "Objects in top row", correct: false },
+                        { text: "Middle row: 🌟 💫 🌠", description: "Objects in middle row", correct: false },
+                        { text: "Bottom row: ✨ 🌌 ⚡", description: "Objects in bottom row", correct: false },
+                        { text: "Center position: 💫", description: "Object in center", correct: true }
+                    ]
+                },
+                {
+                    title: "Direction Following",
+                    type: "direction",
+                    content: "Follow this path: Right → Down → Left → Up",
+                    grid: null,
+                    skills: ["Direction Following", "Sequential Processing", "Spatial Navigation"],
+                    options: [
+                        { text: "End at top-left", description: "Path ends at top-left corner", correct: false },
+                        { text: "End at top-right", description: "Path ends at top-right corner", correct: false },
+                        { text: "End at starting point", description: "Path returns to start", correct: false },
+                        { text: "End at starting point", description: "Path returns to start", correct: true }
+                    ]
+                },
+                {
+                    title: "3D Visualization",
+                    type: "3d",
+                    content: "Imagine this cube rotated 90° forward: [🎲]",
+                    grid: null,
+                    skills: ["3D Visualization", "Mental Rotation", "Spatial Reasoning"],
+                    options: [
+                        { text: "Top face shows", description: "Top face becomes visible", correct: true },
+                        { text: "Front face shows", description: "Front face remains visible", correct: false },
+                        { text: "Side face shows", description: "Side face becomes visible", correct: false },
+                        { text: "Bottom face shows", description: "Bottom face becomes visible", correct: false }
+                    ]
+                },
+                {
+                    title: "Mirror Images",
+                    type: "mirror",
+                    content: "Find the mirror image of this shape: [🔺]",
+                    grid: null,
+                    skills: ["Mirror Recognition", "Symmetry Detection", "Visual Analysis"],
+                    options: [
+                        { text: "🔺", description: "Original shape", correct: false },
+                        { text: "🔻", description: "Mirrored horizontally", correct: true },
+                        { text: "🔼", description: "Mirrored vertically", correct: false },
+                        { text: "🔽", description: "Rotated 180°", correct: false }
+                    ]
+                },
+                {
+                    title: "Object Relations",
+                    type: "relations",
+                    content: "Which object is NOT next to the circle? [⭕ ⭐ 🌙]",
+                    grid: null,
+                    skills: ["Object Relations", "Spatial Logic", "Positional Understanding"],
+                    options: [
+                        { text: "⭕", description: "Circle is between square and star", correct: false },
+                        { text: "⭐", description: "Star is between circle and moon", correct: false },
+                        { text: "🌙", description: "Moon is next to circle", correct: false },
+                        { text: "All objects are adjacent", description: "All objects touch each other", correct: true }
+                    ]
+                },
+                {
+                    title: "Pattern Completion",
+                    type: "pattern",
+                    content: "Complete this spatial pattern: ▲ ◆ ● ?",
+                    grid: null,
+                    skills: ["Pattern Recognition", "Spatial Sequencing", "Logical Reasoning"],
+                    options: [
+                        { text: "▲", description: "Triangle completes the pattern", correct: true },
+                        { text: "◆", description: "Diamond would repeat", correct: false },
+                        { text: "●", description: "Circle would repeat", correct: false },
+                        { text: "⬟", description: "Square doesn't fit pattern", correct: false }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            setupChallenge();
+        }
+
+        function setupChallenge() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.isAnswered = false;
+            gameState.currentChallenge = gameState.challenges[gameState.currentRound];
+            updateChallengeDisplay();
+            generateSpatialOptions();
+            hideFeedback();
+            document.getElementById('startBtn').style.display = 'inline-flex';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updateChallengeDisplay() {
+            const challenge = gameState.currentChallenge;
+            document.getElementById('challengeTitle').textContent = challenge.title;
+            
+            const spatialContent = document.getElementById('spatialContent');
+            if (challenge.grid) {
+                // Create grid display
+                const grid = document.createElement('div');
+                grid.className = 'spatial-grid';
+                challenge.grid.forEach(row => {
+                    row.forEach(cell => {
+                        const cell = document.createElement('div');
+                        cell.className = 'spatial-cell';
+                        cell.textContent = cell;
+                        grid.appendChild(cell);
+                    });
+                });
+                spatialContent.innerHTML = '';
+                spatialContent.appendChild(grid);
+            } else {
+                spatialContent.innerHTML = challenge.content;
+            }
+            
+            // Generate skills
+            const skillsGrid = document.getElementById('skillsGrid');
+            skillsGrid.innerHTML = '';
+            challenge.skills.forEach(skill => {
+                const skillDiv = document.createElement('div');
+                skillDiv.className = 'skill-item';
+                skillDiv.innerHTML = `
+                    <div class="skill-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="skill-name">${skill}</div>
+                `;
+                skillsGrid.appendChild(skillDiv);
+            });
+        }
+
+        function startChallenge() {
+            gameState.isAnswered = true;
+            document.getElementById('startBtn').style.display = 'none';
+            
+            // For position memory challenges, hide the content after display time
+            if (gameState.currentChallenge.type === 'position') {
+                setTimeout(() => {
+                    const cells = document.querySelectorAll('.spatial-cell');
+                    cells.forEach(cell => {
+                        cell.style.visibility = 'hidden';
+                    });
+                }, 3000);
+            }
+        }
+
+        function generateSpatialOptions() {
+            const spatialOptions = document.getElementById('spatialOptions');
+            spatialOptions.innerHTML = '';
+            const shuffledOptions = [...gameState.currentChallenge.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'spatial-option';
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                optionDiv.innerHTML = `
+                    <div class="option-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="option-text">${option.text}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                spatialOptions.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(option, element) {
+            if (!gameState.isAnswered) return;
+            
+            const isCorrect = option.correct;
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                document.querySelectorAll('.spatial-option').forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentChallenge.options.find(o => o.correct).text)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            return 100 + gameState.level * 25 + Math.floor(Math.random() * 25);
+        }
+
+        function nextChallenge() {
+            gameState.currentRound++;
+            if (gameState.currentRound % 2 === 0) gameState.level++;
+            updateStats();
+            setupChallenge();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Excellent spatial thinking!</div><small>Your spatial awareness is outstanding!</small>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not quite right. Keep visualizing! 🧩</div><small>The green option shows the correct answer.</small>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Spatial Awareness',
+                round: gameState.currentRound + 1,
+                challenge: gameState.currentChallenge.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 150)) * 100;
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Spatial Awareness Complete!</h2>
+                    <p>Amazing spatial reasoning skills!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🧩</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Spatial Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Spatial Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You have exceptional spatial awareness!' : 
+                              accuracy >= 60 ? 'Excellent! Your spatial reasoning is very strong!' :
+                              'Good job! Spatial skills take practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Good spatial awareness helps with navigation, organization, and problem-solving!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            const results = {
+                gameName: 'Spatial Awareness',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

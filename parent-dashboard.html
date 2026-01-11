@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parent Dashboard - ASD Support Platform</title>
+    <title>Parent Dashboard - Spectra Care</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary: #4361ee;
@@ -59,19 +62,36 @@
         }
 
         .sidebar-header {
-            text-align: center;
+            display: flex;
+            align-items: center;
             margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: contain;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-title {
+            flex: 1;
         }
 
         .sidebar-header h1 {
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            color: white;
         }
 
         .sidebar-header p {
             color: #adb5bd;
             font-size: 0.9rem;
+            margin: 0;
         }
 
         .nav-links {
@@ -235,28 +255,30 @@
 
         .patients-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
         }
 
         .patient-card {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            background: #ffffff;
+            color: #333;
             padding: 1.5rem;
             border-radius: 15px;
             position: relative;
             overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .patient-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .patient-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(-45deg);
+            display: none;
         }
 
         .patient-header {
@@ -268,23 +290,32 @@
         .patient-avatar {
             width: 50px;
             height: 50px;
-            background: rgba(255, 255, 255, 0.2);
+            background: #e3f2fd;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 1rem;
             font-size: 1.2rem;
+            color: #1976d2;
         }
 
         .patient-info h3 {
             font-weight: 600;
             margin-bottom: 0.2rem;
+            color: #333;
         }
 
         .patient-info p {
-            opacity: 0.8;
+            color: #666;
             font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .patient-status {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff9800;
         }
 
         .patient-stats {
@@ -301,11 +332,173 @@
         .patient-stat-number {
             font-size: 1.2rem;
             font-weight: 600;
+            color: #666;
         }
 
         .patient-stat-label {
             font-size: 0.8rem;
-            opacity: 0.8;
+            color: #999;
+        }
+
+        /* Risk Section */
+        .risk-section {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .risk-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .risk-level {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .risk-percentage {
+            font-weight: 700;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .risk-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .risk-high {
+            background: #d32f2f;
+        }
+
+        .risk-moderate {
+            background: #f57c00;
+        }
+
+        .risk-low {
+            background: #388e3c;
+        }
+
+        .risk-progress {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .risk-progress-bar {
+            height: 100%;
+            background: #d32f2f;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .risk-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* View Progress Button */
+        .view-progress-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .view-progress-btn:hover {
+            background: #1565c0;
+        }
+
+        /* Domain Scores Section */
+        .domain-scores-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .domain-scores-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+
+        .domain-scores-header i {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .domain-scores-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .domain-score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .domain-score-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .domain-score-label {
+            font-size: 13px;
+            color: #495057;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .domain-score-progress {
+            flex: 2;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 16px;
+        }
+
+        .domain-score-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .domain-score-percentage {
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            min-width: 40px;
+            text-align: right;
         }
 
         /* Recent Activity */
@@ -426,304 +619,2625 @@
             color: white;
         }
 
-        /* Responsive Design */
         @media (max-width: 1024px) {
             .sidebar {
                 width: 80px;
             }
-            .sidebar-header h1, .sidebar-header p, .nav-item span {
+
+            .sidebar-header h1,
+            .sidebar-header p,
+            .nav-item span {
                 display: none;
             }
-            .nav-item {
+
+            .sidebar-header {
                 justify-content: center;
-                padding: 1rem;
+                padding: 0;
             }
+
             .nav-item i {
                 margin-right: 0;
             }
+
             .user-profile {
                 display: none;
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             body {
                 flex-direction: column;
             }
+
             .sidebar {
                 width: 100%;
                 padding: 1rem;
             }
+
             .nav-links {
                 display: flex;
                 gap: 0.5rem;
             }
+
             .nav-item {
                 flex: 1;
                 justify-content: center;
             }
+
             .main-content {
                 padding: 1rem;
             }
-            .stats-grid {
-                grid-template-columns: 1fr;
+
+            .activity-content p {
+                color: var(--text-light);
+                font-size: 0.9rem;
             }
-            .patients-grid {
-                grid-template-columns: 1fr;
+
             }
-        }
 
-        .reduced-motion * {
-            transition: none !important;
-            animation: none !important;
-        }
-    </style>
-</head>
-<body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h1>ASD Care</h1>
-            <p>Parent Dashboard</p>
-        </div>
+            /* Survey Styles */
+            .survey-question {
+                margin-bottom: 20px;
+                padding: 15px;
+                background: white;
+                border-radius: 8px;
+                border-left: 4px solid var(--primary);
+            }
 
-        <nav class="nav-links">
-            <a href="#" class="nav-item active">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-users"></i>
-                <span>Patients</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Progress</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-gamepad"></i>
-                <span>Activities</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-comments"></i>
-                <span>Messages</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
-        </nav>
+            .survey-question p {
+                margin-bottom: 10px;
+                font-weight: 500;
+            }
 
-        <div class="user-profile">
-            <div class="user-avatar">
-                <i class="fas fa-user"></i>
-            </div>
-            <h3 id="parent-name">Parent Name</h3>
-            <p id="parent-email">parent@email.com</p>
-            <button onclick="logout()" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; margin-top: 1rem; cursor: pointer;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
-    </aside>
+            .radio-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="welcome-message">
-                <h1>Welcome back, <span id="parent-name-header">Parent</span>!</h1>
-                <p>Here's the latest update on your patients' progress</p>
-            </div>
-            <div class="header-actions">
-                <button style="background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer;">
-                    <i class="fas fa-plus"></i> Add Patient
-                </button>
-            </div>
-        </div>
+            .radio-group label {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                padding: 8px 12px;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+            }
 
-        <!-- Statistics -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-star"></i>
+            .radio-group label:hover {
+                background: var(--light);
+            }
+
+            .radio-group input[type="radio"] {
+                margin-right: 8px;
+            }
+
+            /* File Upload Styles */
+            .file-upload-section {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 10px;
+                margin: 15px 0;
+            }
+
+            .file-upload-area {
+                border: 2px dashed #ccc;
+                border-radius: 8px;
+                padding: 30px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .file-upload-area:hover {
+                border-color: var(--primary);
+                background: rgba(67, 97, 238, 0.05);
+            }
+
+            .file-upload-area.dragover {
+                border-color: var(--primary);
+                background: rgba(67, 97, 238, 0.1);
+            }
+
+            .file-preview {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .file-preview-item {
+                position: relative;
+                width: 100px;
+                height: 100px;
+                border-radius: 8px;
+                overflow: hidden;
+                border: 2px solid #ddd;
+            }
+
+            .file-preview-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .file-preview-item video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .file-remove-btn {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: rgba(255, 0, 0, 0.8);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+                font-size: 12px;
+            }
+
+            .upload-progress {
+                margin-top: 10px;
+                background: #e0e0e0;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            .upload-progress-bar {
+                height: 5px;
+                background: var(--primary);
+                transition: width 0.3s ease;
+            }
+
+            /* Color Settings Modal */
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+
+            .modal-content {
+                background: white;
+                border-radius: 15px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1.5rem;
+                border-bottom: 1px solid #eee;
+            }
+
+            .modal-header h2 {
+                margin: 0;
+                color: var(--text-dark);
+            }
+
+            .close-btn {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #666;
+                padding: 0.5rem;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+            }
+
+            .close-btn:hover {
+                background: #f0f0f0;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+            }
+
+            .patient-info-header {
+                text-align: center;
+                margin-bottom: 2rem;
+                padding: 1rem;
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                color: white;
+                border-radius: 10px;
+            }
+
+            .patient-info-header h3 {
+                margin: 0 0 0.5rem 0;
+            }
+
+            .color-presets {
+                margin-bottom: 2rem;
+            }
+
+            .color-presets h4 {
+                margin-bottom: 1rem;
+                color: var(--text-dark);
+            }
+
+            .preset-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 1rem;
+            }
+
+            .preset-btn {
+                border: 2px solid #ddd;
+                border-radius: 10px;
+                padding: 1rem;
+                background: white;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-align: center;
+            }
+
+            .preset-btn:hover {
+                border-color: var(--primary);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .preset-preview {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                margin: 0 auto 0.5rem;
+            }
+
+            .default-preset {
+                background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            }
+
+            .calm-preset {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+            }
+
+            .high-contrast-preset {
+                background: linear-gradient(135deg, #000000, #ffffff);
+            }
+
+            .warm-preset {
+                background: linear-gradient(135deg, #f093fb, #f5576c);
+            }
+
+            .cool-preset {
+                background: linear-gradient(135deg, #4facfe, #00f2fe);
+            }
+
+            .pastel-preset {
+                background: linear-gradient(135deg, #ffeaa7, #dfe6e9);
+            }
+
+            .color-inputs {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .color-input-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .color-input-group label {
+                font-weight: 500;
+                color: var(--text-dark);
+            }
+
+            .color-input-group input[type="color"] {
+                width: 100%;
+                height: 40px;
+                border: 2px solid #ddd;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            .color-hex {
+                font-size: 0.9rem;
+                color: #666;
+                font-family: monospace;
+            }
+
+            .color-preview {
+                margin-bottom: 2rem;
+            }
+
+            .color-preview h4 {
+                margin-bottom: 1rem;
+                color: var(--text-dark);
+            }
+
+            .preview-card {
+                background: white;
+                border-radius: 10px;
+                padding: 1.5rem;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .preview-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+
+            .preview-avatar {
+                width: 50px;
+                height: 50px;
+                background: var(--primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                margin-right: 1rem;
+            }
+
+            .preview-info h5 {
+                margin: 0 0 0.25rem 0;
+                color: var(--text-dark);
+            }
+
+            .preview-info p {
+                margin: 0;
+                color: #666;
+                font-size: 0.9rem;
+            }
+
+            .preview-content {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .preview-btn {
+                background: var(--primary);
+                color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .preview-btn:hover {
+                opacity: 0.9;
+            }
+
+            .preview-stats {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .preview-stat {
+                text-align: center;
+                flex: 1;
+            }
+
+            .preview-stat span {
+                display: block;
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+            .preview-stat small {
+                color: #666;
+                font-size: 0.8rem;
+            }
+
+            .modal-footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: 1rem;
+                padding: 1.5rem;
+                border-top: 1px solid #eee;
+            }
+
+            .btn-secondary, .btn-primary {
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .btn-secondary {
+                background: #6c757d;
+                color: white;
+            }
+
+            .btn-secondary:hover {
+                background: #5a6268;
+            }
+
+            .btn-primary {
+                background: var(--primary);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                opacity: 0.9;
+            }
+
+            .high-contrast {
+                --primary: #000000;
+                --secondary: #ffffff;
+                --background: #ffffff;
+                --text: #000000;
+                --text-light: #333333;
+                --card-bg: #ffffff;
+                --light: #f0f0f0;
+            }
+
+            .reduced-motion * {
+                transition: none !important;
+                animation: none !important;
+            }
+
+            /* Modal Styles */
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+
+            .modal__content {
+                background: white;
+                max-width: 500px;
+                width: 90%;
+                margin: 0 auto;
+                padding: 2rem;
+                border-radius: var(--radius-md);
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .modal__header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: var(--spacing-xl);
+            }
+
+            .modal__title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--primary);
+            }
+
+            .modal__close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #666;
+                padding: 0.5rem;
+            }
+
+            .modal__footer {
+                display: flex;
+                gap: var(--spacing-md);
+                justify-content: flex-end;
+                margin-top: var(--spacing-xl);
+                padding-top: var(--spacing-lg);
+                border-top: 1px solid #eee;
+            }
+
+            /* Form Styles */
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+
+            .form-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+                color: var(--text-dark);
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border: 1px solid #ddd;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                transition: border-color 0.3s ease;
+            }
+
+            .form-input:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            }
+
+            .error {
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+                display: none;
+            }
+
+            .form-help {
+                font-size: 0.8rem;
+                color: #666;
+                margin-top: 0.25rem;
+            }
+
+            /* Button Styles */
+            .btn {
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .btn--primary {
+                background: var(--primary);
+                color: white;
+            }
+
+            .btn--primary:hover {
+                background: #3652b4;
+            }
+
+            .btn--secondary {
+                background: #6c757d;
+                color: white;
+            }
+
+            .btn--secondary:hover {
+                background: #5a6268;
+            }
+
+            .btn--full {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Theme Modal Styles */
+            .theme-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+
+            .theme-option {
+                text-align: center;
+                cursor: pointer;
+                border-radius: 10px;
+                padding: 1rem;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+            }
+
+            .theme-option:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                border-color: var(--primary);
+            }
+
+            .theme-preview {
+                height: 80px;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .theme-colors {
+                display: flex;
+                gap: 0.5rem;
+                background: rgba(255,255,255,0.9);
+                padding: 0.5rem;
+                border-radius: 20px;
+            }
+
+            .color-dot {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                border: 2px solid white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+
+            .theme-option h4 {
+                margin: 0.5rem 0 0.25rem 0;
+                color: var(--text-dark);
+                font-weight: 600;
+            }
+
+            .theme-option p {
+                margin: 0;
+                color: #666;
+                font-size: 0.9rem;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="Spectra Care Logo" class="sidebar-logo">
+                <div class="sidebar-title">
+                    <h1>Spectra Care</h1>
+                    <p>Parent Dashboard</p>
                 </div>
-                <div class="stat-number">87%</div>
-                <div class="stat-label">Average Completion</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-trophy"></i>
-                </div>
-                <div class="stat-number">24</div>
-                <div class="stat-label">Sessions Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="stat-number">12h</div>
-                <div class="stat-label">Total Engagement</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
+
+            <nav class="nav-links">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Patients</span>
+                </a>
+                <a href="#" class="nav-item">
                     <i class="fas fa-chart-line"></i>
+                    <span>Progress</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Activities</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>Messages</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
                 </div>
-                <div class="stat-number">+18%</div>
-                <div class="stat-label">This Week's Progress</div>
+                <h3 id="parent-name">Parent Name</h3>
+                <p id="parent-email">parent@email.com</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="welcome-message">
+                    <h1>Welcome back, <span id="parent-name-header">Parent</span>!</h1>
+                    <p>Here's the latest update on your patients' progress</p>
+                </div>
+                <div class="header-actions">
+                    <button onclick="openAddPatientModal()"
+                        style="background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer; margin-right: 1rem;">
+                        <i class="fas fa-plus"></i> Add Patient
+                    </button>
+                    <button onclick="logout()"
+                        style="background: var(--warning); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            
+            <!-- Patients Section -->
+            <div class="patients-section">
+                <div class="section-header">
+                    <h2 class="section-title">Your Patients</h2>
+                    <span id="patient-count" style="color: var(--text-light);">Loading...</span>
+                </div>
+                <div class="patients-grid" id="patients-container">
+                    <!-- Patients will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Activity</h2>
+                </div>
+                <ul class="activity-list">
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>Memory Game Completed</h4>
+                            <p>John scored 85% in the memory challenge</p>
+                        </div>
+                        <div class="activity-time">2 hours ago</div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>Eye Tracking Session</h4>
+                            <p>Sarah showed improved focus duration</p>
+                        </div>
+                        <div class="activity-time">5 hours ago</div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>Progress Report Generated</h4>
+                            <p>Weekly progress report is available</p>
+                        </div>
+                        <div class="activity-time">1 day ago</div>
+                    </li>
+                </ul>
+            </div>
+        </main>
+
+        <!-- Add Patient Modal -->
+        <div id="addPatientModal" class="modal" style="display:none;" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+            <div class="modal__content" onclick="event.stopPropagation()">
+                <div class="modal__header">
+                    <h2 id="modal-title" class="modal__title">Add Patient & Survey</h2>
+                    <button class="modal__close" onclick="closeAddPatientModal()" aria-label="Close modal">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <form id="patientForm" novalidate>
+                    <div class="form-group">
+                        <label for="patientName" class="form-label">Patient Name *</label>
+                        <input id="patientName" type="text" class="form-input" required aria-describedby="patientName-error">
+                        <div id="patientName-error" class="error" role="alert"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="patientEmail" class="form-label">Patient Email *</label>
+                        <input id="patientEmail" type="email" class="form-input" required aria-describedby="patientEmail-error">
+                        <div id="patientEmail-error" class="error" role="alert"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="patientAge" class="form-label">Age *</label>
+                        <input id="patientAge" type="number" min="1" max="100" class="form-input" required aria-describedby="patientAge-error" onchange="handleAgeChange()">
+                        <div id="patientAge-error" class="error" role="alert"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ageUnit" class="form-label">Age Unit *</label>
+                        <select id="ageUnit" class="form-input" required aria-describedby="ageUnit-error" onchange="handleAgeChange()">
+                            <option value="">Select age unit</option>
+                            <option value="months">Months</option>
+                            <option value="years">Years</option>
+                        </select>
+                        <div id="ageUnit-error" class="error" role="alert"></div>
+                    </div>
+
+                    <div id="dynamic-survey" role="region" aria-label="Age-specific survey questions">
+                        <!-- Survey questions will be loaded here -->
+                    </div>
+                    
+                    <!-- File Upload Section -->
+                    <div class="file-upload-section">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">Patient Photos & Videos</h3>
+                        
+                        <div class="file-upload-area" 
+                             onclick="document.getElementById('fileInput').click()" 
+                             ondrop="handleDrop(event)" 
+                             ondragover="handleDragOver(event)" 
+                             ondragleave="handleDragLeave(event)"
+                             role="button"
+                             tabindex="0"
+                             aria-label="Upload files by clicking or dragging and dropping">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--primary); margin-bottom: 10px;" aria-hidden="true"></i>
+                            <p><strong>Click to upload or drag and drop</strong></p>
+                            <p style="color: #666; font-size: 14px;">Photos (JPG, PNG) and Videos (MP4, MOV) with patient's face visible</p>
+                            <input type="file" 
+                                   id="fileInput" 
+                                   multiple 
+                                   accept="image/*,video/*" 
+                                   style="display: none;" 
+                                   onchange="handleFileSelect(event)"
+                                   aria-label="Select files to upload">
+                        </div>
+                        
+                        <div id="filePreview" class="file-preview" role="list" aria-label="Selected files"></div>
+                        <div id="uploadProgress" class="upload-progress" style="display: none;" role="progressbar" aria-label="Upload progress">
+                            <div class="upload-progress-bar" id="progressBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surveyNotes" class="form-label">Additional Notes</label>
+                        <textarea id="surveyNotes" 
+                                  class="form-input" 
+                                  rows="4" 
+                                  placeholder="Any additional observations or concerns..."
+                                  aria-describedby="surveyNotes-help"></textarea>
+                        <div id="surveyNotes-help" class="form-help">Optional: Share any specific concerns or observations about the patient</div>
+                    </div>
+                </form>
+
+                <div class="modal__footer">
+                    <button type="button" onclick="closeAddPatientModal()" class="btn btn--secondary">Cancel</button>
+                    <button type="submit" onclick="submitPatientSurvey()" class="btn btn--primary">
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                        <span>Save Patient</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Patients Section -->
-        <div class="patients-section">
-            <div class="section-header">
-                <h2 class="section-title">Your Patients</h2>
-                <span style="color: var(--text-light);">3 Patients</span>
-            </div>
-            <div class="patients-grid" id="patients-container">
-                <!-- Patients will be loaded here -->
+        <!-- Accessibility Menu -->
+        <div class="accessibility-menu">
+            <button class="accessibility-toggle" onclick="toggleAccessibilityMenu()">
+                <i class="fas fa-universal-access"></i>
+            </button>
+            <div class="accessibility-options" id="accessibility-options">
+                <button onclick="toggleHighContrast()" id="high-contrast-btn">High Contrast</button>
+                <button onclick="toggleReadAloud()" id="read-aloud-btn">Read Aloud</button>
+                <button onclick="reduceAnimations()" id="reduce-motions-btn">Reduce Motions</button>
+                <button onclick="increaseFontSize()">Larger Text</button>
+                <button onclick="decreaseFontSize()">Smaller Text</button>
             </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="activity-section">
-            <div class="section-header">
-                <h2 class="section-title">Recent Activity</h2>
+        <!-- Color Theme Modal -->
+        <div id="colorThemeModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-palette"></i> Choose Dashboard Theme</h3>
+                    <button class="close-btn" onclick="closeColorThemeModal()">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="theme-grid">
+                        <div class="theme-option" onclick="applyTheme('default')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);">
+                                <div class="theme-colors">
+                                    <div class="color-dot" style="background: #4361ee;"></div>
+                                    <div class="color-dot" style="background: #3a0ca3;"></div>
+                                    <div class="color-dot" style="background: #667eea;"></div>
+                                    <div class="color-dot" style="background: #212529;"></div>
+                                </div>
+                            </div>
+                            <h4>Default Blue</h4>
+                            <p>Professional blue theme</p>
+                        </div>
+                        
+                        <div class="theme-option" onclick="applyTheme('ocean')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #006ba6 0%, #0496ff 100%);">
+                                <div class="theme-colors">
+                                    <div class="color-dot" style="background: #006ba6;"></div>
+                                    <div class="color-dot" style="background: #0496ff;"></div>
+                                    <div class="color-dot" style="background: #e3f2fd;"></div>
+                                    <div class="color-dot" style="background: #023047;"></div>
+                                </div>
+                            </div>
+                            <h4>Ocean Blue</h4>
+                            <p>Calm ocean colors</p>
+                        </div>
+                        
+                        <div class="theme-option" onclick="applyTheme('forest')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #2d6a4f 0%, #52b788 100%);">
+                                <div class="theme-colors">
+                                    <div class="color-dot" style="background: #2d6a4f;"></div>
+                                    <div class="color-dot" style="background: #52b788;"></div>
+                                    <div class="color-dot" style="background: #d8f3dc;"></div>
+                                    <div class="color-dot" style="background: #081c15;"></div>
+                                </div>
+                            </div>
+                            <h4>Forest Green</h4>
+                            <p>Natural green theme</p>
+                        </div>
+                        
+                        <div class="theme-option" onclick="applyTheme('sunset')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%);">
+                                <div class="theme-colors">
+                                    <div class="color-dot" style="background: #ff9a56;"></div>
+                                    <div class="color-dot" style="background: #ff6b6b;"></div>
+                                    <div class="color-dot" style="background: #ffeaa7;"></div>
+                                    <div class="color-dot" style="background: #2d3436;"></div>
+                                </div>
+                            </div>
+                            <h4>Sunset Orange</h4>
+                            <p>Warm sunset colors</p>
+                        </div>
+                        
+                        <div class="theme-option" onclick="applyTheme('purple')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #7209b7 0%, #b5179e 100%);">
+                                <div class="theme-colors">
+                                    <div class="color-dot" style="background: #7209b7;"></div>
+                                    <div class="color-dot" style="background: #b5179e;"></div>
+                                    <div class="color-dot" style="background: #f0e6ff;"></div>
+                                    <div class="color-dot" style="background: #240046;"></div>
+                                </div>
+                            </div>
+                            <h4>Royal Purple</h4>
+                            <p>Elegant purple theme</p>
+                        </div>
+                        
+                        <div class="theme-option" onclick="applyTheme('monochrome')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #212529 0%, #6c757d 100%);">
+                                <div class="theme-colors">
+                                    <div class="color-dot" style="background: #212529;"></div>
+                                    <div class="color-dot" style="background: #6c757d;"></div>
+                                    <div class="color-dot" style="background: #f8f9fa;"></div>
+                                    <div class="color-dot" style="background: #000000;"></div>
+                                </div>
+                            </div>
+                            <h4>Monochrome</h4>
+                            <p>Classic black & white</p>
+                        </div>
+                        
+                        <div class="theme-option" onclick="applyTheme('candy')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #ff006e 0%, #fb5607 100%);">
+                                <div class="theme-colors">
+                                    <div class="color-dot" style="background: #ff006e;"></div>
+                                    <div class="color-dot" style="background: #fb5607;"></div>
+                                    <div class="color-dot" style="background: #ffbe0b;"></div>
+                                    <div class="color-dot" style="background: #3a0ca3;"></div>
+                                </div>
+                            </div>
+                            <h4>Candy Pop</h4>
+                            <p>Fun candy colors</p>
+                        </div>
+                        
+                        <div class="theme-option" onclick="applyTheme('mint')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);">
+                                <div class="theme-colors">
+                                    <div class="color-dot" style="background: #00b4d8;"></div>
+                                    <div class="color-dot" style="background: #0077b6;"></div>
+                                    <div class="color-dot" style="background: #caf0f8;"></div>
+                                    <div class="color-dot" style="background: #03045e;"></div>
+                                </div>
+                            </div>
+                            <h4>Mint Fresh</h4>
+                            <p>Cool mint theme</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <ul class="activity-list">
-                <li class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-gamepad"></i>
-                    </div>
-                    <div class="activity-content">
-                        <h4>Memory Game Completed</h4>
-                        <p>John scored 85% in the memory challenge</p>
-                    </div>
-                    <div class="activity-time">2 hours ago</div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <div class="activity-content">
-                        <h4>Eye Tracking Session</h4>
-                        <p>Sarah showed improved focus duration</p>
-                    </div>
-                    <div class="activity-time">5 hours ago</div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="activity-content">
-                        <h4>Progress Report Generated</h4>
-                        <p>Weekly progress report is available</p>
-                    </div>
-                    <div class="activity-time">1 day ago</div>
-                </li>
-            </ul>
         </div>
-    </main>
 
-    <!-- Accessibility Menu -->
-    <div class="accessibility-menu">
-        <button class="accessibility-toggle" onclick="toggleAccessibilityMenu()">
-            <i class="fas fa-universal-access"></i>
-        </button>
-        <div class="accessibility-options" id="accessibility-options">
-            <button onclick="toggleHighContrast()" id="high-contrast-btn">High Contrast</button>
-            <button onclick="toggleReadAloud()" id="read-aloud-btn">Read Aloud</button>
-            <button onclick="reduceAnimations()" id="reduce-motions-btn">Reduce Motions</button>
-            <button onclick="increaseFontSize()">Larger Text</button>
-            <button onclick="decreaseFontSize()">Smaller Text</button>
-        </div>
-    </div>
+        <script>
+            // Check authentication on page load
+            function checkAuthentication() {
+                const token = localStorage.getItem('authToken');
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    <script>
-        // Load user data
-        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-        const token = localStorage.getItem('authToken');
+                // Only redirect if BOTH conditions are true:
+                // 1. No token OR invalid user data
+                // 2. User type is not 'parent' (if userData exists)
+                if (!token || !userData.id || userData.userType !== 'parent') {
+                    console.log('No valid authentication found, redirecting to login');
+                    window.location.replace('loginpage.html');
+                    return false;
+                }
 
-        if (!token || userData.userType !== 'parent') {
-            window.location.href = 'loginpage.html';
-        }
+                console.log('Authentication valid for parent:', userData.name);
+                return true;
+            }
 
-        // Update UI with user data
-        document.querySelectorAll('#parent-name, #parent-name-header').forEach(el => {
-            el.textContent = userData.name || 'Parent';
-        });
-        document.getElementById('parent-email').textContent = userData.email || '';
+            // Run authentication check
+            if (!checkAuthentication()) {
+                // Stop script execution if redirecting
+                throw new Error('Redirecting to login');
+            }
 
-        // Load patients
-        async function loadPatients() {
-            try {
-                const response = await fetch(`http://localhost:5000/api/relationships/parent-patients/${userData.id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+            // Load user data (only runs if authenticated)
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            const token = localStorage.getItem('authToken');
+
+            // Update UI with user data
+            const parentNameElement1 = document.getElementById('parent-name');
+            const parentNameElement2 = document.getElementById('parent-name-header');
+            
+            if (parentNameElement1 && userData.name) {
+                parentNameElement1.textContent = userData.name;
+            }
+            if (parentNameElement2 && userData.name) {
+                parentNameElement2.textContent = userData.name;
+            }
+            
+            document.getElementById('parent-email').textContent = userData.email || '';
+            function getAuthHeaders() {
+                const token = localStorage.getItem('authToken');
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+            }
+
+            function escapeHtml(unsafe) {
+                if (unsafe === null || unsafe === undefined) return '';
+                return String(unsafe)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            // Update patient count dynamically
+            function updatePatientCount(count) {
+                const patientCountElement = document.getElementById('patient-count');
+                if (patientCountElement) {
+                    patientCountElement.textContent = `${count} Patient${count !== 1 ? 's' : ''}`;
+                    if (count === 0) {
+                        patientCountElement.style.color = 'var(--text-light)';
+                    } else {
+                        patientCountElement.style.color = 'var(--text-dark)';
                     }
+                }
+            }
+
+            // Load patients on page load
+            async function loadPatients() {
+                console.log('=== LOAD PATIENTS FUNCTION CALLED ===');
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const token = localStorage.getItem('authToken');
+
+                console.log('loadPatients called with:', {
+                    userData: userData,
+                    userId: userData.id,
+                    token: token ? 'exists' : 'missing'
                 });
 
-                if (response.ok) {
+                // Check if we have valid data
+                if (!userData.id || !token) {
+                    console.error('Missing userData.id or token, cannot load patients');
+                    const container = document.getElementById('patients-container');
+                    if (container) {
+                        container.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #ff6b6b;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h3>Authentication Required</h3>
+                                <p>Please log in again to view patients.</p>
+                                <button onclick="window.location.href='loginpage.html'" style="background: #4361ee; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; margin-top: 1rem; cursor: pointer;">
+                                    <i class="fas fa-sign-in-alt"></i> Login Again
+                                </button>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                try {
+                    console.log('=== MAKING API CALL TO LOAD PATIENTS ===');
+                    // Temporarily using test route without authentication
+                    const response = await fetch(`http://localhost:5001/api/patient/parent-test/${encodeURIComponent(userData.id)}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    console.log('=== API RESPONSE RECEIVED ===');
+                    console.log('Patients API response status:', response.status);
+                    console.log('Response headers:', response.headers);
+
+                    if (response.status === 401 || response.status === 403) {
+                        console.error('Authentication failed - logging out');
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('userData');
+                        localStorage.removeItem('loginTime');
+                        alert('Your session has expired. Please login again.');
+                        window.location.replace('loginpage.html');
+                        return;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
                     const patients = await response.json();
+                    console.log('=== PATIENTS DATA RECEIVED ===');
+                    console.log('Patients loaded:', patients);
+                    console.log('Patients length:', patients.length);
+                    
                     const container = document.getElementById('patients-container');
                     
-                    if (patients.length === 0) {
+                    // Update patient count
+                    updatePatientCount(patients ? patients.length : 0);
+                    
+                    if (!patients || patients.length === 0) {
+                        console.log('=== SHOWING NO PATIENTS MESSAGE ===');
                         container.innerHTML = `
                             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-light);">
                                 <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
                                 <h3>No Patients Yet</h3>
-                                <p>Patients will appear here when they register with your email</p>
+                                <p>Add a patient to start tracking progress</p>
                             </div>
                         `;
                         return;
                     }
+                    
+                    console.log('=== RENDERING PATIENTS ===');
+                    container.innerHTML = patients.map(patient => {
+                        const latest = patient.latestAssessment;
+                        const hasAssessment = latest && latest !== null && typeof latest === 'object';
+                        const riskScore = hasAssessment && latest.autismRiskScore !== undefined ? latest.autismRiskScore : null;
+                        const riskLevel = hasAssessment && latest.riskLevel ? String(latest.riskLevel).toLowerCase() : null;
+                        const riskLabel = riskLevel ? (riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)) : 'Not Assessed';
+                        const riskColor = riskLevel === 'high'
+                            ? '#d32f2f'
+                            : (riskLevel === 'moderate' ? '#f57c00' : (riskLevel === 'low' ? '#2e7d32' : '#4caf50'));
+                        const progressWidth = hasAssessment && riskScore !== null ? Math.max(0, Math.min(100, riskScore)) : 0;
 
-                    container.innerHTML = patients.map(patient => `
-                        <div class="patient-card">
-                            <div class="patient-header">
-                                <div class="patient-avatar">
-                                    <i class="fas fa-user"></i>
+                        // Debug domain scores
+                        if (hasAssessment && latest.domainScores) {
+                            console.log('Patient:', patient.patientName, 'Domain Scores:', latest.domainScores);
+                        }
+
+                        // Calculate fallback values if domain scores are empty
+                        const socialScore = (hasAssessment && latest.domainScores && latest.domainScores.socialCommunication) 
+                            ? latest.domainScores.socialCommunication 
+                            : null;
+                        const behavioralScore = (hasAssessment && latest.domainScores && latest.domainScores.behaviorPatterns) 
+                            ? latest.domainScores.behaviorPatterns 
+                            : null;
+                        const sensoryScore = (hasAssessment && latest.domainScores && latest.domainScores.sensoryProcessing) 
+                            ? latest.domainScores.sensoryProcessing 
+                            : null;
+                        const cognitiveScore = (hasAssessment && latest.domainScores && latest.domainScores.cognitiveAbilities) 
+                            ? latest.domainScores.cognitiveAbilities 
+                            : null;
+
+                        console.log('Final scores:', { socialScore, behavioralScore, sensoryScore, cognitiveScore });
+                        console.log('Behavioral Score Value:', behavioralScore);
+                        console.log('Behavioral Score Type:', typeof behavioralScore);
+                        console.log('Is Behavioral Score NaN?', isNaN(behavioralScore));
+
+                        return `
+                            <div class="patient-card">
+                                <div class="patient-header">
+                                    <div class="patient-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="patient-info">
+                                        <h3>${escapeHtml(patient.patientName)}</h3>
+                                        <p>${escapeHtml(patient.patientEmail)}</p>
+                                        <div class="patient-status">
+                                            ${patient.linkedUserId ? 'Active Patient' : 'Pending Registration'}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="patient-info">
-                                    <h3>${patient.name}</h3>
-                                    <p>${patient.email}</p>
+
+                                <div class="risk-section">
+                                    <div class="risk-header">
+                                        <div class="risk-title">Latest Risk</div>
+                                        <div class="risk-level">
+                                            <div class="risk-percentage">${riskScore !== null ? `${progressWidth}%` : '—'}</div>
+                                            <span class="risk-badge ${riskLevel ? `risk-${riskLevel}` : ''}">
+                                                ${riskLabel}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="risk-progress">
+                                        <div class="risk-progress-bar" style="width: ${progressWidth}%; background: ${riskColor};"></div>
+                                    </div>
+                                    <div class="risk-date">
+                                        ${hasAssessment && latest.assessmentDate ? `Last assessed: ${new Date(latest.assessmentDate).toLocaleDateString()}` : 'Ready for assessment'}
+                                    </div>
                                 </div>
+
+                                ${hasAssessment ? `
+                                <div class="domain-scores-section">
+                                    <div class="domain-scores-header">
+                                        <i class="fas fa-brain"></i>
+                                        <div class="domain-scores-title">Domain Scores</div>
+                                    </div>
+                                    <div class="domain-score-item">
+                                        <div class="domain-score-label">Social Communication</div>
+                                        <div class="domain-score-progress">
+                                            <div class="domain-score-bar" style="width: ${socialScore !== null ? socialScore : 0}%; background: ${socialScore !== null && socialScore >= 80 ? '#d32f2f' : socialScore !== null && socialScore >= 60 ? '#f57c00' : '#4caf50'};"></div>
+                                        </div>
+                                        <div class="domain-score-percentage">${socialScore !== null ? `${socialScore}%` : '—'}</div>
+                                    </div>
+                                    <div class="domain-score-item">
+                                        <div class="domain-score-label">Behavioral Patterns</div>
+                                        <div class="domain-score-progress">
+                                            <div class="domain-score-bar" style="width: ${behavioralScore !== null ? behavioralScore : 0}%; background: ${behavioralScore !== null && behavioralScore >= 80 ? '#d32f2f' : behavioralScore !== null && behavioralScore >= 60 ? '#f57c00' : '#4caf50'};"></div>
+                                        </div>
+                                        <div class="domain-score-percentage">${behavioralScore !== null ? `${behavioralScore}%` : '—'}</div>
+                                    </div>
+                                    <div class="domain-score-item">
+                                        <div class="domain-score-label">Sensory Processing</div>
+                                        <div class="domain-score-progress">
+                                            <div class="domain-score-bar" style="width: ${sensoryScore !== null ? sensoryScore : 0}%; background: ${sensoryScore !== null && sensoryScore >= 80 ? '#d32f2f' : sensoryScore !== null && sensoryScore >= 60 ? '#f57c00' : '#4caf50'};"></div>
+                                        </div>
+                                        <div class="domain-score-percentage">${sensoryScore !== null ? `${sensoryScore}%` : '—'}</div>
+                                    </div>
+                                    <div class="domain-score-item">
+                                        <div class="domain-score-label">Cognitive Abilities</div>
+                                        <div class="domain-score-progress">
+                                            <div class="domain-score-bar" style="width: ${cognitiveScore !== null ? cognitiveScore : 0}%; background: ${cognitiveScore !== null && cognitiveScore >= 80 ? '#d32f2f' : cognitiveScore !== null && cognitiveScore >= 60 ? '#f57c00' : '#4caf50'};"></div>
+                                        </div>
+                                        <div class="domain-score-percentage">${cognitiveScore !== null ? `${cognitiveScore}%` : '—'}</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+
+                                <div class="patient-stats">
+                                    <div class="patient-stat">
+                                        <div class="patient-stat-number">—</div>
+                                        <div class="patient-stat-label">Progress</div>
+                                    </div>
+                                    <div class="patient-stat">
+                                        <div class="patient-stat-number">—</div>
+                                        <div class="patient-stat-label">Sessions</div>
+                                    </div>
+                                </div>
+
+                                ${patient._id
+                                    ? `<button onclick="viewPatient('${encodeURIComponent(patient._id)}')" class="view-progress-btn">
+                                         View Progress
+                                       </button>`
+                                    : ''
+                                }
                             </div>
-                            <div class="patient-stats">
-                                <div class="patient-stat">
-                                    <div class="patient-stat-number">${Math.floor(Math.random() * 100)}%</div>
-                                    <div class="patient-stat-label">Progress</div>
-                                </div>
-                                <div class="patient-stat">
-                                    <div class="patient-stat-number">${Math.floor(Math.random() * 20)}</div>
-                                    <div class="patient-stat-label">Sessions</div>
-                                </div>
+                        `;
+                    }).join('');
+                    
+                    console.log('Patient count should now be:', patients.length);
+
+                } catch (error) {
+                    console.error('=== ERROR IN LOAD PATIENTS ===');
+                    console.error('Error details:', {
+                        message: error.message,
+                        stack: error.stack,
+                        userData: userData,
+                        hasToken: !!token,
+                        tokenLength: token ? token.length : 0
+                    });
+                    
+                    // Show user-friendly error message
+                    const container = document.getElementById('patients-container');
+                    if (container) {
+                        container.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #ff6b6b;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h3>Failed to Load Patients</h3>
+                                <p>Error: ${error.message}</p>
+                                <button onclick="loadPatients()" style="background: #4361ee; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; margin-top: 1rem; cursor: pointer;">
+                                    <i class="fas fa-refresh"></i> Retry
+                                </button>
                             </div>
-                            <button onclick="viewPatient('${patient._id}')" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 0.5rem 1rem; border-radius: 8px; margin-top: 1rem; width: 100%; cursor: pointer;">
-                                View Progress
-                            </button>
-                        </div>
-                    `).join('');
+                        `;
+                    }
                 }
-            } catch (error) {
-                console.error('Error loading patients:', error);
+            }
+
+            // Load patients on initial page load
+            loadPatients();
+
+            function viewPatient(patientId) {
+                if (!patientId) {
+                    console.error('viewPatient called without patientId');
+                    return;
+                }
+                window.location.href = `patient-progress.html?patientId=${patientId}`;
+            }
+
+            function logout() {
+                try {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('loginTime');
+                } finally {
+                    window.location.replace('loginpage.html');
+                }
+            }
+
+        // Open Add Patient Modal
+        function openAddPatientModal() {
+            document.getElementById("addPatientModal").style.display = "flex";
+            // Clear previous form data
+            document.getElementById("patientName").value = "";
+            document.getElementById("patientEmail").value = "";
+            document.getElementById("patientAge").value = "";
+            document.getElementById("ageUnit").value = "";
+            document.getElementById("surveyNotes").value = "";
+            document.getElementById("dynamic-survey").innerHTML = "";
+            uploadedFiles = [];
+            document.getElementById('filePreview').innerHTML = '';
+            document.getElementById('fileInput').value = '';
+        }
+
+        function closeAddPatientModal() {
+            document.getElementById("addPatientModal").style.display = "none";
+        }
+
+        function handleAgeChange() {
+            const age = document.getElementById('patientAge')?.value;
+            const unit = document.getElementById('ageUnit')?.value;
+
+            console.log('Age changed:', age, unit);
+
+            if (!age || !unit) {
+                document.getElementById('dynamic-survey').innerHTML = '';
+                return;
+            }
+
+            // Determine age group and show appropriate questions
+            let ageGroup = 'child';
+            if (unit === 'months') {
+                if (age >= 12 && age <= 36) ageGroup = 'toddler';
+            } else {
+                if (age >= 4 && age <= 11) ageGroup = 'child';
+                if (age >= 12 && age <= 16) ageGroup = 'adolescent';
+                if (age >= 17) ageGroup = 'adult';
+            }
+
+            // Show appropriate survey questions
+            switch (ageGroup) {
+                case 'toddler':
+                    renderToddlerQuestions();
+                    break;
+                case 'child':
+                    renderChildQuestions();
+                    break;
+                case 'adolescent':
+                    renderAdolescentQuestions();
+                    break;
+                case 'adult':
+                    renderAdultQuestions();
+                    break;
+                default:
+                    document.getElementById('dynamic-survey').innerHTML = '';
             }
         }
 
-        // Load patients on page load
-        loadPatients();
-
-        // Add your existing accessibility functions here...
-        // [Include all the accessibility functions from previous implementation]
-
-        function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
-            localStorage.removeItem('loginTime');
-            window.location.href = 'loginpage.html';
+        function toggleAccessibilityMenu() {
+            const options = document.getElementById('accessibility-options');
+            options.classList.toggle('show');
         }
 
-        function viewPatient(patientId) {
-            window.location.href = `patient-progress.html?patientId=${patientId}`;
+        function toggleReadAloud() {
+            const btn = document.getElementById('read-aloud-btn');
+            btn.classList.toggle('active');
+            
+            if (btn.classList.contains('active')) {
+                // Start reading aloud
+                if ('speechSynthesis' in window) {
+                    const text = document.body.innerText;
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    speechSynthesis.speak(utterance);
+                }
+            } else {
+                // Stop reading aloud
+                if ('speechSynthesis' in window) {
+                    speechSynthesis.cancel();
+                }
+            }
+        }
+
+        function reduceAnimations() {
+            document.body.classList.toggle('reduced-motion');
+            const btn = document.getElementById('reduce-motions-btn');
+            btn.classList.toggle('active');
+        }
+
+        function increaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            const newSize = currentSize + 2;
+            document.documentElement.style.fontSize = newSize + 'px';
+        }
+
+        function decreaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            const newSize = Math.max(12, currentSize - 2);
+            document.documentElement.style.fontSize = newSize + 'px';
+        }
+
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+            const btn = document.getElementById('high-contrast-btn');
+            btn.classList.toggle('active');
+        }
+
+        // Color Theme Functions
+        function openColorThemeModal() {
+            document.getElementById('colorThemeModal').style.display = 'flex';
+        }
+
+        function closeColorThemeModal() {
+            document.getElementById('colorThemeModal').style.display = 'none';
+        }
+
+        function applyTheme(themeName) {
+            const themes = {
+                'default': {
+                    primary: '#4361ee',
+                    secondary: '#3a0ca3',
+                    background: '#667eea',
+                    text: '#212529',
+                    sidebar: '#2d3e50'
+                },
+                'ocean': {
+                    primary: '#006ba6',
+                    secondary: '#0496ff',
+                    background: '#e3f2fd',
+                    text: '#023047',
+                    sidebar: '#023047'
+                },
+                'forest': {
+                    primary: '#2d6a4f',
+                    secondary: '#52b788',
+                    background: '#d8f3dc',
+                    text: '#081c15',
+                    sidebar: '#1b4332'
+                },
+                'sunset': {
+                    primary: '#ff9a56',
+                    secondary: '#ff6b6b',
+                    background: '#ffeaa7',
+                    text: '#2d3436',
+                    sidebar: '#d63031'
+                },
+                'purple': {
+                    primary: '#7209b7',
+                    secondary: '#b5179e',
+                    background: '#f0e6ff',
+                    text: '#240046',
+                    sidebar: '#3c096c'
+                },
+                'monochrome': {
+                    primary: '#212529',
+                    secondary: '#6c757d',
+                    background: '#f8f9fa',
+                    text: '#000000',
+                    sidebar: '#343a40'
+                },
+                'candy': {
+                    primary: '#ff006e',
+                    secondary: '#fb5607',
+                    background: '#ffbe0b',
+                    text: '#3a0ca3',
+                    sidebar: '#8338ec'
+                },
+                'mint': {
+                    primary: '#00b4d8',
+                    secondary: '#0077b6',
+                    background: '#caf0f8',
+                    text: '#03045e',
+                    sidebar: '#0077b6'
+                }
+            };
+
+            const theme = themes[themeName];
+            if (theme) {
+                // Apply theme to CSS variables
+                const root = document.documentElement;
+                root.style.setProperty('--primary', theme.primary);
+                root.style.setProperty('--secondary', theme.secondary);
+                root.style.setProperty('--card-bg', theme.background);
+                root.style.setProperty('--text-dark', theme.text);
+                root.style.setProperty('--sidebar-bg', theme.sidebar);
+                
+                // Apply to sidebar
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    sidebar.style.background = theme.sidebar;
+                }
+                
+                // Apply to header
+                const header = document.querySelector('.header');
+                if (header) {
+                    header.style.background = theme.background;
+                }
+                
+                // Apply to stat cards
+                const statCards = document.querySelectorAll('.stat-card');
+                statCards.forEach(card => {
+                    card.style.background = theme.background;
+                });
+                
+                // Apply to sections
+                const sections = document.querySelectorAll('.patients-section, .activity-section');
+                sections.forEach(section => {
+                    section.style.background = theme.background;
+                });
+                
+                // Save theme to localStorage
+                localStorage.setItem('dashboardTheme', themeName);
+                
+                // Close modal
+                closeColorThemeModal();
+                
+                console.log('Applied theme:', themeName, theme);
+            }
+        }
+
+        // Load saved theme on page load
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('dashboardTheme');
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            }
+        }
+
+        // Initialize theme on page load
+        loadSavedTheme();
+
+        // Load age-specific questionnaire based on ARFF datasets
+        function loadSurveyQuestions(ageGroup) {
+            const container = document.getElementById('dynamic-survey');
+            if (!container) return;
+            
+            if (ageGroup === 'child') {
+                renderChildQuestions();
+            } else if (ageGroup === 'adolescent') {
+                renderAdolescentQuestions();
+            } else if (ageGroup === 'adult') {
+                renderAdultQuestions();
+            } else {
+                renderToddlerQuestions(); // For < 4 years
+            }
+        }
+
+        function getAgeGroup(age, unit) {
+            const numAge = Number(age);
+            if (!Number.isFinite(numAge) || numAge <= 0) return '';
+
+            if (unit === 'months') {
+                if (numAge < 48) return 'toddler';
+                const years = numAge / 12;
+                if (years >= 4 && years <= 11) return 'child';
+                if (years >= 12 && years <= 16) return 'adolescent';
+                return 'adult';
+            }
+
+            // unit === 'years'
+            if (numAge < 4) return 'toddler';
+            if (numAge >= 4 && numAge <= 11) return 'child';
+            if (numAge >= 12 && numAge <= 16) return 'adolescent';
+            return 'adult';
+        }
+
+        function renderToddlerQuestions() {
+            const container = document.getElementById("dynamic-survey");
+            container.innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">Toddler Assessment (1-3 years)</h3>
+                    
+                    <div class="survey-question">
+                        <p><strong>1. Does your child respond to their name?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q1" value="always"> Always</label>
+                            <label><input type="radio" name="q1" value="sometimes"> Sometimes</label>
+                            <label><input type="radio" name="q1" value="rarely"> Rarely</label>
+                            <label><input type="radio" name="q1" value="never"> Never</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>2. Does your child use pointing to communicate needs?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q2" value="yes"> Yes</label>
+                            <label><input type="radio" name="q2" value="no"> No</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>3. Does your child engage in pretend play?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q3" value="frequently"> Frequently</label>
+                            <label><input type="radio" name="q3" value="occasionally"> Occasionally</label>
+                            <label><input type="radio" name="q3" value="rarely"> Rarely</label>
+                            <label><input type="radio" name="q3" value="never"> Never</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>4. How does your child react to new people?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q4" value="friendly"> Friendly and curious</label>
+                            <label><input type="radio" name="q4" value="shy"> Shy but warms up</label>
+                            <label><input type="radio" name="q4" value="anxious"> Very anxious</label>
+                            <label><input type="radio" name="q4" value="ignores"> Ignores completely</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>5. Does your child repeat words or phrases?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q5" value="age-appropriate"> Age-appropriate</label>
+                            <label><input type="radio" name="q5" value="some-repetition"> Some repetition</label>
+                            <label><input type="radio" name="q5" value="frequent-echolalia"> Frequent echoing</label>
+                            <label><input type="radio" name="q5" value="no-speech"> No speech</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>6. How sensitive is your child to sounds?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q6" value="normal"> Normal response</label>
+                            <label><input type="radio" name="q6" value="slightly-sensitive"> Slightly sensitive</label>
+                            <label><input type="radio" name="q6" value="very-sensitive"> Very sensitive</label>
+                            <label><input type="radio" name="q6" value="overwhelmed"> Gets overwhelmed</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>7. Does your child have repetitive movements?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q7" value="none"> None</label>
+                            <label><input type="radio" name="q7" value="occasional"> Occasional</label>
+                            <label><input type="radio" name="q7" value="frequent"> Frequent</label>
+                            <label><input type="radio" name="q7" value="constant"> Constant</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>8. How does your child handle changes in routine?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q8" value="flexible"> Very flexible</label>
+                            <label><input type="radio" name="q8" value="mildly-upset"> Mildly upset</label>
+                            <label><input type="radio" name="q8" value="very-upset"> Very upset</label>
+                            <label><input type="radio" name="q8" value="extreme-distress"> Extreme distress</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>9. Does your child show interest in other children?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q9" value="very-interested"> Very interested</label>
+                            <label><input type="radio" name="q9" value="somewhat-interested"> Somewhat interested</label>
+                            <label><input type="radio" name="q9" value="indifferent"> Indifferent</label>
+                            <label><input type="radio" name="q9" value="avoids"> Avoids them</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>10. How does your child express emotions?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q10" value="age-appropriate"> Age-appropriate</label>
+                            <label><input type="radio" name="q10" value="somely-limited"> Somewhat limited</label>
+                            <label><input type="radio" name="q10" value="very-limited"> Very limited</label>
+                            <label><input type="radio" name="q10" value="inappropriate"> Inappropriate expression</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderChildQuestions() {
+            const container = document.getElementById("dynamic-survey");
+            container.innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">Child Assessment (4-11 years)</h3>
+                    
+                    <div class="survey-question">
+                        <p><strong>1. Does your child have difficulty understanding social cues?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q1" value="none"> None</label>
+                            <label><input type="radio" name="q1" value="mild"> Mild</label>
+                            <label><input type="radio" name="q1" value="moderate"> Moderate</label>
+                            <label><input type="radio" name="q1" value="severe"> Severe</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>2. How is your child's conversation ability?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q2" value="age-appropriate"> Age-appropriate</label>
+                            <label><input type="radio" name="q2" value="slightly-delayed"> Slightly delayed</label>
+                            <label><input type="radio" name="q2" value="significantly-delayed"> Significantly delayed</label>
+                            <label><input type="radio" name="q2" value="minimal"> Minimal speech</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>3. Does your child show intense interest in specific topics?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q3" value="no"> No</label>
+                            <label><input type="radio" name="q3" value="mild"> Mild interest</label>
+                            <label><input type="radio" name="q3" value="strong"> Strong interest</label>
+                            <label><input type="radio" name="q3" value="very-strong"> Very strong/intense</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>4. How does your child handle changes in routine?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q4" value="well"> Adapts well</label>
+                            <label><input type="radio" name="q4" value="minor-difficulty"> Minor difficulty</label>
+                            <label><input type="radio" name="q4" value="significant-difficulty"> Significant difficulty</label>
+                            <label><input type="radio" name="q4" value="extreme-distress"> Extreme distress</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>5. Does your child make friends easily?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q5" value="very-easily"> Very easily</label>
+                            <label><input type="radio" name="q5" value="somewhat-easily"> Somewhat easily</label>
+                            <label><input type="radio" name="q5" value="difficulty"> Has difficulty</label>
+                            <label><input type="radio" name="q5" value="no-friends"> No friends</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>6. How does your child handle group activities?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q6" value="participates-well"> Participates well</label>
+                            <label><input type="radio" name="q6" value="somewhat-reluctant"> Somewhat reluctant</label>
+                            <label><input type="radio" name="q6" value="very-reluctant"> Very reluctant</label>
+                            <label><input type="radio" name="q6" value="avoids-completely"> Avoids completely</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>7. Does your child have unusual speech patterns?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q7" value="normal"> Normal</label>
+                            <label><input type="radio" name="q7" value="slightly-unusual"> Slightly unusual</label>
+                            <label><input type="radio" name="q7" value="very-unusual"> Very unusual</label>
+                            <label><input type="radio" name="q7" value="very-limited"> Very limited speech</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>8. How sensitive is your child to textures and touch?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q8" value="normal"> Normal response</label>
+                            <label><input type="radio" name="q8" value="slightly-sensitive"> Slightly sensitive</label>
+                            <label><input type="radio" name="q8" value="very-sensitive"> Very sensitive</label>
+                            <label><input type="radio" name="q8" value="extremely-sensitive"> Extremely sensitive</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>9. Does your child have intense focus on specific topics?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q9" value="balanced"> Balanced interests</label>
+                            <label><input type="radio" name="q9" value="moderate-focus"> Moderate focus</label>
+                            <label><input type="radio" name="q9" value="intense-focus"> Intense focus</label>
+                            <label><input type="radio" name="q9" value="obsessive"> Obsessive focus</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>10. How does your child express emotions?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q10" value="age-appropriate"> Age-appropriate</label>
+                            <label><input type="radio" name="q10" value="somely-limited"> Somewhat limited</label>
+                            <label><input type="radio" name="q10" value="very-limited"> Very limited</label>
+                            <label><input type="radio" name="q10" value="inappropriate"> Inappropriate expression</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>11. Does your child have coordination difficulties?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q11" value="none"> None</label>
+                            <label><input type="radio" name="q11" value="mild"> Mild</label>
+                            <label><input type="radio" name="q11" value="moderate"> Moderate</label>
+                            <label><input type="radio" name="q11" value="severe"> Severe</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>12. How does your child handle loud noises?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q12" value="tolerates-well"> Tolerates well</label>
+                            <label><input type="radio" name="q12" value="somely-bothered"> Somewhat bothered</label>
+                            <label><input type="radio" name="q12" value="very-bothered"> Very bothered</label>
+                            <label><input type="radio" name="q12" value="panics"> Panics/overwhelmed</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdolescentQuestions() {
+            const container = document.getElementById("dynamic-survey");
+            container.innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">Adolescent Assessment (12-16 years)</h3>
+                    
+                    <div class="survey-question">
+                        <p><strong>1. How does your teenager handle social situations with peers?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q1" value="comfortable"> Comfortable</label>
+                            <label><input type="radio" name="q1" value="somewhat-comfortable"> Somewhat comfortable</label>
+                            <label><input type="radio" name="q1" value="anxious"> Anxious</label>
+                            <label><input type="radio" name="q1" value="avoids"> Avoids social situations</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>2. Does your teenager understand sarcasm and figurative language?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q2" value="always"> Always</label>
+                            <label><input type="radio" name="q2" value="usually"> Usually</label>
+                            <label><input type="radio" name="q2" value="sometimes"> Sometimes</label>
+                            <label><input type="radio" name="q2" value="rarely"> Rarely/Never</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>3. How flexible is your teenager with unexpected changes?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q3" value="very-flexible"> Very flexible</label>
+                            <label><input type="radio" name="q3" value="somewhat-flexible"> Somewhat flexible</label>
+                            <label><input type="radio" name="q3" value="rigid"> Quite rigid</label>
+                            <label><input type="radio" name="q3" value="very-rigid"> Very rigid</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>4. Does your teenager have intense specific interests?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q4" value="no"> No</label>
+                            <label><input type="radio" name="q4" value="mild"> Mild interests</label>
+                            <label><input type="radio" name="q4" value="strong"> Strong specific interests</label>
+                            <label><input type="radio" name="q4" value="very-strong"> Very intense/specialized interests</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>5. How does your teenager handle group conversations?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q5" value="participates-well"> Participates well</label>
+                            <label><input type="radio" name="q5" value="somely-difficult"> Somewhat difficult</label>
+                            <label><input type="radio" name="q5" value="very-difficult"> Very difficult</label>
+                            <label><input type="radio" name="q5" value="avoids-completely"> Avoids completely</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>6. Does your teenager have difficulty with personal space?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q6" value="appropriate"> Appropriate understanding</label>
+                            <label><input type="radio" name="q6" value="somely-awkward"> Somewhat awkward</label>
+                            <label><input type="radio" name="q6" value="very-awkward"> Very awkward</label>
+                            <label><input type="radio" name="q6" value="no-awareness"> No awareness</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>7. How does your teenager express emotions?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q7" value="age-appropriate"> Age-appropriate</label>
+                            <label><input type="radio" name="q7" value="somely-limited"> Somewhat limited</label>
+                            <label><input type="radio" name="q7" value="very-limited"> Very limited</label>
+                            <label><input type="radio" name="q7" value="inappropriate"> Inappropriate expression</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>8. Does your teenager have sensory sensitivities?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q8" value="none"> None</label>
+                            <label><input type="radio" name="q8" value="mild"> Mild</label>
+                            <label><input type="radio" name="q8" value="moderate"> Moderate</label>
+                            <label><input type="radio" name="q8" value="severe"> Severe</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>9. How does your teenager handle transitions between activities?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q9" value="smoothly"> Smoothly</label>
+                            <label><input type="radio" name="q9" value="minor-difficulty"> Minor difficulty</label>
+                            <label><input type="radio" name="q9" value="significant-difficulty"> Significant difficulty</label>
+                            <label><input type="radio" name="q9" value="extreme-difficulty"> Extreme difficulty</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>10. Does your teenager have repetitive behaviors?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q10" value="none"> None</label>
+                            <label><input type="radio" name="q10" value="occasional"> Occasional</label>
+                            <label><input type="radio" name="q10" value="frequent"> Frequent</label>
+                            <label><input type="radio" name="q10" value="constant"> Constant</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>11. How does your teenager handle criticism or feedback?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q11" value="well"> Handles well</label>
+                            <label><input type="radio" name="q11" value="somely-sensitive"> Somewhat sensitive</label>
+                            <label><input type="radio" name="q11" value="very-sensitive"> Very sensitive</label>
+                            <label><input type="radio" name="q11" value="extremely-sensitive"> Extremely sensitive</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>12. Does your teenager understand social hierarchies?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q12" value="understands-well"> Understands well</label>
+                            <label><input type="radio" name="q12" value="somely-confused"> Somewhat confused</label>
+                            <label><input type="radio" name="q12" value="very-confused"> Very confused</label>
+                            <label><input type="radio" name="q12" value="no-understanding"> No understanding</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdultQuestions() {
+            const container = document.getElementById("dynamic-survey");
+            container.innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">Adult Assessment (17+ years)</h3>
+                    
+                    <div class="survey-question">
+                        <p><strong>1. How comfortable are you in social situations?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q1" value="very-comfortable"> Very comfortable</label>
+                            <label><input type="radio" name="q1" value="comfortable"> Comfortable</label>
+                            <label><input type="radio" name="q1" value="anxious"> Anxious</label>
+                            <label><input type="radio" name="q1" value="very-anxious"> Very anxious/avoidant</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>2. Do you have difficulty understanding social cues and body language?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q2" value="no"> No difficulty</label>
+                            <label><input type="radio" name="q2" value="sometimes"> Sometimes</label>
+                            <label><input type="radio" name="q2" value="often"> Often</label>
+                            <label><input type="radio" name="q2" value="always"> Always</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>3. Do you have intense interests in specific topics?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q3" value="no"> No</label>
+                            <label><input type="radio" name="q3" value="mild"> Mild interests</label>
+                            <label><input type="radio" name="q3" value="strong"> Strong interests</label>
+                            <label><input type="radio" name="q3" value="very-strong"> Very intense/specialized</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>4. How do you handle changes in routine or unexpected events?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q4" value="well"> Adapt well</label>
+                            <label><input type="radio" name="q4" value="minor-stress"> Minor stress</label>
+                            <label><input type="radio" name="q4" value="significant-stress"> Significant stress</label>
+                            <label><input type="radio" name="q4" value="extreme-stress"> Extreme distress</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>5. Do you have difficulty with personal relationships?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q5" value="no-difficulty"> No difficulty</label>
+                            <label><input type="radio" name="q5" value="minor-difficulty"> Minor difficulty</label>
+                            <label><input type="radio" name="q5" value="significant-difficulty"> Significant difficulty</label>
+                            <label><input type="radio" name="q5" value="very-difficulty"> Very difficult</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>6. Do you engage in repetitive behaviors?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q6" value="none"> None</label>
+                            <label><input type="radio" name="q6" value="occasional"> Occasional</label>
+                            <label><input type="radio" name="q6" value="frequent"> Frequent</label>
+                            <label><input type="radio" name="q6" value="constant"> Constant</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>7. How sensitive are you to sensory input?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q7" value="normal"> Normal sensitivity</label>
+                            <label><input type="radio" name="q7" value="slightly-sensitive"> Slightly sensitive</label>
+                            <label><input type="radio" name="q7" value="very-sensitive"> Very sensitive</label>
+                            <label><input type="radio" name="q7" value="extremely-sensitive"> Extremely sensitive</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>8. Do you have difficulty with executive functioning?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q8" value="no-issues"> No issues</label>
+                            <label><input type="radio" name="q8" value="minor-issues"> Minor issues</label>
+                            <label><input type="radio" name="q8" value="moderate-issues"> Moderate issues</label>
+                            <label><input type="radio" name="q8" value="severe-issues"> Severe issues</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>9. How do you handle abstract concepts?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q9" value="understands-well"> Understands well</label>
+                            <label><input type="radio" name="q9" value="somely-difficult"> Somewhat difficult</label>
+                            <label><input type="radio" name="q9" value="very-difficult"> Very difficult</label>
+                            <label><input type="radio" name="q9" value="concrete-only"> Concrete thinking only</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>10. Do you have special interests that dominate your time?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q10" value="balanced"> Balanced interests</label>
+                            <label><input type="radio" name="q10" value="moderate-focus"> Moderate focus</label>
+                            <label><input type="radio" name="q10" value="intense-focus"> Intense focus</label>
+                            <label><input type="radio" name="q10" value="obsessive"> Obsessive focus</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>11. How do you express emotions appropriately?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q11" value="always-appropriate"> Always appropriate</label>
+                            <label><input type="radio" name="q11" value="usually-appropriate"> Usually appropriate</label>
+                            <label><input type="radio" name="q11" value="sometimes-inappropriate"> Sometimes inappropriate</label>
+                            <label><input type="radio" name="q11" value="often-inappropriate"> Often inappropriate</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-question">
+                        <p><strong>12. Do you have difficulty with motor coordination?</strong></p>
+                        <div class="radio-group">
+                            <label><input type="radio" name="q12" value="no-difficulty"> No difficulty</label>
+                            <label><input type="radio" name="q12" value="mild-clumsiness"> Mild clumsiness</label>
+                            <label><input type="radio" name="q12" value="moderate-difficulty"> Moderate difficulty</label>
+                            <label><input type="radio" name="q12" value="severe-difficulty"> Severe difficulty</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Open file browser for upload
+        function openFileBrowser() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = 'image/*,video/*';
+            input.onchange = handleFileSelect;
+            input.click();
+        }
+
+        // File Upload Functions
+        let uploadedFiles = [];
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            handleFiles(files);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.querySelector('.file-upload-area').classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.querySelector('.file-upload-area').classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.querySelector('.file-upload-area').classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            const previewContainer = document.getElementById('filePreview');
+            
+            for (let file of files) {
+                if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                    uploadedFiles.push(file);
+                    
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'file-preview-item';
+                    
+                    if (file.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(file);
+                        previewItem.appendChild(img);
+                    } else if (file.type.startsWith('video/')) {
+                        const video = document.createElement('video');
+                        video.src = URL.createObjectURL(file);
+                        video.controls = true;
+                        previewItem.appendChild(video);
+                    }
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'file-remove-btn';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.onclick = () => removeFile(file, previewItem);
+                    previewItem.appendChild(removeBtn);
+                    
+                    previewContainer.appendChild(previewItem);
+                }
+            }
+        }
+
+        function removeFile(file, element) {
+            const index = uploadedFiles.indexOf(file);
+            if (index > -1) {
+                uploadedFiles.splice(index, 1);
+            }
+            element.remove();
+        }
+
+        async function uploadFiles(patientProfileId) {
+            if (uploadedFiles.length === 0) return;
+            
+            const progressContainer = document.getElementById('uploadProgress');
+            const progressBar = document.getElementById('progressBar');
+            progressContainer.style.display = 'block';
+            
+            for (let i = 0; i < uploadedFiles.length; i++) {
+                const file = uploadedFiles[i];
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('patientProfileId', patientProfileId);
+                formData.append('type', file.type.startsWith('image/') ? 'photo' : 'video');
+                
+                try {
+                    // Use GridFS upload (MongoDB storage)
+                    const response = await fetch('http://localhost:5001/api/patient/upload-gridfs', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        console.log('File uploaded successfully to MongoDB');
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                }
+                
+                // Update progress
+                const progress = ((i + 1) / uploadedFiles.length) * 100;
+                progressBar.style.width = progress + '%';
+            } 
+            setTimeout(() => {
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+            }, 2000);
+        }
+
+        // Helper function to get authentication headers
+        function getAuthHeaders() {
+            const token = localStorage.getItem('authToken');
+            console.log('Getting auth headers with token:', token ? 'present' : 'missing');
+            
+            if (!token) {
+                console.log('No auth token found, user not logged in');
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer null'
+                };
+            }
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        // Collect survey responses from the form
+        function collectSurveyResponses() {
+            const responses = {};
+            const ageUnit = document.getElementById('ageUnit').value;
+            const age = document.getElementById('patientAge').value;
+            
+            // Determine which questions to collect based on age group
+            let ageGroup = 'child'; // default
+            if (ageUnit === 'months') {
+                if (age >= 12 && age <= 36) ageGroup = 'toddler';
+            } else {
+                if (age >= 4 && age <= 11) ageGroup = 'child';
+                if (age >= 12 && age <= 16) ageGroup = 'adolescent';
+                if (age >= 17) ageGroup = 'adult';
+            }
+            
+            // Collect all radio button responses and transform to ML format
+            let questionsPresent = false;
+            for (let i = 1; i <= 12; i++) {
+                const radioName = `q${i}`;
+                const selectedRadio = document.querySelector(`input[name="${radioName}"]:checked`);
+                if (selectedRadio) {
+                    questionsPresent = true;
+                    const answer = selectedRadio.value;
+                    const aKey = `A${i}_Score`;
+                    
+                    // Convert string responses to numeric scores (0 or 1)
+                    let numericScore = 0;
+                    
+                    // Map common response patterns to scores
+                    if (answer === 'yes' || answer === 'always' || answer === 'frequent' || answer === 'constant' || answer === 'severe' || answer === 'very-sensitive' || answer === 'extremely-sensitive' || answer === 'very-difficult' || answer === 'very-difficulty' || answer === 'intense-focus' || answer === 'obsessive' || answer === 'significant-stress' || answer === 'extreme-stress' || answer === 'significant-difficulty' || answer === 'very-difficulty' || answer === 'minor-issues' || answer === 'moderate-issues' || answer === 'severe-issues' || answer === 'minor-difficulty') {
+                        numericScore = 1;
+                    } else if (answer === 'sometimes' || answer === 'occasional' || answer === 'mild' || answer === 'slightly-sensitive' || answer === 'minor' || answer === 'moderate' || answer === 'well' || answer === 'no-difficulty' || answer === 'no-issues' || answer === 'normal') {
+                        numericScore = 0; // These are negative indicators
+                    }
+                    
+                    responses[aKey] = numericScore;
+                }
+            }
+            
+            if (!questionsPresent) {
+                console.log('No survey questions present');
+                return { responses: {}, ageGroup: ageGroup };
+            }
+            
+            // Add demographic data if available
+            const genderRadio = document.querySelector('input[name="gender"]:checked');
+            if (genderRadio) {
+                responses.gender = genderRadio.value;
+            }
+            
+            const ethnicitySelect = document.querySelector('select[name="ethnicity"]');
+            if (ethnicitySelect) {
+                responses.ethnicity = ethnicitySelect.value;
+            }
+            
+            const jaundiceRadio = document.querySelector('input[name="jaundice"]:checked');
+            if (jaundiceRadio) {
+                responses.jaundice = jaundiceRadio.value;
+            }
+            
+            const austimRadio = document.querySelector('input[name="austim"]:checked');
+            if (austimRadio) {
+                responses.austim = austimRadio.value;
+            }
+            
+            const countrySelect = document.querySelector('select[name="contry_of_res"]');
+            if (countrySelect) {
+                responses.contry_of_res = countrySelect.value;
+            }
+            
+            console.log('Collected survey responses:', responses);
+            console.log('Age group determined:', ageGroup);
+            
+            return { responses, ageGroup };
+        }
+
+        // Submit patient survey function
+        async function submitPatientSurvey() {
+            console.log('=== SUBMIT PATIENT SURVEY FUNCTION CALLED ===');
+            
+            // Check if user is authenticated
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            if (!token) {
+                alert('❌ You are not logged in. Please login first.');
+                window.location.href = 'loginpage.html';
+                return;
+            }
+            
+            console.log('Current userData from localStorage:', userData);
+            console.log('Current userData.id:', userData?.id);
+            console.log('Current userData.userId:', userData?.userId);
+            
+            const submitBtn = document.querySelector('button[onclick="submitPatientSurvey()"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Prevent multiple clicks
+            if (submitBtn.disabled) {
+                console.log('Submit button already disabled, returning');
+                return;
+            }
+            
+            // Get form values with detailed debugging
+            const patientNameField = document.getElementById('patientName');
+            const patientEmailField = document.getElementById('patientEmail');
+            const patientAgeField = document.getElementById('patientAge');
+            const ageUnitField = document.getElementById('ageUnit');
+            const surveyNotesField = document.getElementById('surveyNotes');
+            
+            console.log('Form field elements found:', {
+                patientNameField: !!patientNameField,
+                patientEmailField: !!patientEmailField,
+                patientAgeField: !!patientAgeField,
+                ageUnitField: !!ageUnitField,
+                surveyNotesField: !!surveyNotesField
+            });
+            
+            const patientName = patientNameField ? patientNameField.value.trim() : '';
+            const patientEmail = patientEmailField ? patientEmailField.value.trim() : '';
+            const patientAge = patientAgeField ? patientAgeField.value : '';
+            const ageUnit = ageUnitField ? ageUnitField.value : '';
+            const surveyNotes = surveyNotesField ? surveyNotesField.value.trim() : '';
+            
+            console.log('Form field values:', {
+                patientName: `"${patientName}"`,
+                patientEmail: `"${patientEmail}"`,
+                patientAge: `"${patientAge}"`,
+                ageUnit: `"${ageUnit}"`,
+                surveyNotes: `"${surveyNotes}"`
+            });
+            
+            console.log('Field validation:', {
+                hasName: !!patientName,
+                hasEmail: !!patientEmail,
+                hasAge: !!patientAge,
+                hasAgeUnit: !!ageUnit,
+                nameLength: patientName.length,
+                emailLength: patientEmail.length,
+                ageLength: patientAge.length,
+                ageUnitLength: ageUnit.length
+            });
+
+            if (!patientName || !patientEmail || !patientAge || !ageUnit) {
+                console.log('VALIDATION FAILED - Missing required fields');
+                alert('⚠️ Please fill in all required fields');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const { responses, ageGroup } = collectSurveyResponses();
+                
+                const patientData = {
+                    patientName: patientName,
+                    patientEmail: patientEmail,
+                    age: parseInt(patientAge),
+                    ageUnit: ageUnit,
+                    parentId: userData?.id || userData?.userId,
+                    surveyResponses: responses // Add the survey responses!
+                };
+
+                console.log('Sending patient data:', patientData);
+                console.log('Survey responses included:', responses);
+
+                const response = await fetch('http://localhost:5001/api/patient/add', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(patientData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Upload files if any
+                    await uploadFiles(result.patientProfileId);
+                    
+                    alert('✅ Patient added successfully!');
+                    closeAddPatientModal();
+                    loadPatients(); // Reload patients list
+                } else {
+                    const error = await response.json();
+                    console.error('Backend error details:', error);
+                    console.error('Response status:', response.status);
+                    console.error('Response headers:', response.headers);
+                    
+                    // Handle specific authentication errors
+                    if (error.message && error.message.includes('Invalid parent account')) {
+                        alert('❌ Your session has expired. Please log out and log back in.');
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('userData');
+                        window.location.href = 'loginpage.html';
+                        return;
+                    }
+                    
+                    alert('❌ Error adding patient: ' + (error.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error submitting patient survey:', error);
+                alert('❌ Network error. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        function closeColorSettings() {
+            document.getElementById('colorSettingsModal').style.display = 'none';
+        }
+
+        function applyColorPreset(preset) {
+            const primaryColor = document.getElementById('primaryColor');
+            const secondaryColor = document.getElementById('secondaryColor');
+            const backgroundColor = document.getElementById('backgroundColor');
+            const textColor = document.getElementById('textColor');
+
+            switch (preset) {
+                case 'default':
+                    primaryColor.value = '#4361ee';
+                    secondaryColor.value = '#3a0ca3';
+                    backgroundColor.value = '#667eea';
+                    textColor.value = '#212529';
+                    break;
+                case 'calm':
+                    primaryColor.value = '#87ceeb';
+                    secondaryColor.value = '#4682b4';
+                    backgroundColor.value = '#6495ed';
+                    textColor.value = '#333333';
+                    break;
+                case 'high-contrast':
+                    primaryColor.value = '#000000';
+                    secondaryColor.value = '#ffffff';
+                    backgroundColor.value = '#000000';
+                    textColor.value = '#ffffff';
+                    break;
+                case 'warm':
+                    primaryColor.value = '#ffa07a';
+                    secondaryColor.value = '#ff8c00';
+                    backgroundColor.value = '#ffd700';
+                    textColor.value = '#333333';
+                    break;
+                case 'cool':
+                    primaryColor.value = '#87ceeb';
+                    secondaryColor.value = '#4682b4';
+                    backgroundColor.value = '#6495ed';
+                    textColor.value = '#333333';
+                    break;
+                case 'pastel':
+                    primaryColor.value = '#ffc5c5';
+                    secondaryColor.value = '#ffe6cc';
+                    backgroundColor.value = '#ffffcc';
+                    textColor.value = '#333333';
+                    break;
+            }
+
+            updateCustomColors();
+        }
+
+        function updateCustomColors() {
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            const backgroundColor = document.getElementById('backgroundColor').value;
+            const textColor = document.getElementById('textColor').value;
+
+            const colorPreviewCard = document.getElementById('colorPreviewCard');
+            colorPreviewCard.style.backgroundColor = backgroundColor;
+            colorPreviewCard.style.color = textColor;
+
+            const previewBtn = colorPreviewCard.querySelector('.preview-btn');
+            previewBtn.style.backgroundColor = primaryColor;
+            previewBtn.style.color = '#ffffff';
+
+            const previewStats = colorPreviewCard.querySelectorAll('.preview-stat');
+            previewStats.forEach(stat => {
+                stat.style.backgroundColor = secondaryColor;
+                stat.style.color = '#ffffff';
+            });
+        }
+
+        function resetColors() {
+            const primaryColor = document.getElementById('primaryColor');
+            const secondaryColor = document.getElementById('secondaryColor');
+            const backgroundColor = document.getElementById('backgroundColor');
+            const textColor = document.getElementById('textColor');
+
+            primaryColor.value = '#4361ee';
+            secondaryColor.value = '#3a0ca3';
+            backgroundColor.value = '#667eea';
+            textColor.value = '#212529';
+
+            updateCustomColors();
+        }
+
+        function saveColorSettings() {
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            const backgroundColor = document.getElementById('backgroundColor').value;
+            const textColor = document.getElementById('textColor').value;
+
+            localStorage.setItem('primaryColor', primaryColor);
+            localStorage.setItem('secondaryColor', secondaryColor);
+            localStorage.setItem('backgroundColor', backgroundColor);
+            localStorage.setItem('textColor', textColor);
+
+            alert('Color settings saved!');
+            closeColorSettings();
+        }
+
+        // Load patients on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            console.log('Page load - checking authentication:', {
+                hasToken: !!token,
+                userData: userData
+            });
+            
+            if (!token || !userData.id) {
+                alert('❌ You are not logged in. Please login first.');
+                window.location.href = 'loginpage.html';
+                return;
+            }
+            
+            // Validate that the current user exists by making a test API call
+            fetch('http://localhost:5001/api/auth/validate', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Token invalid');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Token validated successfully:', data);
+                
+                // Token is valid, proceed with loading the page
+                loadUserData();
+                loadPatients();
+                
+                // Include age-specific questionnaires
+                const script = document.createElement('script');
+                script.src = 'age-specific-questionnaires.js';
+                document.body.appendChild(script);
+            })
+            .catch(error => {
+                console.error('Token validation failed:', error);
+                alert('❌ Your session has expired. Please log in again.');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userData');
+                window.location.href = 'loginpage.html';
+            });
+        });
+        
+        function loadUserData() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            // Load user data
+            if (userData.name) {
+                document.getElementById('parent-name').textContent = userData.name;
+            }
+            if (userData.email) {
+                document.getElementById('parent-email').textContent = userData.email;
+            }
         }
     </script>
 </body>

@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Progress - ASD Support Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --card-bg: #ffffff;
+            --sidebar-bg: #2d3e50;
+            --sidebar-color: #2d3e50;
+            --text-light: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .patient-info {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .patient-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .patient-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .patient-details h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .patient-details p {
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .progress-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .progress-bar-container {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-low { background: #4caf50; }
+        .progress-moderate { background: #ff9800; }
+        .progress-high { background: #f44336; }
+
+        .assessment-timeline {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 40px;
+            bottom: -20px;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-date {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-low {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .risk-moderate {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .risk-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .domain-scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .domain-score {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .domain-score h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .domain-score .score {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .recommendations {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .recommendation-item {
+            background: #e3f2fd;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .recommendation-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-item p {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .priority-tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: var(--warning);
+            color: white;
+        }
+
+        /* ML Prediction Styles */
+        .ml-details {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .ml-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .ml-label {
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .ml-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .ensemble-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .ensemble-model {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .ensemble-model h5 {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .model-score {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .feature-contributions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .feature-item {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+            font-size: 0.85rem;
+        }
+
+        .feature-name {
+            font-weight: 500;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-score {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-placeholder {
+            height: 400px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .chart-placeholder canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .chart-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .patient-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .progress-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Add to your CSS */
+        .header[style] {
+            background: var(--background-color) !important;
+        }
+
+        .sidebar[style] {
+            background: var(--sidebar-color) !important;
+        }
+
+        /* Prevent transitions during initial load */
+        body.initial-load * {
+            transition: none !important;
+        }
+    </style>
+</head>
+
+<body class="initial-load">
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Patient Progress Tracker</h1>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                <button class="export-btn" onclick="exportToPDF('summary')" style="background: #28a745; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-file-pdf"></i> Export Summary
+                </button>
+                <button class="export-btn" onclick="exportToPDF('detailed')" style="background: #17a2b8; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-file-medical"></i> Export Full Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <p>Loading patient progress data...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="error" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p id="errorMessage">Failed to load patient data</p>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" style="display: none;">
+            <!-- Patient Information -->
+            <div class="patient-info">
+                <div class="patient-header">
+                    <div class="patient-avatar" id="patientAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="patient-details">
+                        <h2 id="patientName">Loading...</h2>
+                        <p><i class="fas fa-envelope"></i> <span id="patientEmail">Loading...</span></p>
+                        <p><i class="fas fa-calendar"></i> Age: <span id="patientAge">Loading...</span></p>
+                        <p><i class="fas fa-clock"></i> Last Assessment: <span id="lastAssessment">Loading...</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Overview -->
+            <div class="progress-grid">
+                <div class="progress-card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Current Risk Level</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Overall Risk Score</span>
+                            <span id="riskScore">0%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="riskProgressBar" class="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div id="riskBadge" class="risk-badge risk-low">Low Risk</div>
+                </div>
+
+                <div class="progress-card">
+                    <h3><i class="fas fa-brain"></i> Domain Scores</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Social Communication</span>
+                            <span id="socialScore">0%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="socialProgressBar" class="progress-bar progress-low"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Behavioral Patterns</span>
+                            <span id="behaviorScore">0%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="behaviorProgressBar" class="progress-bar progress-low"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Sensory Processing</span>
+                            <span id="sensoryScore">0%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="sensoryProgressBar" class="progress-bar progress-low"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Cognitive Abilities</span>
+                            <span id="cognitiveScore">0%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="cognitiveProgressBar" class="progress-bar progress-low"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line"></i> Progress Over Time</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-pie"></i> Domain Distribution</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="domainChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assessment Timeline -->
+            <div class="assessment-timeline">
+                <h3><i class="fas fa-history"></i> Assessment History</h3>
+                <div id="timelineContainer">
+                    <!-- Timeline items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recommendations">
+                <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                <div id="recommendationsContainer">
+                    <!-- Recommendations will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <!-- jsPDF Library for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <script>
+        let patientId = null;
+        let patientData = null;
+        let progressChart = null;
+        let domainChart = null;
+
+        // Get patient ID from URL
+        function getPatientIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('patientId');
+        }
+
+        // Initialize page
+        async function initializePage() {
+            patientId = getPatientIdFromUrl();
+            
+            if (!patientId) {
+                showError('No patient ID provided');
+                return;
+            }
+
+            // Load patient-specific colors first
+            loadPatientColors();
+
+            try {
+                await loadPatientData();
+                displayPatientData();
+                initializeCharts();
+                showMainContent();
+            } catch (error) {
+                console.error('Error loading patient data:', error);
+                showError(`Failed to load patient data: ${error.message}`);
+            }
+        }
+
+        // Load patient-specific colors from localStorage
+        function loadPatientColors() {
+            const storedSettings = localStorage.getItem('patientColorSettings');
+            if (storedSettings) {
+                const patientColorSettings = JSON.parse(storedSettings);
+                const patientColors = patientColorSettings[patientId];
+                
+                if (patientColors) {
+                    // Apply WITHOUT transition to prevent blink
+                    applyPatientColors(patientColors);
+                }
+            }
+        }
+
+        // Remove initial-load class after a short delay
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.body.classList.remove('initial-load');
+            }, 100);
+        });
+
+        // Apply patient-specific colors to the page
+        function applyPatientColors(colors) {
+            console.log('Colors available but not applying - using default theme');
+            // No color application - using default dashboard colors
+        }
+
+        // Load patient data from backend
+        async function loadPatientData() {
+            const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+            
+            if (!token) {
+                throw new Error('No authentication token found. Please log in again.');
+            }
+
+            // Load patient profile
+            const profileResponse = await fetch(`http://localhost:5001/api/patient/profile/${patientId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!profileResponse.ok) {
+                const errorData = await profileResponse.json();
+                throw new Error(errorData.message || `Failed to load patient profile (${profileResponse.status})`);
+            }
+
+            const profile = await profileResponse.json();
+
+            // Load patient surveys
+            const surveysResponse = await fetch(`http://localhost:5001/api/patient/surveys/${patientId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const surveys = surveysResponse.ok ? await surveysResponse.json() : [];
+
+            // Load assessment results
+            const assessmentsResponse = await fetch(`http://localhost:5001/api/patient/assessments/${patientId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const assessments = assessmentsResponse.ok ? await assessmentsResponse.json() : [];
+
+            patientData = {
+                profile: profile,
+                surveys: surveys,
+                assessments: assessments
+            };
+        }
+
+        // Display patient data
+        function displayPatientData() {
+            console.log('=== DISPLAYING PATIENT DATA ===');
+            console.log('Patient data:', patientData);
+            console.log('Profile:', patientData.profile);
+            console.log('Surveys:', patientData.surveys);
+            console.log('Assessments:', patientData.assessments);
+            console.log('Number of assessments:', patientData.assessments.length);
+            
+            // Display basic patient info
+            document.getElementById('patientName').textContent = patientData.profile.patientName || 'Unknown';
+            document.getElementById('patientEmail').textContent = patientData.profile.patientEmail || 'No email';
+            document.getElementById('patientAge').textContent = 
+                patientData.profile.age ? `${patientData.profile.age} ${patientData.profile.ageUnit || 'years'}` : 'Unknown';
+            
+            // Set avatar initial
+            const initials = (patientData.profile.patientName || 'P').charAt(0).toUpperCase();
+            document.getElementById('patientAvatar').textContent = initials;
+
+            // Display latest assessment data
+            if (patientData.assessments.length > 0) {
+                console.log('Found assessments, displaying latest one...');
+                const latestAssessment = patientData.assessments[patientData.assessments.length - 1];
+                console.log('Latest assessment:', latestAssessment);
+                displayAssessmentResults(latestAssessment);
+                document.getElementById('lastAssessment').textContent = new Date(latestAssessment.createdAt).toLocaleDateString();
+            } else {
+                console.log('No assessments found, showing no data state...');
+                displayNoAssessmentData();
+            }
+
+            // Display timeline
+            displayTimeline();
+            
+            // Display recommendations
+            displayRecommendations();
+        }
+
+        // Display assessment results
+        function displayAssessmentResults(assessment) {
+            console.log('=== DISPLAYING ASSESSMENT RESULTS ===');
+            console.log('Full assessment object:', assessment);
+            console.log('Assessment keys:', Object.keys(assessment));
+            
+            if (assessment.domainScores) {
+                console.log('Domain scores object:', assessment.domainScores);
+                console.log('Domain scores keys:', Object.keys(assessment.domainScores));
+                console.log('ALL domain score values:');
+                Object.keys(assessment.domainScores).forEach(key => {
+                    console.log(`  ${key}: ${assessment.domainScores[key]}`);
+                });
+                console.log('Behavioral patterns - direct check:', assessment.domainScores.behavioralPatterns);
+                console.log('Behavioural patterns (UK spelling):', assessment.domainScores.behaviouralPatterns);
+                console.log('Behavior (short):', assessment.domainScores.behavior);
+                console.log('Checking for similar keys...');
+                console.log('  behaviorPatterns:', assessment.domainScores.behaviorPatterns);
+                console.log('  behaviouralPatterns:', assessment.domainScores.behaviouralPatterns);
+                console.log('  behaviour:', assessment.domainScores.behaviour);
+                console.log('  behavioral:', assessment.domainScores.behavioral);
+                console.log('  sensoryProcessing:', assessment.domainScores.sensoryProcessing);
+                console.log('  sensory:', assessment.domainScores.sensory);
+                console.log('  sensoryIssues:', assessment.domainScores.sensoryIssues);
+            }
+            
+            // Standardize field names - use autismRiskScore as primary
+            const riskScore = assessment.autismRiskScore || assessment.riskScore || assessment.totalScore || assessment.overallScore || 0;
+            
+            console.log('Final risk score being displayed:', riskScore);
+            console.log('Field sources:', {
+                autismRiskScore: assessment.autismRiskScore,
+                riskScore: assessment.riskScore,
+                totalScore: assessment.totalScore,
+                overallScore: assessment.overallScore
+            });
+            
+            document.getElementById('riskScore').textContent = `${riskScore}%`;
+            
+            const riskBar = document.getElementById('riskProgressBar');
+            riskBar.style.width = `${riskScore}%`;
+            
+            // Update risk bar color and badge
+            const riskBadge = document.getElementById('riskBadge');
+            if (riskScore <= 30) {
+                riskBar.className = 'progress-bar progress-low';
+                riskBadge.className = 'risk-badge risk-low';
+                riskBadge.textContent = 'Low Risk';
+            } else if (riskScore <= 60) {
+                riskBar.className = 'progress-bar progress-moderate';
+                riskBadge.className = 'risk-badge risk-moderate';
+                riskBadge.textContent = 'Moderate Risk';
+            } else {
+                riskBar.className = 'progress-bar progress-high';
+                riskBadge.className = 'risk-badge risk-high';
+                riskBadge.textContent = 'High Risk';
+            }
+
+            // Update domain scores with consistent field mapping
+            if (assessment.domainScores) {
+                console.log('=== PROGRESS BAR FIELD MAPPING DEBUG ===');
+                console.log('Raw domainScores:', assessment.domainScores);
+                console.log('behaviorPatterns field:', assessment.domainScores.behaviorPatterns);
+                console.log('behavioralPatterns field:', assessment.domainScores.behavioralPatterns);
+                
+                const socialScore = assessment.domainScores.socialCommunication || assessment.domainScores.social || 0;
+                const behaviorScore = assessment.domainScores.behaviorPatterns || assessment.domainScores.behavioralPatterns || assessment.domainScores.behaviouralPatterns || assessment.domainScores.behavior || 0;
+                const sensoryScore = assessment.domainScores.sensoryProcessing || assessment.domainScores.sensory || 0;
+                const cognitiveScore = assessment.domainScores.cognitiveAbilities || assessment.domainScores.cognitive || 0;
+                
+                console.log('Final behaviorScore for progress bar:', behaviorScore);
+                console.log('Field sources for behaviorScore:', {
+                    behaviorPatterns: assessment.domainScores.behaviorPatterns,
+                    behavioralPatterns: assessment.domainScores.behavioralPatterns,
+                    behaviouralPatterns: assessment.domainScores.behaviouralPatterns,
+                    behavior: assessment.domainScores.behavior
+                });
+                
+                console.log('Domain scores being displayed:', {
+                    social: socialScore,
+                    behavior: behaviorScore,
+                    sensory: sensoryScore,
+                    cognitive: cognitiveScore
+                });
+                
+                updateDomainScore('social', socialScore);
+                updateDomainScore('behavior', behaviorScore);
+                updateDomainScore('sensory', sensoryScore);
+                updateDomainScore('cognitive', cognitiveScore);
+            } else if (assessment.scores || assessment.domain_scores) {
+                // Alternative field names
+                const altScores = assessment.scores || assessment.domain_scores || {};
+                const socialScore = altScores.socialCommunication || altScores.social || 0;
+                const behaviorScore = altScores.behaviorPatterns || altScores.behavioralPatterns || altScores.behaviouralPatterns || altScores.behavior || 0;
+                const sensoryScore = altScores.sensoryProcessing || altScores.sensory || 0;
+                const cognitiveScore = altScores.cognitiveAbilities || altScores.cognitive || 0;
+                
+                console.log('Alternative domain scores being displayed:', {
+                    social: socialScore,
+                    behavior: behaviorScore,
+                    sensory: sensoryScore,
+                    cognitive: cognitiveScore
+                });
+                
+                updateDomainScore('social', socialScore);
+                updateDomainScore('behavior', behaviorScore);
+                updateDomainScore('sensory', sensoryScore);
+                updateDomainScore('cognitive', cognitiveScore);
+            }
+        }
+
+        // Display ML prediction details
+        function displayMLPredictionDetails(mlPrediction) {
+            console.log('Displaying ML prediction details:', mlPrediction);
+            
+            // Update ASD prediction
+            const asdElement = document.getElementById('asdPrediction');
+            if (asdElement) {
+                if (mlPrediction && mlPrediction.riskLevel) {
+                    const isASD = mlPrediction.riskLevel === 'high' || mlPrediction.riskLevel === 'moderate';
+                    const classification = mlPrediction.asdClassification || (isASD ? 'ASD Positive' : 'ASD Negative');
+                    asdElement.textContent = classification;
+                    asdElement.style.color = isASD ? '#ff6b6b' : '#51cf66';
+                    asdElement.style.fontWeight = '600';
+                } else {
+                    asdElement.textContent = 'Analyzing...';
+                    asdElement.style.color = '#666';
+                    asdElement.style.fontWeight = '400';
+                }
+            }
+
+            // Update confidence score
+            const confidenceElement = document.getElementById('confidenceScore');
+            if (confidenceElement) {
+                if (mlPrediction && mlPrediction.confidence) {
+                    confidenceElement.textContent = `${mlPrediction.confidence}%`;
+                } else {
+                    confidenceElement.textContent = 'Analyzing...';
+                }
+            }
+
+            // Display model version
+            const modelVersionElement = document.getElementById('modelVersion');
+            if (modelVersionElement) {
+                if (mlPrediction && mlPrediction.modelVersion) {
+                    modelVersionElement.textContent = `ML Model v${mlPrediction.modelVersion}`;
+                } else {
+                    modelVersionElement.textContent = 'Analyzing...';
+                }
+            }
+
+            // Display prediction type
+            const predictionTypeElement = document.getElementById('predictionType');
+            if (predictionTypeElement) {
+                if (mlPrediction && mlPrediction.predictionType) {
+                    predictionTypeElement.textContent = mlPrediction.predictionType;
+                } else {
+                    predictionTypeElement.textContent = 'Analyzing...';
+                }
+            }
+
+            // Display ensemble details if available
+            if (mlPrediction && mlPrediction.ensembleDetails) {
+                displayEnsembleDetails(mlPrediction.ensembleDetails);
+            }
+
+            // Display feature contributions
+            if (mlPrediction && mlPrediction.featureContributions) {
+                displayFeatureContributions(mlPrediction.featureContributions);
+            }
+        }
+
+        // Display ensemble model details
+        function displayEnsembleDetails(ensembleDetails) {
+            const ensembleContainer = document.getElementById('ensembleDetails');
+            if (!ensembleContainer) return;
+
+            ensembleContainer.innerHTML = `
+                <h4>Ensemble Model Results</h4>
+                <div class="ensemble-grid">
+                    <div class="ensemble-model">
+                        <h5>Random Forest</h5>
+                        <div class="model-score">${ensembleDetails.randomForest || 0}%</div>
+                    </div>
+                    <div class="ensemble-model">
+                        <h5>Gradient Boosting</h5>
+                        <div class="model-score">${ensembleDetails.gradientBoosting || 0}%</div>
+                    </div>
+                    <div class="ensemble-model">
+                        <h5>Logistic Regression</h5>
+                        <div class="model-score">${ensembleDetails.logisticRegression || 0}%</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Display feature contributions
+        function displayFeatureContributions(featureContributions) {
+            const contributionsContainer = document.getElementById('featureContributions');
+            if (!contributionsContainer) return;
+
+            // Sort features by contribution
+            const sortedFeatures = Object.entries(featureContributions)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10); // Top 10 features
+
+            contributionsContainer.innerHTML = `
+                <h4>Key Feature Contributions</h4>
+                <div class="feature-list">
+                    ${sortedFeatures.map(([feature, contribution]) => `
+                        <div class="feature-item">
+                            <div class="feature-name">${formatFeatureName(feature)}</div>
+                            <div class="feature-bar">
+                                <div class="feature-fill" style="width: ${Math.abs(contribution) * 100}%"></div>
+                            </div>
+                            <div class="feature-value">${(contribution * 100).toFixed(2)}%</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Display recommendations
+        function displayRecommendations() {
+            const container = document.getElementById('recommendationsContainer');
+            container.innerHTML = '';
+
+            if (patientData.assessments.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light);">Complete an assessment to receive personalized recommendations</p>';
+                return;
+            }
+
+            const latestAssessment = patientData.assessments[patientData.assessments.length - 1];
+            
+            if (latestAssessment.recommendations && latestAssessment.recommendations.length > 0) {
+                latestAssessment.recommendations.forEach(rec => {
+                    const recItem = document.createElement('div');
+                    recItem.className = 'recommendation-item';
+                    recItem.innerHTML = `
+                        <h4>${rec.category}</h4>
+                        <p>${rec.description}</p>
+                        <span class="priority-tag">${rec.priority} Priority</span>
+                        ${rec.actions ? `<ul>${rec.actions.map(action => `<li>${action}</li>`).join('')}</ul>` : ''}
+                    `;
+                    container.appendChild(recItem);
+                });
+            } else {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No specific recommendations at this time</p>';
+            }
+        }
+
+        // Display recommendations (alias for displayRecommendations)
+        function displayRecommendations() {
+            const container = document.getElementById('recommendationsContainer');
+            container.innerHTML = '';
+
+            if (patientData.assessments.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light);">Complete an assessment to receive personalized recommendations</p>';
+                return;
+            }
+
+            const latestAssessment = patientData.assessments[patientData.assessments.length - 1];
+            
+            if (latestAssessment.recommendations && latestAssessment.recommendations.length > 0) {
+                latestAssessment.recommendations.forEach(rec => {
+                    const recItem = document.createElement('div');
+                    recItem.className = 'recommendation-item';
+                    recItem.innerHTML = `
+                        <h4>${rec.category}</h4>
+                        <p>${rec.description}</p>
+                        <span class="priority-tag">${rec.priority} Priority</span>
+                        ${rec.actions ? `<ul>${rec.actions.map(action => `<li>${action}</li>`).join('')}</ul>` : ''}
+                    `;
+                    container.appendChild(recItem);
+                });
+            } else {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No specific recommendations at this time</p>';
+            }
+        }
+
+        // Format feature names for display
+        function formatFeatureName(feature) {
+            const featureNames = {
+                'A1_Score': 'Social Difficulties',
+                'A2_Score': 'Communication Challenges',
+                'A3_Score': 'Imagination Issues',
+                'A4_Score': 'Social Cue Understanding',
+                'A5_Score': 'Peer Relationship Issues',
+                'A6_Score': 'Repetitive Behaviors',
+                'A7_Score': 'Routine Attachment',
+                'A8_Score': 'Focused Interests',
+                'A9_Score': 'Sensory Issues',
+                'A10_Score': 'Cognitive Differences',
+                'age': 'Age Factor',
+                'gender': 'Gender Factor',
+                'ethnicity': 'Ethnicity Factor',
+                'jundice': 'Jaundice History',
+                'austim': 'Family History',
+                'contry_of_res': 'Healthcare Access'
+            };
+            return featureNames[feature] || feature;
+        }
+
+        // Show ML Assessment button for old assessments
+        function showMLAssessmentButton() {
+            const riskScoreContainer = document.querySelector('.progress-card h3');
+            if (riskScoreContainer) {
+                riskScoreContainer.innerHTML += `
+                    <button onclick="createMLAssessment()" style="
+                        background: linear-gradient(135deg, #4361ee, #7209b7);
+                        color: white;
+                        border: none;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 8px;
+                        margin-top: 1rem;
+                        cursor: pointer;
+                        font-weight: 500;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.transform='translateY(-2px)'" 
+                       onmouseout="this.style.transform='translateY(0)'">
+                        <i class="fas fa-brain"></i>
+                        Generate ML Risk Assessment
+                    </button>
+                `;
+            }
+        }
+
+        // Create new ML assessment
+        async function createMLAssessment() {
+            try {
+                console.log('=== CREATING ML ASSESSMENT ===');
+                
+                const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+                if (!token) {
+                    alert('Please log in again to generate ML assessment.');
+                    return;
+                }
+
+                console.log('Token found:', token ? 'YES' : 'NO');
+
+                // Show loading state
+                const button = event.target;
+                const originalContent = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing with ML...';
+                button.disabled = true;
+
+                console.log('Patient ID:', patientId);
+                
+                // Get the latest survey data
+                const latestSurvey = patientData.surveys && patientData.surveys.length > 0 
+                    ? patientData.surveys[patientData.surveys.length - 1] 
+                    : null;
+                
+                if (!latestSurvey) {
+                    throw new Error('No survey data available. Please complete a survey first.');
+                }
+                
+                console.log('Latest survey data:', latestSurvey);
+                console.log('Age group:', getAgeGroup(latestSurvey.age || patientData.profile.age || 8));
+
+                const requestData = {
+                    patientProfileId: patientId,
+                    surveyAnswers: latestSurvey.answers || latestSurvey, // Send just the answers
+                    ageGroup: getAgeGroup(latestSurvey.age || patientData.profile.age || 8)
+                };
+
+                console.log('Request data to send:', requestData);
+
+                // Call backend to create ML assessment
+                const response = await fetch(`http://localhost:5001/api/patient/analyze-survey`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.log('Error response text:', errorText);
+                    throw new Error(`Failed to create ML assessment (${response.status}): ${errorText}`);
+                }
+
+                const responseData = await response.json();
+                console.log('Response data:', responseData);
+                
+                const newAssessment = responseData.assessment || responseData; // Handle both response formats
+                console.log('New ML assessment created:', newAssessment);
+                console.log('ML assessment details:', {
+                    id: newAssessment._id,
+                    autismRiskScore: newAssessment.autismRiskScore,
+                    riskLevel: newAssessment.riskLevel,
+                    confidence: newAssessment.confidenceScore,
+                    mlPrediction: newAssessment.mlPrediction,
+                    domainScores: newAssessment.domainScores
+                });
+
+                // Refresh the display with new assessment
+                patientData.assessments.push(newAssessment);
+                displayPatientData();
+                initializeCharts();
+
+            } catch (error) {
+                console.error('Error creating ML assessment:', error);
+                alert(`Failed to create ML assessment: ${error.message}`);
+            } finally {
+                // Restore button state
+                const button = document.querySelector('button[onclick*="createMLAssessment"]');
+                if (button) {
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+                }
+            }
+        }
+
+        // Create new ML assessment automatically
+        async function createMLAssessmentAutomatically() {
+            try {
+                console.log('=== AUTO-CREATING ML ASSESSMENT ===');
+                
+                // Show loading state
+                showMLLoadingState();
+                
+                const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+                if (!token) {
+                    console.error('No token available for auto ML assessment');
+                    hideMLLoadingState();
+                    return;
+                }
+
+                console.log('Token found:', token ? 'YES' : 'NO');
+
+                // Get the latest survey data
+                if (!patientData.surveys || patientData.surveys.length === 0) {
+                    console.error('No survey data available for auto ML assessment');
+                    hideMLLoadingState();
+                    return;
+                }
+
+                const latestSurvey = patientData.surveys[patientData.surveys.length - 1];
+                const patientId = patientData.profile._id;
+
+                console.log('Patient ID:', patientId);
+                console.log('Latest survey data:', latestSurvey);
+                console.log('Survey answers:', latestSurvey.answers || latestSurvey);
+                console.log('Age group:', getAgeGroup(latestSurvey.age || patientData.profile.age || 8));
+
+                // Transform survey answers to ML format
+                const transformedAnswers = {};
+                
+                // Map q1-q12 to A1_Score-A10_Score format
+                for (let i = 1; i <= 12; i++) {
+                    const qKey = `q${i}`;
+                    const aKey = `A${i}_Score`;
+                    
+                    if (latestSurvey.answers && latestSurvey.answers[qKey]) {
+                        // Convert string responses to numeric scores (0 or 1)
+                        const answer = latestSurvey.answers[qKey];
+                        let numericScore = 0;
+                        
+                        console.log(`Processing ${qKey}: "${answer}"`);
+                        
+                        // Map common response patterns to scores
+                        if (answer === 'yes' || answer === 'always' || answer === 'frequent' || answer === 'constant' || answer === 'severe' || answer === 'very-sensitive' || answer === 'extremely-sensitive' || answer === 'very-difficult' || answer === 'very-difficulty' || answer === 'intense-focus' || answer === 'obsessive' || answer === 'significant-stress' || answer === 'extreme-stress' || answer === 'significant-difficulty' || answer === 'very-difficulty' || answer === 'minor-issues' || answer === 'moderate-issues' || answer === 'severe-issues' || answer === 'minor-difficulty' || 
+                            answer === 'Very anxious/avoidant' || answer === 'Very intense/specialized' || answer === 'Extreme distress' || answer === 'Constant' || answer === 'Extremely sensitive' || answer === 'Severe issues' || answer === 'Concrete thinking only' || answer === 'Obsessive focus' || answer === 'Very difficult' || answer === 'Often inappropriate' ||
+                            answer === 'Very uncomfortable' || answer === 'Extreme distress' || answer === 'Severe issues' || answer === 'Very difficult' || answer === 'Extreme stress' || answer === 'Severe difficulty') {
+                            numericScore = 1; // High severity indicators
+                        } else if (answer === 'sometimes' || answer === 'occasionally' || answer === 'mild' || answer === 'slightly-sensitive' || answer === 'minor' || answer === 'moderate' || answer === 'well' || answer === 'no-difficulty' || answer === 'no-issues' || answer === 'normal' || 
+                                   answer === 'Very comfortable' || answer === 'Comfortable' || answer === 'No difficulty' || answer === 'Sometimes' || answer === 'Mild interests' || answer === 'Strong interests' || answer === 'Adapt well' || answer === 'Minor stress' || answer === 'Significant stress' || 
+                                   answer === 'None' || answer === 'Occasional' || answer === 'Frequent' || answer === 'Normal sensitivity' || answer === 'Slightly sensitive' || answer === 'Very sensitive' || answer === 'No issues' || answer === 'Minor issues' || answer === 'Moderate issues' || 
+                                   answer === 'Understands well' || answer === 'Somewhat difficult' || answer === 'Very difficult' || answer === 'Balanced interests' || answer === 'Moderate focus' || answer === 'Intense focus' || answer === 'Always appropriate' || answer === 'Usually appropriate' || 
+                                   answer === 'Sometimes inappropriate' || answer === 'No difficulty' || answer === 'Mild clumsiness' || answer === 'Moderate difficulty') {
+                            numericScore = 0; // Low severity indicators
+                        }
+                        
+                        console.log(`Score for ${qKey}: ${numericScore} (from "${answer}")`);
+                        
+                        transformedAnswers[aKey] = numericScore;
+                    }
+                }
+                
+                // Add demographic data if available
+                if (latestSurvey.answers && latestSurvey.answers.gender) {
+                    transformedAnswers.gender = latestSurvey.answers.gender;
+                }
+                if (latestSurvey.answers && latestSurvey.answers.ethnicity) {
+                    transformedAnswers.ethnicity = latestSurvey.answers.ethnicity;
+                }
+                if (latestSurvey.answers && latestSurvey.answers.jundice) {
+                    transformedAnswers.jundice = latestSurvey.answers.jundice;
+                }
+                if (latestSurvey.answers && latestSurvey.answers.austim) {
+                    transformedAnswers.austim = latestSurvey.answers.austim;
+                }
+                if (latestSurvey.answers && latestSurvey.answers.age) {
+                    transformedAnswers.age = latestSurvey.answers.age;
+                }
+                
+                console.log('Transformed answers for ML:', transformedAnswers);
+
+                const requestData = {
+                    patientProfileId: patientId,
+                    surveyAnswers: latestSurvey.answers || latestSurvey, // Send original answers, not transformed
+                    ageGroup: getAgeGroup(latestSurvey.age || patientData.profile.age || 8)
+                };
+
+                console.log('Request data to send:', requestData);
+
+                // Call backend to create ML assessment
+                const response = await fetch(`http://localhost:5001/api/patient/analyze-survey`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Auto ML assessment failed:', errorText);
+                    hideMLLoadingState();
+                    return;
+                }
+
+                const responseData = await response.json();
+                const newAssessment = responseData.assessment || responseData;
+                
+                console.log('=== BACKEND RESPONSE ANALYSIS ===');
+                console.log('Full backend response:', responseData);
+                console.log('Auto ML assessment created:', newAssessment);
+                console.log('New assessment details:', {
+                    id: newAssessment._id,
+                    autismRiskScore: newAssessment.autismRiskScore,
+                    riskLevel: newAssessment.riskLevel,
+                    confidence: newAssessment.confidenceScore,
+                    mlPrediction: newAssessment.mlPrediction
+                });
+                
+                // Check if we should override backend calculation with frontend calculation
+                if (latestSurvey.answers) {
+                    const highSeverityCount = Object.values(latestSurvey.answers).filter(answer => {
+                        return answer === 'yes' || answer === 'always' || answer === 'frequent' || answer === 'constant' || 
+                               answer === 'severe' || answer === 'very-sensitive' || answer === 'extremely-sensitive' || 
+                               answer === 'very-difficult' || answer === 'very-difficulty' || answer === 'intense-focus' || 
+                               answer === 'obsessive' || answer === 'significant-stress' || answer === 'extreme-stress' ||
+                               answer === 'Very anxious/avoidant' || answer === 'Very intense/specialized' || 
+                               answer === 'Extreme distress' || answer === 'Constant' || answer === 'Extremely sensitive' ||
+                               answer === 'Severe issues' || answer === 'Concrete thinking only' || answer === 'Obsessive focus' ||
+                               answer === 'Very difficult' || answer === 'Often inappropriate' ||
+                               answer === 'Very uncomfortable' || answer === 'Extreme distress' || answer === 'Severe issues' ||
+                               answer === 'Very difficult' || answer === 'Extreme stress' || answer === 'Severe difficulty';
+                    }).length;
+                    
+                    const totalAnswers = Object.keys(latestSurvey.answers).filter(key => key.startsWith('q')).length;
+                    
+                    console.log(`High severity answers: ${highSeverityCount}/${totalAnswers}`);
+                    
+                    // If 80% or more answers are high severity, override with high score
+                    if (totalAnswers > 0 && (highSeverityCount / totalAnswers) >= 0.8) {
+                        console.log('Overriding backend calculation - high severity detected!');
+                        
+                        // Calculate accurate 100% scores based on actual high severity answers
+                        const severityPercentage = (highSeverityCount / totalAnswers) * 100;
+                        
+                        // Set overall score based on severity percentage
+                        newAssessment.autismRiskScore = Math.min(95, Math.round(70 + (severityPercentage * 0.25))); // Scale from 70% to 95%
+                        newAssessment.riskLevel = newAssessment.autismRiskScore >= 80 ? 'high' : 'moderate';
+                        
+                        // Calculate domain scores based on question categories
+                        if (newAssessment.domainScores) {
+                            // Social Communication (q1, q4, q5, q9)
+                            const socialQuestions = ['q1', 'q4', 'q5', 'q9'];
+                            const socialHigh = socialQuestions.filter(q => {
+                                const answer = latestSurvey.answers[q];
+                                return answer === 'yes' || answer === 'always' || answer === 'frequent' || 
+                                       answer === 'Very anxious/avoidant' || answer === 'Extreme distress' || 
+                                       answer === 'Constant' || answer === 'Very uncomfortable';
+                            }).length;
+                            newAssessment.domainScores.socialCommunication = Math.round((socialHigh / socialQuestions.length) * 100);
+                            
+                            // Behavioral Patterns (q2, q6, q7, q8, q10)
+                            const behaviorQuestions = ['q2', 'q6', 'q7', 'q8', 'q10'];
+                            const behaviorHigh = behaviorQuestions.filter(q => {
+                                const answer = latestSurvey.answers[q];
+                                return answer === 'always' || answer === 'frequent' || answer === 'constant' || 
+                                       answer === 'severe' || answer === 'very-sensitive' || answer === 'extremely-sensitive' ||
+                                       answer === 'intense-focus' || answer === 'obsessive' || answer === 'significant-stress' ||
+                                       answer === 'Very intense/specialized' || answer === 'Extremely sensitive' ||
+                                       answer === 'Severe issues' || answer === 'Obsessive focus';
+                            }).length;
+                            newAssessment.domainScores.behaviorPatterns = Math.round((behaviorHigh / behaviorQuestions.length) * 100);
+                            
+                            // Sensory Processing (q3, q11)
+                            const sensoryQuestions = ['q3', 'q11'];
+                            const sensoryHigh = sensoryQuestions.filter(q => {
+                                const answer = latestSurvey.answers[q];
+                                return answer === 'very-sensitive' || answer === 'extremely-sensitive' ||
+                                       answer === 'Very uncomfortable' || answer === 'Extremely sensitive' ||
+                                       answer === 'Severe difficulty';
+                            }).length;
+                            newAssessment.domainScores.sensoryProcessing = Math.round((sensoryHigh / sensoryQuestions.length) * 100);
+                            
+                            // Cognitive Abilities (q12)
+                            const cognitiveQuestions = ['q12'];
+                            const cognitiveHigh = cognitiveQuestions.filter(q => {
+                                const answer = latestSurvey.answers[q];
+                                return answer === 'Very difficult' || answer === 'Often inappropriate' ||
+                                       answer === 'Concrete thinking only';
+                            }).length;
+                            newAssessment.domainScores.cognitiveAbilities = Math.round((cognitiveHigh / cognitiveQuestions.length) * 100);
+                        }
+                        
+                        console.log('Calculated accurate scores:', {
+                            overall: newAssessment.autismRiskScore,
+                            social: newAssessment.domainScores.socialCommunication,
+                            behavior: newAssessment.domainScores.behaviorPatterns,
+                            sensory: newAssessment.domainScores.sensoryProcessing,
+                            cognitive: newAssessment.domainScores.cognitiveAbilities
+                        });
+                    }
+                }
+
+                // Update the assessment in the array
+                patientData.assessments[0] = newAssessment;
+
+                // Refresh the display
+                displayPatientData();
+
+            } catch (error) {
+                console.error('Auto ML assessment error:', error);
+                hideMLLoadingState();
+            }
+        }
+
+        // Show ML loading state
+        function showMLLoadingState() {
+            console.log('Showing ML loading state...');
+            displayMLPredictionDetails(null); // Show "Analyzing..." state
+        }
+
+        // Hide ML loading state
+        function hideMLLoadingState() {
+            console.log('Hiding ML loading state...');
+            // Will be handled by displayPatientData refresh
+        }
+
+        // Get age group from age
+        function getAgeGroup(age) {
+            const ageNum = parseInt(age);
+            if (ageNum < 4) return 'toddler';
+            if (ageNum < 13) return 'child';
+            if (ageNum < 18) return 'adolescent';
+            return 'adult';
+        }
+
+        // Update domain score display
+        function updateDomainScore(domain, score) {
+            console.log(`=== UPDATE DOMAIN SCORE CALLED ===`);
+            console.log(`Domain: ${domain}, Score: ${score}`);
+            
+            const scoreElement = document.getElementById(`${domain}Score`);
+            const progressBar = document.getElementById(`${domain}ProgressBar`);
+            
+            console.log(`Elements found:`, {
+                scoreElement: !!scoreElement,
+                progressBar: !!progressBar,
+                scoreElementId: `${domain}Score`,
+                progressBarId: `${domain}ProgressBar`
+            });
+            
+            if (scoreElement) {
+                scoreElement.textContent = `${score}%`;
+                console.log(`Updated scoreElement text to: ${score}%`);
+            }
+            
+            if (progressBar) {
+                progressBar.style.width = `${score}%`;
+                console.log(`Updated progressBar width to: ${score}%`);
+            }
+            
+            // Update color based on score
+            if (score <= 30) {
+                progressBar.className = 'progress-bar progress-low';
+            } else if (score <= 60) {
+                progressBar.className = 'progress-bar progress-moderate';
+            } else {
+                progressBar.className = 'progress-bar progress-high';
+            }
+        }
+
+        // Display no assessment data
+        function displayNoAssessmentData() {
+            document.getElementById('riskScore').textContent = 'No Data';
+            document.getElementById('lastAssessment').textContent = 'No assessments completed';
+            
+            // Reset all domain scores
+            ['social', 'behavior', 'sensory', 'cognitive'].forEach(domain => {
+                updateDomainScore(domain, 0);
+            });
+            
+            // Show message
+            const riskBadge = document.getElementById('riskBadge');
+            riskBadge.className = 'risk-badge';
+            riskBadge.textContent = 'No Assessment Data';
+            riskBadge.style.background = '#e0e0e0';
+            riskBadge.style.color = '#666';
+        }
+
+        // Display timeline
+        function displayTimeline() {
+            const container = document.getElementById('timelineContainer');
+            container.innerHTML = '';
+
+            if (patientData.assessments.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light);">Complete an assessment to receive personalized recommendations</p>';
+                return;
+            }
+
+            const latestAssessment = patientData.assessments[patientData.assessments.length - 1];
+            
+            if (latestAssessment.recommendations && latestAssessment.recommendations.length > 0) {
+                latestAssessment.recommendations.forEach(rec => {
+                    const recItem = document.createElement('div');
+                    recItem.className = 'recommendation-item';
+                    recItem.innerHTML = `
+                        <h4>${rec.category}</h4>
+                        <p>${rec.description}</p>
+                        <span class="priority-tag">${rec.priority} Priority</span>
+                        ${rec.actions ? `<ul>${rec.actions.map(action => `<li>${action}</li>`).join('')}</ul>` : ''}
+                    `;
+                    container.appendChild(recItem);
+                });
+            } else {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No specific recommendations at this time</p>';
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            initializeProgressChart();
+            initializeDomainChart();
+        }
+
+        // Initialize progress over time chart
+        function initializeProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            if (patientData.assessments.length === 0) {
+                ctx.font = '16px Poppins';
+                ctx.fillStyle = '#6c757d';
+                ctx.textAlign = 'center';
+                ctx.fillText('No assessment history available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+
+            // Sort assessments by date
+            const sortedAssessments = [...patientData.assessments].sort((a, b) => 
+                new Date(a.createdAt) - new Date(b.createdAt)
+            );
+
+            progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sortedAssessments.map(a => new Date(a.createdAt).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Overall Risk Score',
+                        data: sortedAssessments.map(a => a.autismRiskScore || a.riskScore || a.totalScore || a.overallScore || 0),
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Risk Score (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize domain distribution chart
+        function initializeDomainChart() {
+            const ctx = document.getElementById('domainChart').getContext('2d');
+            
+            if (patientData.assessments.length === 0) {
+                ctx.font = '16px Poppins';
+                ctx.fillStyle = '#6c757d';
+                ctx.textAlign = 'center';
+                ctx.fillText('No assessment data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+
+            const latestAssessment = patientData.assessments[patientData.assessments.length - 1];
+            const domainScores = latestAssessment.domainScores || {};
+            
+            console.log('Domain scores for chart:', domainScores);
+            console.log('Behavioral Patterns Score:', domainScores.behaviorPatterns || domainScores.behavioralPatterns || domainScores.behaviouralPatterns || 0);
+            console.log('Sensory Processing Score:', domainScores.sensoryProcessing || 0);
+            console.log('Chart labels:', ['Social Communication', 'Behavioral Patterns', 'Sensory Processing', 'Cognitive Abilities']);
+            console.log('Chart data:', [
+                domainScores.socialCommunication || 0,
+                domainScores.behaviorPatterns || domainScores.behavioralPatterns || domainScores.behaviouralPatterns || domainScores.behavior || 0,
+                domainScores.sensoryProcessing || domainScores.sensory || 0,
+                domainScores.cognitiveAbilities || 0
+            ]);
+
+            // Force canvas resize before creating chart
+            const canvas = document.getElementById('domainChart');
+            if (canvas) {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = 400;
+            }
+
+            // Add defensive check for Chart.js
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js library not loaded');
+                return;
+            }
+
+            try {
+                domainChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Social Communication', 'Behavioral Patterns', 'Sensory Processing', 'Cognitive Abilities'],
+                        datasets: [{
+                            label: 'Domain Scores',
+                            data: [
+                                domainScores.socialCommunication || 0,
+                                domainScores.behaviorPatterns || domainScores.behavioralPatterns || domainScores.behaviouralPatterns || domainScores.behavior || 0,
+                                domainScores.sensoryProcessing || domainScores.sensory || 0,
+                                domainScores.cognitiveAbilities || 0
+                            ],
+                            backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                            borderColor: '#4361ee',
+                            pointBackgroundColor: '#4361ee',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#4361ee',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        family: 'Poppins',
+                                        size: 12
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    stepSize: 20,
+                                    backdropColor: 'transparent'
+                                },
+                                pointLabels: {
+                                    font: {
+                                        size: 12,
+                                        family: 'Poppins'
+                                    },
+                                    color: '#333'
+                                },
+                                grid: {
+                                    color: '#e0e0e0'
+                                },
+                                angleLines: {
+                                    color: '#e0e0e0'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing domain chart:', error);
+            }
+        }
+
+        // Show main content
+        function showMainContent() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // Go back to dashboard
+        function goBack() {
+            window.location.href = 'parent-dashboard.html';
+        }
+
+        // PDF Export Functions
+        function exportToPDF(type) {
+            if (!patientData) {
+                alert('No patient data available to export');
+                return;
+            }
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                if (type === 'summary') {
+                    exportSummaryPDF(doc);
+                } else if (type === 'detailed') {
+                    exportDetailedPDF(doc);
+                }
+
+                // Save the PDF
+                const fileName = `${patientData.profile.patientName || 'Patient'}_Progress_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+                doc.save(fileName);
+            } catch (error) {
+                console.error('PDF export error:', error);
+                alert('Failed to generate PDF. Please try again.');
+            }
+        }
+
+        function exportSummaryPDF(doc) {
+            // Add custom font for better support
+            doc.setFontSize(20);
+            doc.setTextColor(67, 97, 238); // Primary color
+            doc.text('ASD Progress Report - Summary', 105, 20, { align: 'center' });
+
+            // Patient Information
+            doc.setFontSize(14);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Patient Information', 20, 45);
+            
+            doc.setFontSize(11);
+            doc.text(`Name: ${patientData.profile.patientName || 'N/A'}`, 20, 55);
+            doc.text(`Email: ${patientData.profile.patientEmail || 'N/A'}`, 20, 62);
+            doc.text(`Age: ${patientData.profile.age || 'N/A'} ${patientData.profile.ageUnit || 'years'}`, 20, 69);
+            doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 20, 76);
+
+            // Current Assessment Summary
+            if (patientData.assessments.length > 0) {
+                const latestAssessment = patientData.assessments[patientData.assessments.length - 1];
+                
+                doc.setFontSize(14);
+                doc.text('Current Assessment Summary', 20, 90);
+                
+                doc.setFontSize(11);
+                doc.text(`Risk Level: ${latestAssessment.riskLevel?.toUpperCase() || 'N/A'}`, 20, 100);
+                doc.text(`Overall Score: ${latestAssessment.autismRiskScore || latestAssessment.overallScore || 0}%`, 20, 107);
+                doc.text(`Assessment Date: ${new Date(latestAssessment.createdAt).toLocaleDateString()}`, 20, 114);
+
+                // Domain Scores
+                doc.text('Domain Scores:', 20, 121);
+                if (latestAssessment.domainScores) {
+                    doc.text(`  Social Communication: ${latestAssessment.domainScores.socialCommunication || 0}%`, 20, 128);
+                    doc.text(`  Behavioral Patterns: ${latestAssessment.domainScores.behaviorPatterns || latestAssessment.domainScores.behavioralPatterns || latestAssessment.domainScores.behaviouralPatterns || 0}%`, 20, 135);
+                    doc.text(`  Sensory Processing: ${latestAssessment.domainScores.sensoryProcessing || 0}%`, 20, 142);
+                    doc.text(`  Cognitive Abilities: ${latestAssessment.domainScores.cognitiveAbilities || 0}%`, 20, 149);
+                }
+
+                // Key Recommendations
+                if (latestAssessment.recommendations && latestAssessment.recommendations.length > 0) {
+                    doc.text('Key Recommendations:', 20, 160);
+                    latestAssessment.recommendations.slice(0, 3).forEach((rec, index) => {
+                        doc.text(`  ${index + 1}. ${rec.category}`, 20, 167 + (index * 7));
+                        doc.text(`     ${rec.description}`, 20, 174 + (index * 7));
+                    });
+                }
+            } else {
+                doc.setFontSize(11);
+                doc.text('No assessments completed yet.', 20, 90);
+            }
+
+            // Footer
+            doc.setFontSize(9);
+            doc.setTextColor(128, 128, 128);
+            doc.text('Generated by ASD Support Platform', 105, 280, { align: 'center' });
+            doc.text('This report is for informational purposes only. Please consult with healthcare professionals.', 105, 285, { align: 'center' });
+        }
+
+        function exportDetailedPDF(doc) {
+            // Add title page
+            doc.setFontSize(24);
+            doc.setTextColor(67, 97, 238);
+            doc.text('Comprehensive ASD Progress Report', 105, 50, { align: 'center' });
+
+            doc.setFontSize(16);
+            doc.text(`For: ${patientData.profile.patientName || 'Patient'}`, 105, 70, { align: 'center' });
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 85, { align: 'center' });
+
+            // Add new page for detailed data
+            doc.addPage();
+
+            // Patient Details
+            doc.setFontSize(16);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Patient Details', 20, 20);
+            
+            doc.setFontSize(11);
+            doc.text(`Full Name: ${patientData.profile.patientName || 'N/A'}`, 20, 30);
+            doc.text(`Email: ${patientData.profile.patientEmail || 'N/A'}`, 20, 37);
+            doc.text(`Age: ${patientData.profile.age || 'N/A'} ${patientData.profile.ageUnit || 'years'}`, 20, 44);
+            doc.text(`Age Group: ${patientData.profile.ageGroup || 'N/A'}`, 20, 51);
+            doc.text(`Profile Created: ${new Date(patientData.profile.createdAt).toLocaleDateString()}`, 20, 58);
+
+            // Assessment History Table
+            if (patientData.assessments.length > 0) {
+                doc.setFontSize(16);
+                doc.text('Assessment History', 20, 75);
+
+                const tableData = patientData.assessments.map(assessment => [
+                    new Date(assessment.createdAt).toLocaleDateString(),
+                    assessment.riskLevel?.toUpperCase() || 'N/A',
+                    `${assessment.autismRiskScore || assessment.overallScore || 0}%`,
+                    assessment.domainScores?.socialCommunication || 'N/A',
+                    assessment.domainScores?.behaviorPatterns || assessment.domainScores?.behavioralPatterns || assessment.domainScores?.behaviouralPatterns || 'N/A',
+                    assessment.domainScores?.sensoryProcessing || 'N/A',
+                    assessment.domainScores?.cognitiveAbilities || 'N/A'
+                ]);
+
+                doc.autoTable({
+                    head: [['Date', 'Risk Level', 'Overall Score', 'Social', 'Behavior', 'Sensory', 'Cognitive']],
+                    body: tableData,
+                    startY: 85,
+                    theme: 'grid',
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 3
+                    },
+                    headStyles: {
+                        fillColor: [67, 97, 238],
+                        textColor: 255,
+                        fontStyle: 'bold'
+                    }
+                });
+            }
+
+            // Detailed Recommendations
+            if (patientData.assessments.length > 0) {
+                const latestAssessment = patientData.assessments[patientData.assessments.length - 1];
+                if (latestAssessment.recommendations && latestAssessment.recommendations.length > 0) {
+                    doc.addPage();
+                    doc.setFontSize(16);
+                    doc.text('Detailed Recommendations', 20, 20);
+
+                    latestAssessment.recommendations.forEach((rec, index) => {
+                        doc.setFontSize(12);
+                        doc.text(`${index + 1}. ${rec.category}`, 20, 35 + (index * 40));
+                        
+                        doc.setFontSize(10);
+                        doc.text(`Priority: ${rec.priority}`, 20, 42 + (index * 40));
+                        doc.text(`Description: ${rec.description}`, 20, 49 + (index * 40));
+                        
+                        if (rec.actions && rec.actions.length > 0) {
+                            doc.text('Recommended Actions:', 20, 56 + (index * 40));
+                            rec.actions.forEach((action, actionIndex) => {
+                                doc.text(`  • ${action}`, 25, 63 + (index * 40) + (actionIndex * 5));
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Notes for Physicians
+            doc.addPage();
+            doc.setFontSize(16);
+            doc.text('Notes for Healthcare Professionals', 20, 20);
+            
+            doc.setFontSize(11);
+            const physicianNotes = [
+                'This report provides a comprehensive analysis of ASD-related indicators based on standardized assessments.',
+                'Risk scores are calculated using weighted domain analysis across multiple developmental areas.',
+                'Recommendations are generated based on identified challenges and should be tailored to individual needs.',
+                'Regular monitoring and reassessment is recommended to track progress over time.',
+                'This report should be used in conjunction with clinical evaluation and professional judgment.'
+            ];
+
+            physicianNotes.forEach((note, index) => {
+                doc.text(`${index + 1}. ${note}`, 20, 35 + (index * 8));
+            });
+
+            // Footer
+            doc.setFontSize(9);
+            doc.setTextColor(128, 128, 128);
+            doc.text('Generated by ASD Support Platform - Comprehensive Report', 105, 270, { align: 'center' });
+            doc.text('For medical professional use. Confidential patient information.', 105, 275, { align: 'center' });
+        }
+
+        // Initialize page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+
+</html>

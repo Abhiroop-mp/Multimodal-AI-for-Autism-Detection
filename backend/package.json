@@ -1,21 +1,28 @@
 {
-  "name": "backend",
+  "name": "spectra-care-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend API for Spectra Care Autism Detection Platform",
+  "main": "game-recommendations-api.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node game-recommendations-api.js",
+    "dev": "nodemon game-recommendations-api.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.1",
-    "nodemailer": "^7.0.6"
-  }
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.12",
+    "uuid": "^9.0.0"
+  },
+  "keywords": [
+    "autism",
+    "therapy",
+    "healthcare",
+    "api",
+    "express"
+  ],
+  "author": "Spectra Care Team",
+  "license": "MIT"
 }

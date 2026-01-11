@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Building - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Team Challenge */
+        .challenge-container {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .challenge-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-description {
+            font-size: 1.1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .team-members {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .team-member {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .team-member.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .member-avatar {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fed7aa, #f38681);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .member-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-role {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* Team Actions */
+        .team-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .action-card:hover::before {
+            left: 100%;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .action-card.selected {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            transform: scale(1.02);
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .action-card:hover .action-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .action-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* Cooperation Meter */
+        .cooperation-meter {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .meter-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .cooperation-bar {
+            width: 100%;
+            height: 30px;
+            background: #e2e8f0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cooperation-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .cooperation-label {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .team-members {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .team-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-users"></i>
+            <h1>Team Building</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Build a Team!</h2>
+                <p>Work together to complete team challenges</p>
+            </div>
+
+            <div class="challenge-container">
+                <div class="challenge-title" id="challengeTitle">Team Challenge: Build a Bridge</div>
+                <div class="challenge-description" id="challengeDescription">
+                    Your team needs to work together to build a bridge using blocks. Each team member has a special role!
+                </div>
+            </div>
+
+            <div class="team-members" id="teamMembers">
+                <!-- Team members will be generated by JavaScript -->
+            </div>
+
+            <div class="team-actions" id="teamActions">
+                <!-- Team actions will be generated by JavaScript -->
+            </div>
+
+            <div class="cooperation-meter">
+                <div class="meter-title">Team Cooperation</div>
+                <div class="cooperation-bar">
+                    <div class="cooperation-fill" id="cooperationFill" style="width: 0%">
+                        <span id="cooperationPercent">0%</span>
+                    </div>
+                </div>
+                <div class="cooperation-label" id="cooperationLabel">Keep working together!</div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="completeBtn" onclick="completeChallenge()">
+                    <i class="fas fa-check"></i> Complete Challenge
+                </button>
+                <button class="btn btn-secondary" onclick="nextChallenge()">
+                    <i class="fas fa-arrow-right"></i> Next Challenge
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 6,
+            currentRound: 0,
+            selectedMembers: [],
+            selectedActions: [],
+            cooperation: 0,
+            challenges: [
+                {
+                    title: 'Team Challenge: Build a Bridge',
+                    description: 'Your team needs to work together to build a bridge using blocks. Each team member has a special role!',
+                    members: [
+                        { name: 'Alex', role: 'Builder', icon: 'fa-hammer', color: '#f38681' },
+                        { name: 'Sam', role: 'Planner', icon: 'fa-clipboard-list', color: '#667eea' },
+                        { name: 'Jordan', role: 'Tester', icon: 'fa-search', color: '#48dbfb' },
+                        { name: 'Taylor', role: 'Helper', icon: 'fa-hands-helping', color: '#feca57' }
+                    ],
+                    actions: [
+                        { title: 'Plan Together', description: 'Discuss the bridge design', icon: 'fa-comments', points: 15 },
+                        { title: 'Share Materials', description: 'Distribute blocks fairly', icon: 'fa-box-open', points: 10 },
+                        { title: 'Build Base', description: 'Create strong foundation', icon: 'fa-cube', points: 20 },
+                        { title: 'Add Supports', description: 'Add support pillars', icon: 'fa-columns', points: 15 }
+                    ]
+                },
+                {
+                    title: 'Team Challenge: Garden Project',
+                    description: 'Work together to plant a community garden. Everyone has an important job!',
+                    members: [
+                        { name: 'Morgan', role: 'Gardener', icon: 'fa-seedling', color: '#48dbfb' },
+                        { name: 'Casey', role: 'Waterer', icon: 'fa-tint', color: '#00d2d3' },
+                        { name: 'Riley', role: 'Planter', icon: 'fa-spa', color: '#f368e0' },
+                        { name: 'Avery', role: 'Harvester', icon: 'fa-apple-alt', color: '#ff9ff3' }
+                    ],
+                    actions: [
+                        { title: 'Prepare Soil', description: 'Get the garden ready', icon: 'fa-shovel', points: 15 },
+                        { title: 'Plant Seeds', description: 'Plant seeds in rows', icon: 'fa-seedling', points: 20 },
+                        { title: 'Water Plants', description: 'Give water to all plants', icon: 'fa-tint', points: 10 },
+                        { title: 'Add Mulch', description: 'Protect the soil', icon: 'fa-layer-group', points: 15 }
+                    ]
+                },
+                {
+                    title: 'Team Challenge: Art Mural',
+                    description: 'Create a beautiful mural together. Each person adds their special touch!',
+                    members: [
+                        { name: 'Drew', role: 'Artist', icon: 'fa-palette', color: '#f368e0' },
+                        { name: 'Blake', role: 'Designer', icon: 'fa-pencil-ruler', color: '#667eea' },
+                        { name: 'Cameron', role: 'Painter', icon: 'fa-paint-brush', color: '#ff6b6b' },
+                        { name: 'Quinn', role: 'Helper', icon: 'fa-hands-helping', color: '#feca57' }
+                    ],
+                    actions: [
+                        { title: 'Sketch Design', description: 'Draw the mural outline', icon: 'fa-pencil-ruler', points: 15 },
+                        { title: 'Mix Colors', description: 'Prepare paint colors', icon: 'fa-palette', points: 10 },
+                        { title: 'Paint Background', description: 'Paint the base colors', icon: 'fa-fill-drip', points: 20 },
+                        { title: 'Add Details', description: 'Add final touches', icon: 'fa-magic', points: 15 }
+                    ]
+                },
+                {
+                    title: 'Team Challenge: Science Fair',
+                    description: 'Work together on a science experiment. Everyone helps with different parts!',
+                    members: [
+                        { name: 'Jamie', role: 'Scientist', icon: 'fa-flask', color: '#48dbfb' },
+                        { name: 'Dakota', role: 'Recorder', icon: 'fa-clipboard', color: '#feca57' },
+                        { name: 'Skyler', role: 'Observer', icon: 'fa-eye', color: '#667eea' },
+                        { name: 'Emerson', role: 'Presenter', icon: 'fa-microphone', color: '#f368e0' }
+                    ],
+                    actions: [
+                        { title: 'Set Up Experiment', description: 'Prepare materials', icon: 'fa-flask', points: 20 },
+                        { title: 'Record Data', description: 'Write observations', icon: 'fa-clipboard', points: 15 },
+                        { title: 'Test Hypothesis', description: 'Run the experiment', icon: 'fa-vial', points: 25 },
+                        { title: 'Share Results', description: 'Present findings', icon: 'fa-chart-line', points: 15 }
+                    ]
+                },
+                {
+                    title: 'Team Challenge: Clean Up Day',
+                    description: 'Work together to clean and organize the classroom. Teamwork makes it easy!',
+                    members: [
+                        { name: 'Parker', role: 'Organizer', icon: 'fa-tasks', color: '#667eea' },
+                        { name: 'Sage', role: 'Cleaner', icon: 'fa-broom', color: '#feca57' },
+                        { name: 'River', role: 'Sorter', icon: 'fa-sort', color: '#48dbfb' },
+                        { name: 'Indigo', role: 'Checker', icon: 'fa-check-double', color: '#f368e0' }
+                    ],
+                    actions: [
+                        { title: 'Sort Items', description: 'Group similar items', icon: 'fa-sort', points: 15 },
+                        { title: 'Clean Surfaces', description: 'Wipe tables and shelves', icon: 'fa-spray-can', points: 20 },
+                        { title: 'Organize Supplies', description: 'Put things in order', icon: 'fa-tasks', points: 15 },
+                        { title: 'Check Work', description: 'Make sure everything is clean', icon: 'fa-check-double', points: 10 }
+                    ]
+                },
+                {
+                    title: 'Team Challenge: Music Band',
+                    description: 'Form a band and create music together. Everyone plays their part!',
+                    members: [
+                        { name: 'Harmony', role: 'Singer', icon: 'fa-microphone', color: '#f368e0' },
+                        { name: 'Rhythm', role: 'Drummer', icon: 'fa-drum', color: '#ff6b6b' },
+                        { name: 'Melody', role: 'Guitarist', icon: 'fa-guitar', color: '#feca57' },
+                        { name: 'Beat', role: 'Keyboardist', icon: 'fa-music', color: '#667eea' }
+                    ],
+                    actions: [
+                        { title: 'Choose Song', description: 'Pick a song to play', icon: 'fa-music', points: 10 },
+                        { title: 'Practice Parts', description: 'Each person practices', icon: 'fa-headphones', points: 15 },
+                        { title: 'Play Together', description: 'Combine all parts', icon: 'fa-users', points: 25 },
+                        { title: 'Perform Show', description: 'Play for audience', icon: 'fa-star', points: 20 }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewChallenge();
+        }
+
+        // Start New Challenge
+        function startNewChallenge() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            // Reset state
+            gameState.selectedMembers = [];
+            gameState.selectedActions = [];
+            gameState.cooperation = 0;
+            
+            // Get current challenge
+            const challenge = gameState.challenges[gameState.currentRound];
+            
+            // Update challenge display
+            updateChallengeDisplay(challenge);
+            
+            // Generate team members
+            generateTeamMembers(challenge);
+            
+            // Generate team actions
+            generateTeamActions(challenge);
+            
+            // Reset cooperation meter
+            updateCooperationMeter(0);
+            
+            // Hide feedback
+            hideFeedback();
+        }
+
+        // Update Challenge Display
+        function updateChallengeDisplay(challenge) {
+            document.getElementById('challengeTitle').textContent = challenge.title;
+            document.getElementById('challengeDescription').textContent = challenge.description;
+        }
+
+        // Generate Team Members
+        function generateTeamMembers(challenge) {
+            const teamMembers = document.getElementById('teamMembers');
+            teamMembers.innerHTML = '';
+            
+            challenge.members.forEach(member => {
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'team-member';
+                memberDiv.onclick = () => selectMember(member, memberDiv);
+                
+                memberDiv.innerHTML = `
+                    <div class="member-avatar" style="background: ${member.color}">
+                        <i class="fas ${member.icon}"></i>
+                    </div>
+                    <div class="member-name">${member.name}</div>
+                    <div class="member-role">${member.role}</div>
+                `;
+                
+                teamMembers.appendChild(memberDiv);
+            });
+        }
+
+        // Generate Team Actions
+        function generateTeamActions(challenge) {
+            const teamActions = document.getElementById('teamActions');
+            teamActions.innerHTML = '';
+            
+            challenge.actions.forEach(action => {
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'action-card';
+                actionDiv.onclick = () => selectAction(action, actionDiv);
+                
+                actionDiv.innerHTML = `
+                    <div class="action-icon">
+                        <i class="fas ${action.icon}"></i>
+                    </div>
+                    <div class="action-title">${action.title}</div>
+                    <div class="action-description">${action.description}</div>
+                `;
+                
+                teamActions.appendChild(actionDiv);
+            });
+        }
+
+        // Select Team Member
+        function selectMember(member, element) {
+            if (gameState.selectedMembers.find(m => m.name === member.name)) {
+                // Deselect if already selected
+                gameState.selectedMembers = gameState.selectedMembers.filter(m => m.name !== member.name);
+                element.classList.remove('selected');
+            } else {
+                // Select member
+                gameState.selectedMembers.push(member);
+                element.classList.add('selected');
+            }
+            
+            updateCooperation();
+        }
+
+        // Select Team Action
+        function selectAction(action, element) {
+            if (gameState.selectedActions.find(a => a.title === action.title)) {
+                // Deselect if already selected
+                gameState.selectedActions = gameState.selectedActions.filter(a => a.title !== action.title);
+                element.classList.remove('selected');
+            } else {
+                // Select action
+                gameState.selectedActions.push(action);
+                element.classList.add('selected');
+            }
+            
+            updateCooperation();
+        }
+
+        // Update Cooperation
+        function updateCooperation() {
+            const memberCooperation = (gameState.selectedMembers.length / 4) * 50; // Max 50 points for members
+            const actionCooperation = (gameState.selectedActions.length / 4) * 50; // Max 50 points for actions
+            gameState.cooperation = Math.round(memberCooperation + actionCooperation);
+            
+            updateCooperationMeter(gameState.cooperation);
+        }
+
+        // Update Cooperation Meter
+        function updateCooperationMeter(cooperation) {
+            const cooperationFill = document.getElementById('cooperationFill');
+            const cooperationPercent = document.getElementById('cooperationPercent');
+            const cooperationLabel = document.getElementById('cooperationLabel');
+            
+            cooperationFill.style.width = `${cooperation}%`;
+            cooperationPercent.textContent = `${cooperation}%`;
+            
+            if (cooperation >= 80) {
+                cooperationLabel.textContent = 'Excellent teamwork! 🌟';
+            } else if (cooperation >= 60) {
+                cooperationLabel.textContent = 'Good cooperation! 👍';
+            } else if (cooperation >= 40) {
+                cooperationLabel.textContent = 'Keep working together! 💪';
+            } else {
+                cooperationLabel.textContent = 'Select team members and actions! 👥';
+            }
+        }
+
+        // Complete Challenge
+        function completeChallenge() {
+            if (gameState.selectedMembers.length < 2 || gameState.selectedActions.length < 2) {
+                showFeedback('Please select at least 2 team members and 2 actions!', 'info');
+                return;
+            }
+            
+            // Calculate score
+            const baseScore = 100;
+            const cooperationBonus = gameState.cooperation;
+            const totalScore = baseScore + cooperationBonus;
+            
+            gameState.score += totalScore;
+            
+            // Show feedback
+            showFeedback(`Great teamwork! You earned ${totalScore} points!`, 'success');
+            
+            // Update stats
+            updateStats();
+            
+            // Track progress
+            trackProgress(totalScore);
+            
+            // Show next button
+            document.getElementById('completeBtn').style.display = 'none';
+        }
+
+        // Next Challenge
+        function nextChallenge() {
+            gameState.currentRound++;
+            document.getElementById('completeBtn').style.display = 'inline-flex';
+            startNewChallenge();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = message;
+            feedback.className = `feedback ${type} show`;
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 3000);
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(score) {
+            const progressData = {
+                gameName: 'Team Building',
+                round: gameState.currentRound + 1,
+                challenge: gameState.challenges[gameState.currentRound].title,
+                cooperation: gameState.cooperation,
+                score: score,
+                totalScore: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const averageCooperation = gameState.score / (gameState.totalRounds * 150); // Max ~150 points per round
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Team Building Complete!</h2>
+                    <p>Amazing teamwork on all challenges!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Team Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(averageCooperation * 100).toFixed(1)}%</div>
+                            <div style="color: #718096;">Teamwork</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${averageCooperation >= 0.8 ? 'Outstanding! You are an amazing team player!' : 
+                              averageCooperation >= 0.6 ? 'Excellent! You work great with others!' :
+                              'Good job! Teamwork gets better with practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Team building skills help with cooperation, communication, and social success!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(averageCooperation, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(averageCooperation, totalTime) {
+            const results = {
+                gameName: 'Team Building',
+                finalScore: gameState.score,
+                averageCooperation: averageCooperation,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

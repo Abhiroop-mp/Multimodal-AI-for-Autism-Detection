@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Memory - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #f5576c; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb, #f5576c); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 1200px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .memory-challenge { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .challenge-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1.5rem; }
+        .memory-display { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem; min-height: 300px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .memory-content { font-size: 2rem; color: #4a5568; text-align: center; line-height: 1.6; }
+        .memory-timer { position: absolute; top: 1rem; right: 1rem; font-size: 1.2rem; font-weight: bold; color: #f5576c; }
+        .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .memory-cell { aspect-ratio: 1; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #4a5568; cursor: pointer; transition: all 0.3s ease; }
+        .memory-cell:hover { transform: scale(1.1); background: #e2e8f0; }
+        .memory-cell.revealed { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; transform: scale(1.1); }
+        .memory-cell.matched { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .memory-cell.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .memory-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .memory-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .memory-option::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(240,147,251,0.1), transparent); transition: left 0.5s ease; }
+        .memory-option:hover::before { left: 100%; }
+        .memory-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #f5576c; }
+        .memory-option.selected { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-color: #f5576c; transform: scale(1.02); }
+        .memory-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .memory-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        .option-icon { font-size: 2rem; color: #f5576c; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .memory-option:hover .option-icon { transform: scale(1.2) rotate(10deg); }
+        .option-text { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .option-description { font-size: 0.9rem; color: #4a5568; line-height: 1.4; }
+        .skills-container { background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; text-align: center; }
+        .skills-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .skill-item { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; text-align: center; transition: all 0.3s ease; }
+        .skill-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .skill-icon { font-size: 1.5rem; color: #f5576c; margin-bottom: 0.5rem; }
+        .skill-name { font-size: 0.9rem; color: #4a5568; font-weight: 600; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(240,147,251,0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .memory-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+            .memory-options { grid-template-columns: repeat(2, 1fr); }
+            .skills-grid { grid-template-columns: repeat(2, 1fr); }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-brain"></i>
+            <h1>Working Memory</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Train Your Working Memory!</h2>
+                <p>Remember and manipulate information in your mind</p>
+            </div>
+
+            <div class="memory-challenge">
+                <div class="challenge-title" id="challengeTitle">Memory Span</div>
+                <div class="memory-display">
+                    <div class="memory-content" id="memoryContent">
+                        Loading memory challenge...
+                    </div>
+                    <div class="memory-timer" id="memoryTimer">5s</div>
+                </div>
+                <div class="memory-grid" id="memoryGrid">
+                    <!-- Memory cells will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="skills-container">
+                <div class="skills-title">Working Memory Skills Being Trained</div>
+                <div class="skills-grid" id="skillsGrid">
+                    <!-- Skills will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="memory-options" id="memoryOptions">
+                <!-- Memory options will be generated by memory -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="startBtn" onclick="startMemory()">
+                    <i class="fas fa-play"></i> Start Memory
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextRound()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Round
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, currentChallenge: null, isAnswered: false,
+            memoryActive: false, memoryItems: [], revealedItems: [],
+            challenges: [
+                {
+                    title: "Visual Memory Span",
+                    type: "visual",
+                    items: ["🍎", "🌟�", "🔺", "🔵", "🟢", "🔺"],
+                    skills: ["Visual Memory", "Pattern Recognition", "Attention Span"],
+                    options: [
+                        { text: "🔺", description: "Third item in sequence", correct: false },
+                        { text: "🔵", description: "Fourth item in sequence", correct: false },
+                        { text: "🟢", description: "Second item in sequence", correct: false },
+                        { text: "🍎", description: "First item in sequence", correct: false },
+                        { text: "🔵", description: "Fifth item in sequence", correct: true }
+                    ]
+                },
+                {
+                    title: "Auditory Memory",
+                    type: "auditory",
+                    items: ["Bell", "Phone", "Door", "Clock", "Bird"],
+                    soundText: "Bell → Phone → Door → Clock → Bird",
+                    skills: ["Auditory Memory", "Sequential Processing", "Sound Discrimination"],
+                    options: [
+                        { text: "Clock", description: "Fourth item in sequence", correct: false },
+                        { text: "Bird", description: "Last item in sequence", correct: false },
+                        { text: "Door", description: "Third item in sequence", correct: false },
+                        { text: "Phone", description: "Second item in sequence", correct: false },
+                        { text: "Bell", description: "First item in sequence", correct: true }
+                    ]
+                },
+                {
+                    title: "Spatial Memory",
+                    type: "spatial",
+                    items: ["🏠", "🌟", "🔺", "🔵"],
+                    grid: [
+                        ["🏠", "🌟", "🔺", "🔵"],
+                        ["🌟", "🔺", "🔵", "🏠"],
+                        ["🔺", "🔵", "🏠", "🌟"]
+                    ],
+                    skills: ["Spatial Memory", "Visual-Spatial Integration", "Position Memory"],
+                    options: [
+                        { text: "🔵", description: "Bottom-right corner", correct: false },
+                        { text: "🌟", description: "Top-right corner", correct: false },
+                        { text: "🔺", description: "Top-left corner", correct: false },
+                        { text: "🏠", description: "Bottom-left corner", correct: true }
+                    ]
+                },
+                {
+                    title: "Working Memory Span",
+                    type: "working",
+                    items: ["7", "3", "9", "2", "8", "5"],
+                    operations: ["Add 2", "Subtract 1", "Multiply by 3"],
+                    skills: ["Working Memory", "Moral Calculation", "Information Processing"],
+                    options: [
+                        { text: "9, 5, 11, 3, 10", description: "7+2=9, 3+2=5, 9+2=11, 2+3=5, 8+3=10", correct: true },
+                        { text: "9, 5, 12, 3, 11", description: "9+2=11, incorrect calculation", correct: false },
+                        { text: "9, 5, 11, 3, 10", description: "2+3=5, incorrect calculation", correct: false },
+                        { text: "7, 3, 9, 2, 8", description: "No calculation on last item", correct: false }
+                    ]
+                },
+                {
+                    title: "Complex Memory",
+                    type: "complex",
+                    items: ["📚", "📝", "📊", "📋", "🎨"],
+                    sequence: "Remember the order and content",
+                    skills: ["Complex Memory", "Multi-Modal Processing", "Long-term Memory"],
+                    options: [
+                        { text: "📚 → 📝 → 📊 → 📋 → 🎨", description: "Correct sequence and content", correct: true },
+                        { text: "📚 → 📝 → 📋 → 📊 → 🎨", description: "Last two items swapped", correct: false },
+                        { text: "📚 → 📝 → 📊 → 🎨 → 📋", description: "Middle item moved", correct: false },
+                        { text: "📚 → 📝 → 📊 → 📋 → 🎨", description: "Wrong item inserted", correct: false }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            setupMemoryChallenge();
+        }
+
+        function setupMemoryChallenge() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.isAnswered = false;
+            gameState.memoryActive = false;
+            gameState.memoryItems = [];
+            gameState.revealedItems = [];
+            gameState.currentChallenge = gameState.challenges[gameState.currentRound];
+            updateMemoryDisplay();
+            generateMemoryGrid();
+            generateMemoryOptions();
+            hideFeedback();
+            document.getElementById('startBtn').style.display = 'inline-flex';
+            displayMemoryItems();
+        }
+
+        function updateMemoryDisplay() {
+            const challenge = gameState.currentChallenge;
+            document.getElementById('challengeTitle').textContent = challenge.title;
+            
+            // Generate skills
+            const skillsGrid = document.getElementById('skillsGrid');
+            skillsGrid.innerHTML = '';
+            challenge.skills.forEach(skill => {
+                const skillDiv = document.createElement('div');
+                skillDiv.className = 'skill-item';
+                skillDiv.innerHTML = `
+                    <div class="skill-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="skill-name">${skill}</div>
+                `;
+                skillsGrid.appendChild(skillDiv);
+            });
+        }
+
+        function displayMemoryItems() {
+            const memoryGrid = document.getElementById('memoryGrid');
+            memoryGrid.innerHTML = '';
+            
+            gameState.memoryItems.forEach((item, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'memory-cell';
+                cell.textContent = item;
+                cell.onclick = () => revealItem(index, cell);
+                memoryGrid.appendChild(cell);
+            });
+        }
+
+        function revealItem(index, element) {
+            if (gameState.revealedItems.includes(index)) return;
+            
+            gameState.revealedItems.push(index);
+            element.classList.add('revealed');
+            
+            // Auto-reveal next item after short delay
+            if (index < gameState.memoryItems.length - 1) {
+                setTimeout(() => {
+                    revealItem(index + 1, document.querySelectorAll('.memory-cell')[index + 1]);
+                }, 500);
+            }
+        }
+
+        function generateMemoryGrid() {
+            const memoryGrid = document.getElementById('memoryGrid');
+            memoryGrid.innerHTML = '';
+            
+            // Shuffle items for variety
+            const shuffledItems = [...gameState.currentChallenge.items].sort(() => Math.random() - 0.5);
+            gameState.memoryItems = shuffledItems;
+            displayMemoryItems();
+        }
+
+        function startMemory() {
+            gameState.memoryActive = true;
+            document.getElementById('startBtn').style.display = 'none';
+            
+            // Show items briefly, then hide
+            displayMemoryItems();
+            
+            const timer = document.getElementById('memoryTimer');
+            timer.style.display = 'block';
+            timer.textContent = '5s';
+            
+            let timeLeft = 5;
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timer.textContent = `${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    hideMemoryItems();
+                }
+            }, 1000);
+        }
+
+        function hideMemoryItems() {
+            const cells = document.querySelectorAll('.memory-cell');
+            cells.forEach(cell => {
+                cell.textContent = '?';
+                cell.classList.remove('revealed');
+            });
+        }
+
+        function generateMemoryOptions() {
+            const memoryOptions = document.getElementById('memoryOptions');
+            memoryOptions.innerHTML = '';
+            const shuffledOptions = [...gameState.currentChallenge.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'memory-option';
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                optionDiv.innerHTML = `
+                    <div class="option-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="option-text">${option.text}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                memoryOptions.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(option, element) {
+            if (gameState.isAnswered || !gameState.memoryActive) return;
+            
+            gameState.isAnswered = true;
+            const isCorrect = option.correct;
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+                // Show correct answer in memory
+                const correctIndex = gameState.currentChallenge.options.findIndex(o => o.correct);
+                const cells = document.querySelectorAll('.memory-cell');
+                cells[correctIndex].classList.add('matched');
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                document.querySelectorAll('.memory-option').forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentChallenge.options.find(o => o.correct).text)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            const baseScore = 100;
+            const levelBonus = gameState.level * 25;
+            const speedBonus = Math.max(0, 50 - Math.floor((Date.now() - gameState.startTime) / 1000));
+            const memoryBonus = Math.floor(Math.random() * 20); // Random bonus for variety
+            return baseScore + levelBonus + speedBonus + memoryBonus;
+        }
+
+        function nextRound() {
+            gameState.currentRound++;
+            if (gameState.currentRound % 2 === 0) gameState.level++;
+            updateStats();
+            setupMemoryChallenge();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress'). style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Excellent working memory!</div><small>Your memory skills are outstanding!</small>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not quite right. Keep practicing! 🧠</div><small>The green option shows the correct answer.</small>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Working Memory',
+                round: gameState.currentRound + 1,
+                challenge: gameState.currentChallenge.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 150)) * 100;
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Working Memory Complete!</h2>
+                    <p>Amazing memory and information processing!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🧠</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Memory Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Memory Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You have exceptional working memory!' : 
+                              accuracy >= 60 ? 'Excellent! Your working memory is very strong!' :
+                              'Good job! Working memory takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Good working memory helps with learning, problem-solving, and daily tasks!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            const results = {
+                gameName: 'Working Memory',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

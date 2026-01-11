@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texture Play - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #f6ad55;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f6ad55, #ed8936);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Texture Display */
+        .texture-display {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .texture-item {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .texture-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .texture-question {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        /* Texture Styles */
+        .texture-soft {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #d69e2e;
+            border: 3px solid #f6ad55;
+            position: relative;
+        }
+
+        .texture-rough {
+            background: linear-gradient(135deg, #fed7aa, #fbbf24);
+            color: #d97706;
+            border: 3px solid #f59e0b;
+            position: relative;
+        }
+
+        .texture-smooth {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            color: #4f46e5;
+            border: 3px solid #6366f1;
+            position: relative;
+        }
+
+        .texture-bumpy {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            color: #ea580c;
+            border: 3px solid #fb923c;
+            position: relative;
+        }
+
+        .texture-fluffy {
+            background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+            color: #9333ea;
+            border: 3px solid #a855f7;
+            position: relative;
+        }
+
+        .texture-slimy {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #059669;
+            border: 3px solid #10b981;
+            position: relative;
+        }
+
+        /* Simplified Texture Patterns - Easy for Toddlers! */
+        .texture-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .pattern-soft {
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9) 20px, transparent 20px),
+                radial-gradient(circle at 70% 70%, rgba(255,255,255,0.8) 25px, transparent 25px);
+            background-size: 100px 100px, 120px 120px;
+        }
+
+        .pattern-rough {
+            background: 
+                repeating-linear-gradient(45deg, rgba(139,69,19,0.4) 5px, transparent 5px, transparent 10px),
+                repeating-linear-gradient(-45deg, rgba(160,82,45,0.3) 8px, transparent 8px, transparent 16px);
+        }
+
+        .pattern-smooth {
+            background: 
+                linear-gradient(135deg, rgba(255,255,255,0.6) 30%, transparent 30%, transparent 70%, rgba(255,255,255,0.6) 70%),
+                linear-gradient(45deg, rgba(255,255,255,0.4) 50%, transparent 50%);
+            background-size: 30px 30px, 20px 20px;
+        }
+
+        .pattern-bumpy {
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(139,69,19,0.5) 8px, transparent 8px),
+                radial-gradient(circle at 75% 25%, rgba(160,82,45,0.4) 8px, transparent 8px),
+                radial-gradient(circle at 25% 75%, rgba(101,67,33,0.5) 8px, transparent 8px),
+                radial-gradient(circle at 75% 75%, rgba(139,69,19,0.4) 8px, transparent 8px);
+            background-size: 60px 60px;
+        }
+
+        .pattern-fluffy {
+            background: 
+                radial-gradient(circle at 50% 30%, rgba(147,51,234,0.4) 30px, transparent 30px),
+                radial-gradient(circle at 30% 70%, rgba(147,51,234,0.3) 25px, transparent 25px),
+                radial-gradient(circle at 70% 70%, rgba(147,51,234,0.4) 25px, transparent 25px);
+            background-size: 80px 80px;
+        }
+
+        .pattern-slimy {
+            background: 
+                repeating-linear-gradient(0deg, rgba(16,185,129,0.5) 3px, transparent 3px, transparent 6px),
+                repeating-linear-gradient(90deg, rgba(5,150,105,0.3) 4px, transparent 4px, transparent 8px);
+        }
+
+        /* Simple Texture Icons - More Recognizable! */
+        .texture-icon {
+            font-size: 5rem;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Texture Preview Enhancements */
+        .texture-preview {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .texture-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .texture-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e0;
+        }
+
+        .texture-option.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .texture-option.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        .texture-preview {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .texture-option span {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f6ad55, #ed8936);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(246, 173, 85, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        /* Animations */
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Touch Instructions */
+        .touch-instructions {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .touch-instructions i {
+            color: #f6ad55;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .texture-item {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-hand"></i>
+            <h1>Texture Play</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Explore Textures!</h2>
+                <p>Touch and feel different textures. Can you tell what this texture is?</p>
+            </div>
+
+            <div class="touch-instructions">
+                <i class="fas fa-hand-paper"></i>
+                <p>Imagine touching the texture below. How does it feel?</p>
+            </div>
+
+            <div class="texture-display">
+                <div class="texture-item" id="textureItem">
+                    <i class="fas fa-question"></i>
+                    <div class="texture-pattern" id="texturePattern"></div>
+                </div>
+                <div class="texture-question">What texture is this?</div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="options-grid" id="optionsGrid">
+                <!-- Options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextRound()">
+                    <i class="fas fa-arrow-right"></i> Next
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            currentRound: 0,
+            score: 0,
+            level: 1,
+            totalRounds: 8,
+            correctAnswers: 0,
+            currentTexture: null,
+            isAnswered: false,
+            startTime: Date.now(),
+            roundStartTime: Date.now()
+        };
+
+        // Simplified Textures Data - Easy for Toddlers!
+        const textures = [
+            { 
+                name: 'soft', 
+                icon: 'fa-cloud', 
+                color: 'texture-soft',
+                pattern: 'pattern-soft',
+                description: 'Gentle like cotton',
+                examples: 'Pillows, blankets'
+            },
+            { 
+                name: 'rough', 
+                icon: 'fa-mountain', 
+                color: 'texture-rough',
+                pattern: 'pattern-rough',
+                description: 'Bumpy like rocks',
+                examples: 'Sandpaper, tree bark'
+            },
+            { 
+                name: 'smooth', 
+                icon: 'fa-water', 
+                color: 'texture-smooth',
+                pattern: 'pattern-smooth',
+                description: 'Flat like glass',
+                examples: 'Mirror, phone screen'
+            },
+            { 
+                name: 'bumpy', 
+                icon: 'fa-circle-dot', 
+                color: 'texture-bumpy',
+                pattern: 'pattern-bumpy',
+                description: 'Lumpy like bubbles',
+                examples: 'Bubble wrap, gravel'
+            }
+        ];
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewRound();
+        }
+
+        // Start New Round
+        function startNewRound() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            gameState.isAnswered = false;
+            gameState.roundStartTime = Date.now();
+            
+            // Select random texture
+            gameState.currentTexture = textures[Math.floor(Math.random() * textures.length)];
+            
+            // Update texture display
+            updateTextureDisplay();
+            
+            // Generate new options
+            generateOptions();
+            
+            // Ensure feedback is hidden
+            hideFeedback();
+            
+            // Ensure next button is hidden
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // Update Texture Display
+        function updateTextureDisplay() {
+            const textureItem = document.getElementById('textureItem');
+            const texturePattern = document.getElementById('texturePattern');
+            
+            // Remove all classes
+            textureItem.className = 'texture-item fade-in';
+            
+            // Add current texture classes
+            textureItem.classList.add(gameState.currentTexture.color);
+            
+            // Update pattern
+            texturePattern.className = `texture-pattern ${gameState.currentTexture.pattern}`;
+            
+            // Update icon with enhanced visual
+            textureItem.innerHTML = `
+                <div class="texture-icon">
+                    <i class="fas ${gameState.currentTexture.icon}"></i>
+                </div>
+                <div class="texture-pattern ${gameState.currentTexture.pattern}"></div>
+            `;
+        }
+
+        // Generate Options
+        function generateOptions() {
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            // Create options array with correct answer and random wrong answers
+            const options = [gameState.currentTexture];
+            
+            // Add 3 random wrong answers
+            const wrongAnswers = textures.filter(t => t.name !== gameState.currentTexture.name);
+            while (options.length < 4) {
+                const randomWrong = wrongAnswers[Math.floor(Math.random() * wrongAnswers.length)];
+                if (!options.find(o => o.name === randomWrong.name)) {
+                    options.push(randomWrong);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            // Create option elements
+            options.forEach((texture, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'texture-option';
+                optionDiv.onclick = () => selectAnswer(texture, optionDiv);
+                
+                optionDiv.innerHTML = `
+                    <div class="texture-preview ${texture.color}">
+                        <div class="texture-pattern ${texture.pattern}" style="width: 100%; height: 100%; border-radius: 10px;"></div>
+                    </div>
+                    <span>${texture.name.charAt(0).toUpperCase() + texture.name.slice(1)}</span>
+                `;
+                
+                optionsGrid.appendChild(optionDiv);
+            });
+        }
+
+        // Select Answer
+        function selectAnswer(texture, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            
+            const isCorrect = texture.name === gameState.currentTexture.name;
+            const roundTime = Date.now() - gameState.roundStartTime;
+            
+            // Update option styling
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.correctAnswers++;
+                gameState.score += calculateScore(roundTime);
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                const options = document.querySelectorAll('.texture-option');
+                options.forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentTexture.name)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Show feedback with description
+            showFeedback(isCorrect);
+            
+            // Update stats
+            updateStats();
+            
+            // Show next button
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            
+            // Track progress
+            trackProgress(isCorrect, roundTime);
+        }
+
+        // Calculate Score
+        function calculateScore(timeMs) {
+            const baseScore = 100;
+            const timeBonus = Math.max(0, 50 - Math.floor(timeMs / 1000)); // Up to 50 bonus points for speed
+            return baseScore + timeBonus;
+        }
+
+        // Show Feedback
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = `
+                    <div>🎉 Excellent! You got it right!</div>
+                    <small>${gameState.currentTexture.description}</small>
+                    <br><small>Examples: ${gameState.currentTexture.examples}</small>
+                `;
+                feedback.className = 'feedback correct show';
+            } else {
+                feedback.innerHTML = `
+                    <div>Not quite right. Keep exploring! 💪</div>
+                    <small>The correct answer was: ${gameState.currentTexture.name}</small>
+                    <br><small>${gameState.currentTexture.description}</small>
+                `;
+                feedback.className = 'feedback incorrect show';
+            }
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+        }
+
+        // Next Round
+        function nextRound() {
+            gameState.currentRound++;
+            
+            // Clear previous selections
+            clearSelections();
+            
+            // Start new round
+            startNewRound();
+        }
+
+        // Clear Previous Selections
+        function clearSelections() {
+            // Remove all correct/incorrect classes from options
+            const options = document.querySelectorAll('.texture-option');
+            options.forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+            });
+            
+            // Hide feedback
+            hideFeedback();
+            
+            // Hide next button until new answer is selected
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Track Progress
+        function trackProgress(isCorrect, timeMs) {
+            // This would normally save to database
+            const progressData = {
+                gameName: 'Texture Play',
+                round: gameState.currentRound + 1,
+                texture: gameState.currentTexture.name,
+                isCorrect: isCorrect,
+                timeMs: timeMs,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const accuracy = (gameState.correctAnswers / gameState.totalRounds) * 100;
+            const totalTime = Date.now() - gameState.startTime;
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Game Complete!</h2>
+                    <p>Great job exploring different textures!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Accuracy</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Total Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #d69e2e; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Amazing! You have excellent texture recognition skills!' : 
+                              accuracy >= 60 ? 'Great job! You have good sensory awareness!' :
+                              'Nice work! Texture recognition takes practice, keep exploring!'}
+                        </p>
+                        <p style="color: #d69e2e; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Sensory exploration is important for cognitive development!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(accuracy, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(accuracy, totalTime) {
+            const results = {
+                gameName: 'Texture Play',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                correctAnswers: gameState.correctAnswers,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

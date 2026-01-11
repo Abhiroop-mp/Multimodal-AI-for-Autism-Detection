@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peek-a-Boo - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Peek-a-Boo Game Area */
+        .peekaboo-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .character-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .character {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            color: #4a5568;
+            position: relative;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .character.hiding {
+            transform: scale(0.1);
+            opacity: 0;
+        }
+
+        .character.showing {
+            transform: scale(1);
+            opacity: 1;
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(0.1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .hands {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .hand {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #fdbcb4, #f4a460);
+            border-radius: 50%;
+            border: 3px solid #d2691e;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #8b4513;
+        }
+
+        .hand.left {
+            top: 20px;
+            left: -40px;
+            transform: rotate(-20deg);
+        }
+
+        .hand.right {
+            top: 20px;
+            right: -40px;
+            transform: rotate(20deg);
+        }
+
+        .hand.covering {
+            transform: scale(1.2);
+        }
+
+        .hand.left.covering {
+            top: 50px;
+            left: 20px;
+            transform: rotate(-45deg);
+        }
+
+        .hand.right.covering {
+            top: 50px;
+            right: 20px;
+            transform: rotate(45deg);
+        }
+
+        /* Character Types */
+        .character.happy {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+        }
+
+        .character.surprised {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+        }
+
+        .character.sleepy {
+            background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+        }
+
+        .character.excited {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+
+        /* Interactive Buttons */
+        .peekaboo-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback Area */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Instructions Panel */
+        .instructions-panel {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .instructions-panel i {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .instructions-panel h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions-panel p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .wiggle {
+            animation: wiggle 0.5s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .character-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            .character {
+                width: 150px;
+                height: 150px;
+                font-size: 6rem;
+            }
+
+            .hand {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            .peekaboo-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-eye"></i>
+            <h1>Peek-a-Boo</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Play Peek-a-Boo!</h2>
+                <p>Click the buttons to hide and show the faces</p>
+            </div>
+
+            <div class="instructions-panel">
+                <i class="fas fa-hand-point-up"></i>
+                <h3>How to Play</h3>
+                <p>Click "Hide" to cover the face, then click "Show" to reveal it! Watch the fun expressions appear and disappear!</p>
+            </div>
+
+            <div class="peekaboo-area">
+                <div class="character-container">
+                    <div class="character happy showing" id="character">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <div class="hands">
+                        <div class="hand left" id="leftHand">
+                            <i class="fas fa-hand-paper"></i>
+                        </div>
+                        <div class="hand right" id="rightHand">
+                            <i class="fas fa-hand-paper"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="peekaboo-controls">
+                <button class="btn btn-primary" id="hideBtn" onclick="hideCharacter()">
+                    <i class="fas fa-eye-slash"></i> Hide
+                </button>
+                <button class="btn btn-primary" id="showBtn" onclick="showCharacter()" disabled>
+                    <i class="fas fa-eye"></i> Show
+                </button>
+                <button class="btn btn-secondary" onclick="nextCharacter()">
+                    <i class="fas fa-arrow-right"></i> Next Face
+                </button>
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 8,
+            currentRound: 0,
+            isHiding: false,
+            hideCount: 0,
+            showCount: 0,
+            currentCharacter: 0,
+            characters: [
+                { icon: 'fa-smile', name: 'happy', color: 'happy', message: 'Peek-a-Boo! I see you!' },
+                { icon: 'fa-grin', name: 'excited', color: 'excited', message: 'Boo! Here I am!' },
+                { icon: 'fa-meh', name: 'sleepy', color: 'sleepy', message: 'Sleepy peek-a-boo!' },
+                { icon: 'fa-surprise', name: 'surprised', color: 'surprised', message: 'Surprise! Boo!' },
+                { icon: 'fa-laugh', name: 'happy', color: 'happy', message: 'Ha ha! Peek-a-Boo!' },
+                { icon: 'fa-grin-stars', name: 'excited', color: 'excited', message: 'Stars! Here I come!' },
+                { icon: 'fa-grin-tongue', name: 'happy', color: 'happy', message: 'Silly peek-a-boo!' },
+                { icon: 'fa-grin-hearts', name: 'excited', color: 'excited', message: 'Love peek-a-boo!' }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            updateCharacter();
+        }
+
+        // Hide Character
+        function hideCharacter() {
+            if (gameState.isHiding) return;
+            
+            gameState.isHiding = true;
+            gameState.hideCount++;
+            
+            const character = document.getElementById('character');
+            const leftHand = document.getElementById('leftHand');
+            const rightHand = document.getElementById('rightHand');
+            const hideBtn = document.getElementById('hideBtn');
+            const showBtn = document.getElementById('showBtn');
+            
+            // Animate hands covering
+            leftHand.classList.add('covering');
+            rightHand.classList.add('covering');
+            
+            // Hide character
+            setTimeout(() => {
+                character.classList.remove('showing');
+                character.classList.add('hiding');
+                
+                // Update buttons
+                hideBtn.disabled = true;
+                showBtn.disabled = false;
+                
+                // Show feedback
+                showFeedback('Where did I go? 👀', 'info');
+            }, 300);
+            
+            updateScore(5); // Points for hiding
+        }
+
+        // Show Character
+        function showCharacter() {
+            if (!gameState.isHiding) return;
+            
+            gameState.isHiding = false;
+            gameState.showCount++;
+            
+            const character = document.getElementById('character');
+            const leftHand = document.getElementById('leftHand');
+            const rightHand = document.getElementById('rightHand');
+            const hideBtn = document.getElementById('hideBtn');
+            const showBtn = document.getElementById('showBtn');
+            
+            // Show character
+            character.classList.remove('hiding');
+            character.classList.add('showing');
+            
+            // Animate hands moving away
+            setTimeout(() => {
+                leftHand.classList.remove('covering');
+                rightHand.classList.remove('covering');
+                
+                // Update buttons
+                hideBtn.disabled = false;
+                showBtn.disabled = true;
+                
+                // Show character-specific message
+                const currentChar = gameState.characters[gameState.currentCharacter];
+                showFeedback(currentChar.message, 'success');
+                
+                // Add wiggle animation
+                character.classList.add('wiggle');
+                setTimeout(() => character.classList.remove('wiggle'), 500);
+            }, 100);
+            
+            updateScore(10); // Points for showing
+        }
+
+        // Next Character
+        function nextCharacter() {
+            gameState.currentRound++;
+            gameState.currentCharacter = (gameState.currentCharacter + 1) % gameState.characters.length;
+            
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            
+            updateCharacter();
+            hideFeedback();
+            
+            // Reset to showing state
+            gameState.isHiding = false;
+            document.getElementById('hideBtn').disabled = false;
+            document.getElementById('showBtn').disabled = true;
+        }
+
+        // Update Character Display
+        function updateCharacter() {
+            const character = document.getElementById('character');
+            const currentChar = gameState.characters[gameState.currentCharacter];
+            
+            // Remove all color classes
+            character.className = 'character showing';
+            
+            // Add current character color
+            character.classList.add(currentChar.color);
+            
+            // Update icon
+            character.innerHTML = `<i class="fas ${currentChar.icon}"></i>`;
+            
+            // Add fade-in animation
+            character.classList.add('fade-in');
+            setTimeout(() => character.classList.remove('fade-in'), 500);
+        }
+
+        // Update Score
+        function updateScore(points) {
+            gameState.score += points;
+            updateStats();
+            
+            // Track progress
+            trackProgress(points);
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = message;
+            feedback.className = `feedback ${type} show`;
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 2000);
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(points) {
+            const progressData = {
+                gameName: 'Peek-a-Boo',
+                round: gameState.currentRound + 1,
+                character: gameState.characters[gameState.currentCharacter].name,
+                action: gameState.isHiding ? 'hiding' : 'showing',
+                points: points,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const totalInteractions = gameState.hideCount + gameState.showCount;
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Peek-a-Boo Complete!</h2>
+                    <p>Great job playing peek-a-boo!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👀</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${totalInteractions}</div>
+                            <div style="color: #718096;">Interactions</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time Played</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${gameState.score >= 100 ? 'Amazing! You are a peek-a-boo expert!' : 
+                              gameState.score >= 50 ? 'Great job! You love playing peek-a-boo!' :
+                              'Nice work! Peek-a-boo is so much fun!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Peek-a-boo helps with object permanence and social bonding!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(totalInteractions, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(totalInteractions, totalTime) {
+            const results = {
+                gameName: 'Peek-a-Boo',
+                finalScore: gameState.score,
+                totalInteractions: totalInteractions,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

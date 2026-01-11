@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Matching - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Color Display */
+        .color-display {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .target-color {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .target-color:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .color-question {
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+
+        /* Color Options */
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .color-option {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .color-option:hover::before {
+            left: 100%;
+        }
+
+        .color-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .color-option.selected {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .color-option.correct {
+            animation: correctPulse 0.6s ease;
+            border-color: #28a745;
+        }
+
+        .color-option.incorrect {
+            animation: shake 0.5s ease;
+            border-color: #dc3545;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .color-option:hover .color-swatch {
+            transform: scale(1.1);
+        }
+
+        .color-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .color-example {
+            font-size: 0.85rem;
+            color: #4a5568;
+            line-height: 1.3;
+        }
+
+        /* Instructions Panel */
+        .instructions-panel {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .instructions-panel i {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .instructions-panel h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions-panel p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .rainbow {
+            animation: rainbow 3s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .target-color {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+
+            .color-options {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-palette"></i>
+            <h1>Color Matching</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Match Colors!</h2>
+                <p>Look at the color and choose the matching one</p>
+            </div>
+
+            <div class="instructions-panel">
+                <i class="fas fa-hand-point-up"></i>
+                <h3>How to Play</h3>
+                <p>Look at the color in the circle, then click the matching color from the options below!</p>
+            </div>
+
+            <div class="color-display">
+                <div class="target-color" id="targetColor">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <div class="color-name" id="colorName">Find this color!</div>
+                <div class="color-question">Which color matches the one above?</div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="color-options" id="colorOptions">
+                <!-- Color options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextRound()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Color
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 8,
+            currentRound: 0,
+            currentColor: null,
+            isAnswered: false,
+            usedColors: [], // Track used colors to avoid repetition
+            colors: [
+                {
+                    name: 'Red',
+                    hex: '#ff6b6b',
+                    rgb: 'rgb(255, 107, 107)',
+                    examples: 'Apple, Fire truck, Stop sign',
+                    icon: 'fa-apple-alt'
+                },
+                {
+                    name: 'Blue',
+                    hex: '#4dabf7',
+                    rgb: 'rgb(77, 171, 247)',
+                    examples: 'Sky, Ocean, Blueberries',
+                    icon: 'fa-water'
+                },
+                {
+                    name: 'Yellow',
+                    hex: '#feca57',
+                    rgb: 'rgb(254, 202, 87)',
+                    examples: 'Sun, Banana, Lemon',
+                    icon: 'fa-sun'
+                },
+                {
+                    name: 'Green',
+                    hex: '#48dbfb',
+                    rgb: 'rgb(72, 219, 251)',
+                    examples: 'Grass, Trees, Leaves',
+                    icon: 'fa-tree'
+                },
+                {
+                    name: 'Orange',
+                    hex: '#ff9ff3',
+                    rgb: 'rgb(255, 159, 243)',
+                    examples: 'Orange, Carrot, Pumpkin',
+                    icon: 'fa-carrot'
+                },
+                {
+                    name: 'Purple',
+                    hex: '#f368e0',
+                    rgb: 'rgb(243, 104, 224)',
+                    examples: 'Grapes, Flowers, Lavender',
+                    icon: 'fa-spa'
+                },
+                {
+                    name: 'Pink',
+                    hex: '#ee5a6f',
+                    rgb: 'rgb(238, 90, 111)',
+                    examples: 'Flowers, Cotton candy, Pig',
+                    icon: 'fa-heart'
+                },
+                {
+                    name: 'Brown',
+                    hex: '#8b4513',
+                    rgb: 'rgb(139, 69, 19)',
+                    examples: 'Chocolate, Wood, Bear',
+                    icon: 'fa-cookie'
+                },
+                {
+                    name: 'Black',
+                    hex: '#2c3e50',
+                    rgb: 'rgb(44, 62, 80)',
+                    examples: 'Night, Coal, Cat',
+                    icon: 'fa-moon'
+                },
+                {
+                    name: 'White',
+                    hex: '#f8f9fa',
+                    rgb: 'rgb(248, 249, 250)',
+                    examples: 'Snow, Cloud, Paper',
+                    icon: 'fa-cloud'
+                },
+                {
+                    name: 'Gray',
+                    hex: '#95a5a6',
+                    rgb: 'rgb(149, 165, 166)',
+                    examples: 'Stone, Elephant, Cloud',
+                    icon: 'fa-cloud'
+                },
+                {
+                    name: 'Teal',
+                    hex: '#00d2d3',
+                    rgb: 'rgb(0, 210, 211)',
+                    examples: 'Ocean, Peacock, Teal',
+                    icon: 'fa-fish'
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewRound();
+        }
+
+        // Start New Round
+        function startNewRound() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            gameState.isAnswered = false;
+            
+            // Select unique color (avoid repetition)
+            const availableColors = gameState.colors.filter(c => !gameState.usedColors.includes(c.name));
+            let selectedColor;
+            
+            if (availableColors.length > 0) {
+                selectedColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+            } else {
+                // If all colors used, reset and pick randomly
+                gameState.usedColors = [];
+                selectedColor = gameState.colors[Math.floor(Math.random() * gameState.colors.length)];
+            }
+            
+            gameState.currentColor = selectedColor;
+            gameState.usedColors.push(selectedColor.name);
+            
+            // Update color display
+            updateColorDisplay();
+            
+            // Generate options
+            generateOptions();
+            
+            // Hide feedback and next button
+            hideFeedback();
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // Update Color Display
+        function updateColorDisplay() {
+            const targetColor = document.getElementById('targetColor');
+            const colorName = document.getElementById('colorName');
+            
+            targetColor.style.background = gameState.currentColor.hex;
+            targetColor.innerHTML = `<i class="fas ${gameState.currentColor.icon}"></i>`;
+            colorName.textContent = gameState.currentColor.name;
+        }
+
+        // Generate Options
+        function generateOptions() {
+            const colorOptions = document.getElementById('colorOptions');
+            colorOptions.innerHTML = '';
+            
+            // Create options array with correct answer and random wrong answers
+            const options = [gameState.currentColor];
+            
+            // Add 3 random wrong answers
+            const wrongAnswers = gameState.colors.filter(c => c.name !== gameState.currentColor.name);
+            while (options.length < 4) {
+                const randomWrong = wrongAnswers[Math.floor(Math.random() * wrongAnswers.length)];
+                if (!options.find(o => o.name === randomWrong.name)) {
+                    options.push(randomWrong);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            // Create option elements
+            options.forEach((color, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'color-option';
+                optionDiv.onclick = () => selectAnswer(color, optionDiv);
+                
+                optionDiv.innerHTML = `
+                    <div class="color-swatch" style="background: ${color.hex}"></div>
+                    <div class="color-label">${color.name}</div>
+                    <div class="color-example">${color.examples}</div>
+                `;
+                
+                colorOptions.appendChild(optionDiv);
+            });
+        }
+
+        // Select Answer
+        function selectAnswer(color, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            
+            const isCorrect = color.name === gameState.currentColor.name;
+            
+            // Update option styling
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                const options = document.querySelectorAll('.color-option');
+                options.forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentColor.name)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Show feedback
+            showFeedback(isCorrect);
+            
+            // Update stats
+            updateStats();
+            
+            // Show next button
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            
+            // Track progress
+            trackProgress(isCorrect);
+        }
+
+        // Calculate Score
+        function calculateScore() {
+            const baseScore = 50;
+            const bonus = Math.floor(Math.random() * 20); // Random bonus for variety
+            return baseScore + bonus;
+        }
+
+        // Next Round
+        function nextRound() {
+            gameState.currentRound++;
+            startNewRound();
+        }
+
+        // Update Score
+        function updateScore(points) {
+            if (points) gameState.score += points;
+            updateStats();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = `
+                    <div>🎉 Perfect! You found the color!</div>
+                    <small>${gameState.currentColor.examples}</small>
+                `;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `
+                    <div>Not quite right. Keep looking! 👀</div>
+                    <small>The correct color was: ${gameState.currentColor.name}</small>
+                `;
+                feedback.className = 'feedback info show';
+            }
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Color Matching',
+                round: gameState.currentRound + 1,
+                color: gameState.currentColor.name,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 70)) * 100; // Max 70 points per round
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎨 Color Matching Complete!</h2>
+                    <p>Great job matching all the colors!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🌈</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Accuracy</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Amazing! You are a color expert!' : 
+                              accuracy >= 60 ? 'Great job! You know your colors well!' :
+                              'Nice work! Color recognition takes practice, keep learning!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Color recognition helps with visual processing and cognitive development!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(accuracy, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(accuracy, totalTime) {
+            const results = {
+                gameName: 'Color Matching',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

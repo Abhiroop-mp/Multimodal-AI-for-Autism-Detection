@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Pattern Recognition - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #667eea; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 1200px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .pattern-challenge { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .challenge-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1.5rem; }
+        .pattern-display { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem; min-height: 400px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .pattern-content { font-size: 1.5rem; color: #4a5568; text-align: center; line-height: 1.6; }
+        .pattern-timer { position: absolute; top: 1rem; right: 1rem; font-size: 1.2rem; font-weight: bold; color: #667eea; }
+        .pattern-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .pattern-cell { aspect-ratio: 1; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #4a5568; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .pattern-cell:hover { transform: scale(1.1); background: #e2e8f0; border-color: #667eea; }
+        .pattern-cell.selected { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-color: #667eea; transform: scale(1.1); }
+        .pattern-cell.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .pattern-cell.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .pattern-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .pattern-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .pattern-option::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent); transition: left 0.5s ease; }
+        .pattern-option:hover::before { left: 100%; }
+        .pattern-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #667eea; }
+        .pattern-option.selected { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-color: #667eea; transform: scale(1.02); }
+        .pattern-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .pattern-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        .option-icon { font-size: 2rem; color: #667eea; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .pattern-option:hover .option-icon { transform: scale(1.2) rotate(10deg); }
+        .option-text { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .option-description { font-size: 0.9rem; color: #4a5568; line-height: 1.4; }
+        .skills-container { background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; text-align: center; }
+        .skills-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .skill-item { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; text-align: center; transition: all 0.3s ease; }
+        .skill-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .skill-icon { font-size: 1.5rem; color: #667eea; margin-bottom: 0.5rem; }
+        .skill-name { font-size: 0.9rem; color: #4a5568; font-weight: 600; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .pattern-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+            .pattern-options { grid-template-columns: repeat(2, 1fr); }
+            .skills-grid { grid-template-columns: repeat(2, 1fr); }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-brain"></i>
+            <h1>Advanced Pattern Recognition</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Master Advanced Pattern Recognition!</h2>
+                <p>Analyze complex patterns and abstract relationships</p>
+            </div>
+
+            <div class="pattern-challenge">
+                <div class="challenge-title" id="challengeTitle">Complex Pattern Analysis</div>
+                <div class="pattern-display">
+                    <div class="pattern-content" id="patternContent">
+                        Loading advanced pattern challenge...
+                    </div>
+                    <div class="pattern-timer" id="patternTimer">45s</div>
+                </div>
+                <div class="pattern-grid" id="patternGrid">
+                    <!-- Pattern cells will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="skills-container">
+                <div class="skills-title">Advanced Pattern Skills Being Trained</div>
+                <div class="skills-grid" id="skillsGrid">
+                    <!-- Skills will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="pattern-options" id="patternOptions">
+                <!-- Pattern options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="startBtn" onclick="startPattern()">
+                    <i class="fas fa-play"></i> Start Pattern
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextPattern()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Pattern
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, currentPattern: null, isAnswered: false,
+            patterns: [
+                {
+                    title: "Fractal Pattern Analysis",
+                    content: "Identify the next element in this complex fractal sequence",
+                    pattern: ["🔺", "🔻", "🔺", "🔻", "🔺"],
+                    skills: ["Visual-Spatial Processing", "Abstract Reasoning", "Pattern Recognition"],
+                    options: [
+                        { text: "Triangle", description: "Next in alternating sequence", correct: true },
+                        { text: "Square", description: "Different shape", correct: false },
+                        { text: "Circle", description: "Not in sequence", correct: false },
+                        { text: "Diamond", description: "Wrong pattern", correct: false }
+                    ]
+                },
+                {
+                    title: "Mathematical Sequence",
+                    content: "Complete this advanced mathematical pattern",
+                    pattern: ["2", "4", "8", "16", "32"],
+                    skills: ["Numerical Analysis", "Logical Progression", "Mathematical Thinking"],
+                    options: [
+                        { text: "64", description: "Powers of 2", correct: true },
+                        { text: "48", description: "Add 16", correct: false },
+                        { text: "56", description: "Multiply by 2", correct: false },
+                        { text: "128", description: "Powers of 4", correct: false }
+                    ]
+                },
+                {
+                    title: "Abstract Relationship",
+                    content: "Find the relationship between these abstract symbols",
+                    pattern: ["α", "β", "γ", "δ", "ε"],
+                    skills: ["Symbolic Logic", "Abstract Reasoning", "Pattern Relationships"],
+                    options: [
+                        { text: "Greek Alphabet", description: "Sequential relationship", correct: true },
+                        { text: "Mathematical Constants", description: "Different relationship", correct: false },
+                        { text: "Random Symbols", description: "No clear relationship", correct: false },
+                        { text: "Chemical Elements", description: "Wrong context", correct: false }
+                    ]
+                },
+                {
+                    title: "Complex Matrix Pattern",
+                    content: "Identify the pattern in this 4x4 matrix",
+                    pattern: [
+                        ["🔴", "🔵", "🟢", "🟡"],
+                        ["🔵", "🟢", "🟡", "🔴"],
+                        ["🟢", "🟡", "🔴", "🔵"],
+                        ["🟡", "🔴", "🔵", "🟢"]
+                    ],
+                    skills: ["Matrix Logic", "Spatial Reasoning", "Complex Pattern Analysis"],
+                    options: [
+                        { text: "Rotation Pattern", description: "Clockwise rotation", correct: true },
+                        { text: "Mirror Pattern", description: "Horizontal flip", correct: false },
+                        { text: "Random Colors", description: "No clear pattern", correct: false },
+                        { text: "Diagonal Shift", description: "Wrong transformation", correct: false }
+                    ]
+                },
+                {
+                    title: "Temporal Pattern",
+                    content: "Predict the next element in this time-based sequence",
+                    pattern: ["🌅", "🌆", "🌇", "🌈", "🌉"],
+                    skills: ["Temporal Logic", "Sequence Prediction", "Pattern Evolution"],
+                    options: [
+                        { text: "🌊", description: "Next day of week", correct: true },
+                        { text: "🌄", description: "Earth symbol", correct: false },
+                        { text: "🌍", description: "Moon phases", correct: false },
+                        { text: "⭐", description: "Star symbol", correct: false }
+                    ]
+                },
+                {
+                    title: "Recursive Pattern",
+                    content: "Identify the rule in this recursive pattern",
+                    pattern: ["1", "1", "2", "3", "5", "8", "13"],
+                    skills: ["Recursive Logic", "Fibonacci Analysis", "Mathematical Sequences"],
+                    options: [
+                        { text: "21", description: "Next Fibonacci number", correct: true },
+                        { text: "34", description: "Add previous two", correct: false },
+                        { text: "26", description: "Double previous", correct: false },
+                        { text: "17", description: "Previous number", correct: false }
+                    ]
+                },
+                {
+                    title: "Multi-Dimensional Pattern",
+                    content: "Analyze this complex multi-dimensional pattern",
+                    pattern: [
+                        ["🔺🔵", "🔻🔴", "🔺🟢", "🔻🟡"],
+                        ["🔵🔺", "🔴🔻", "🟢🔺", "🟡🔻"],
+                        ["🔺🔵", "🔻🔴", "🔺🟢", "🔻🟡"]
+                    ],
+                    skills: ["Multi-Dimensional Analysis", "Complex Pattern Recognition", "Visual Processing"],
+                    options: [
+                        { text: "Color Swap", description: "Alternating color pattern", correct: true },
+                        { text: "Shape Rotation", description: "Geometric transformation", correct: false },
+                        { text: "Random Mix", description: "No clear pattern", correct: false },
+                        { text: "Mirror Pattern", description: "Reflection pattern", correct: false }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            setupPattern();
+        }
+
+        function setupPattern() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.isAnswered = false;
+            gameState.currentPattern = gameState.patterns[gameState.currentRound];
+            updatePatternDisplay();
+            generatePatternGrid();
+            generatePatternOptions();
+            hideFeedback();
+            document.getElementById('startBtn').style.display = 'inline-flex';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updatePatternDisplay() {
+            const pattern = gameState.currentPattern;
+            document.getElementById('challengeTitle').textContent = pattern.title;
+            document.getElementById('patternContent').textContent = pattern.content;
+            
+            // Generate skills
+            const skillsGrid = document.getElementById('skillsGrid');
+            skillsGrid.innerHTML = '';
+            pattern.skills.forEach(skill => {
+                const skillDiv = document.createElement('div');
+                skillDiv.className = 'skill-item';
+                skillDiv.innerHTML = `
+                    <div class="skill-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="skill-name">${skill}</div>
+                `;
+                skillsGrid.appendChild(skillDiv);
+            });
+        }
+
+        function generatePatternGrid() {
+            const patternGrid = document.getElementById('patternGrid');
+            patternGrid.innerHTML = '';
+            
+            const pattern = gameState.currentPattern.pattern;
+            const displayPattern = Array.isArray(pattern[0]) ? pattern : [pattern];
+            const flatPattern = displayPattern.flat();
+            
+            flatPattern.forEach((element, index) => {
+                const cellDiv = document.createElement('div');
+                cellDiv.className = 'pattern-cell';
+                cellDiv.textContent = element;
+                cellDiv.onclick = () => selectPatternElement(index, cellDiv);
+                patternGrid.appendChild(cellDiv);
+            });
+        }
+
+        function generatePatternOptions() {
+            const patternOptions = document.getElementById('patternOptions');
+            patternOptions.innerHTML = '';
+            const shuffledOptions = [...gameState.currentPattern.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'pattern-option';
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                optionDiv.innerHTML = `
+                    <div class="option-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="option-text">${option.text}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                patternOptions.appendChild(optionDiv);
+            });
+        }
+
+        function startPattern() {
+            gameState.isAnswered = true;
+            document.getElementById('startBtn').style.display = 'none';
+            
+            // Start timer
+            startTimer();
+        }
+
+        function startTimer() {
+            const timer = document.getElementById('patternTimer');
+            let timeLeft = 45;
+            timer.textContent = `${timeLeft}s`;
+            
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timer.textContent = `${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    endPattern();
+                }
+            }, 1000);
+        }
+
+        function endPattern() {
+            document.getElementById('patternTimer').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+        }
+
+        function selectPatternElement(index, element) {
+            if (gameState.isAnswered) return;
+            
+            // Highlight selected element
+            document.querySelectorAll('.pattern-cell').forEach(cell => {
+                cell.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        function selectAnswer(option, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            const isCorrect = option.correct;
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                document.querySelectorAll('.pattern-option').forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentPattern.options.find(o => o.correct).text)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            return 150 + gameState.level * 30 + Math.floor(Math.random() * 30);
+        }
+
+        function nextPattern() {
+            gameState.currentRound++;
+            if (gameState.currentRound % 2 === 0) gameState.level++;
+            updateStats();
+            setupPattern();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Excellent pattern analysis!</div><small>Your advanced pattern recognition is outstanding!</small>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not quite right. Keep analyzing! 🧠</div><small>The green option shows the correct answer.</small>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Advanced Pattern Recognition',
+                round: gameState.currentRound + 1,
+                challenge: gameState.currentPattern.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 200)) * 100;
+            
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Advanced Pattern Recognition Complete!</h2>
+                    <p>Outstanding complex pattern analysis skills!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🧠</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Pattern Recognition Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Pattern Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You have exceptional advanced pattern recognition skills!' : 
+                              accuracy >= 60 ? 'Excellent! Your complex pattern analysis is very strong!' :
+                              'Good job! Advanced pattern recognition takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Excellent advanced pattern recognition helps with complex problem-solving, analytical thinking, and abstract reasoning!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            const results = {
+                gameName: 'Advanced Pattern Recognition',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Management - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #ff6b6b; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff6b6b, #feca57); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 1000px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .schedule-container { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; }
+        .schedule-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; text-align: center; }
+        .time-blocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .time-block { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .time-block:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #ff6b6b; }
+        .time-block.selected { background: linear-gradient(135deg, #ff6b6b, #feca57); color: white; border-color: #ff6b6b; transform: scale(1.02); }
+        .time-icon { font-size: 2rem; color: #ff6b6b; margin-bottom: 0.5rem; }
+        .time-text { font-size: 1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .time-duration { font-size: 0.9rem; color: #718096; }
+        .task-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .task-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s ease; }
+        .task-option:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #ff6b6b; }
+        .task-option.selected { background: linear-gradient(135deg, #ff6b6b, #feca57); color: white; border-color: #ff6b6b; transform: scale(1.02); }
+        .task-icon { font-size: 1.5rem; color: #ff6b6b; margin-bottom: 0.5rem; }
+        .task-title { font-size: 1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .task-time { font-size: 0.9rem; color: #718096; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #ff6b6b, #feca57); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,107,107,0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .time-blocks { grid-template-columns: 1fr; }
+            .task-options { grid-template-columns: 1fr; }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-clock"></i>
+            <h1>Time Management</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Manage Your Time!</h2>
+                <p>Plan your day by organizing tasks and time blocks</p>
+            </div>
+
+            <div class="schedule-container">
+                <div class="schedule-title" id="scheduleTitle">Plan Your Afternoon</div>
+                <div class="time-blocks" id="timeBlocks">
+                    <!-- Time blocks will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="task-options" id="taskOptions">
+                <!-- Task options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="checkBtn" onclick="checkSchedule()">
+                    <i class="fas fa-check"></i> Check Schedule
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextSchedule()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Schedule
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, selectedTimeBlock: null, selectedTask: null,
+            schedules: [
+                {
+                    title: "Plan Your Afternoon",
+                    timeBlocks: [
+                        { id: "3:00-4:00", duration: "1 hour", icon: "fa-home", text: "After School" },
+                        { id: "4:00-5:00", duration: "1 hour", icon: "fa-book", text: "Homework" },
+                        { id: "5:00-6:00", duration: "1 hour", icon: "fa-gamepad", text: "Free Time" },
+                        { id: "6:00-7:00", duration: "1 hour", icon: "fa-utensils", text: "Dinner" }
+                    ],
+                    tasks: [
+                        { id: "homework", time: "2 hours", icon: "fa-book", title: "Math & Science Homework" },
+                        { id: "chores", time: "1 hour", icon: "fa-broom", title: "Clean Room" },
+                        { id: "exercise", time: "1 hour", icon: "fa-running", title: "Sports Practice" },
+                        { id: "hobby", time: "2 hours", icon: "fa-music", title: "Music Practice" },
+                        { id: "family", time: "1 hour", icon: "fa-users", title: "Family Time" },
+                        { id: "reading", time: "1 hour", icon: "fa-book-open", title: "Reading" }
+                    ],
+                    correctMatches: {
+                        "4:00-5:00": "homework",
+                        "5:00-6:00": "hobby",
+                        "6:00-7:00": "family"
+                    }
+                },
+                {
+                    title: "Plan Your Morning",
+                    timeBlocks: [
+                        { id: "6:00-7:00", duration: "1 hour", icon: "fa-bed", text: "Wake Up" },
+                        { id: "7:00-8:00", duration: "1 hour", icon: "fa-coffee", text: "Breakfast" },
+                        { id: "8:00-9:00", duration: "1 hour", icon: "fa-school", text: "School" },
+                        { id: "9:00-10:00", duration: "1 hour", icon: "fa-book", text: "Study" }
+                    ],
+                    tasks: [
+                        { id: "exercise", time: "30 min", icon: "fa-running", title: "Morning Exercise" },
+                        { id: "shower", time: "20 min", icon: "fa-shower", title: "Get Ready" },
+                        { id: "breakfast", time: "30 min", icon: "fa-utensils", title: "Eat Breakfast" },
+                        { id: "study", time: "1 hour", icon: "fa-book", title: "Review Notes" },
+                        { id: "pack", time: "15 min", icon: "fa-backpack", title: "Pack Bag" },
+                        { id: "commute", time: "30 min", icon: "fa-walking", title: "Travel to School" }
+                    ],
+                    correctMatches: {
+                        "6:00-7:00": "exercise",
+                        "7:00-8:00": "breakfast",
+                        "8:00-9:00": "commute",
+                        "9:00-10:00": "study"
+                    }
+                },
+                {
+                    title: "Plan Your Weekend",
+                    timeBlocks: [
+                        { id: "9:00-11:00", duration: "2 hours", icon: "fa-friends", text: "Social Time" },
+                        { id: "11:00-1:00", duration: "2 hours", icon: "fa-shopping-cart", text: "Shopping" },
+                        { id: "1:00-3:00", duration: "2 hours", icon: "fa-utensils", text: "Lunch & Rest" },
+                        { id: "3:00-5:00", duration: "2 hours", icon: "fa-gamepad", text: "Entertainment" }
+                    ],
+                    tasks: [
+                        { id: "park", time: "2 hours", icon: "fa-tree", title: "Visit Park" },
+                        { id: "movies", time: "3 hours", icon: "fa-film", title: "Watch Movies" },
+                        { id: "shopping", time: "2 hours", icon: "fa-shopping-bag", title: "Buy Clothes" },
+                        { id: "restaurant", time: "2 hours", icon: "fa-utensils", title: "Eat Out" },
+                        { id: "games", time: "2 hours", icon: "fa-gamepad", title: "Video Games" },
+                        { id: "homework", time: "2 hours", icon: "fa-book", title: "School Projects" }
+                    ],
+                    correctMatches: {
+                        "9:00-11:00": "park",
+                        "11:00-1:00": "shopping",
+                        "1:00-3:00": "restaurant",
+                        "3:00-5:00": "games"
+                    }
+                },
+                {
+                    title: "Plan Your Study Session",
+                    timeBlocks: [
+                        { id: "3:00-4:00", duration: "1 hour", icon: "fa-book", text: "Math" },
+                        { id: "4:00-5:00", duration: "1 hour", icon: "fa-flask", text: "Science" },
+                        { id: "5:00-6:00", duration: "1 hour", icon: "fa-globe", text: "Geography" },
+                        { id: "6:00-7:00", duration: "1 hour", icon: "fa-pen", text: "English" }
+                    ],
+                    tasks: [
+                        { id: "math", time: "1 hour", icon: "fa-calculator", title: "Math Problems" },
+                        { id: "science", time: "1 hour", icon: "fa-microscope", title: "Science Lab" },
+                        { id: "history", time: "1 hour", icon: "fa-landmark", title: "History Reading" },
+                        { id: "art", time: "1 hour", icon: "fa-palette", title: "Art Project" },
+                        { id: "break", time: "30 min", icon: "fa-coffee", title: "Take Break" },
+                        { id: "review", time: "1 hour", icon: "fa-sticky-note", title: "Review Notes" }
+                    ],
+                    correctMatches: {
+                        "3:00-4:00": "math",
+                        "4:00-5:00": "science",
+                        "5:00-6:00": "history",
+                        "6:00-7:00": "review"
+                    }
+                },
+                {
+                    title: "Plan Your Evening Routine",
+                    timeBlocks: [
+                        { id: "5:00-6:00", duration: "1 hour", icon: "fa-dumbbell", text: "Exercise" },
+                        { id: "6:00-7:00", duration: "1 hour", icon: "fa-utensils", text: "Dinner" },
+                        { id: "7:00-8:00", duration: "1 hour", icon: "fa-tv", text: "Entertainment" },
+                        { id: "8:00-9:00", duration: "1 hour", icon: "fa-moon", text: "Wind Down" }
+                    ],
+                    tasks: [
+                        { id: "gym", time: "1 hour", icon: "fa-dumbbell", title: "Workout" },
+                        { id: "cook", time: "45 min", icon: "fa-utensils", title: "Cook Dinner" },
+                        { id: "homework", time: "1 hour", icon: "fa-book", title: "Finish Homework" },
+                        { id: "family", time: "1 hour", icon: "fa-users", title: "Family Time" },
+                        { id: "shower", time: "30 min", icon: "fa-shower", title: "Get Ready for Bed" },
+                        { id: "read", time: "30 min", icon: "fa-book", title: "Read Book" }
+                    ],
+                    correctMatches: {
+                        "5:00-6:00": "gym",
+                        "6:00-7:00": "cook",
+                        "7:00-8:00": "family",
+                        "8:00-9:00": "read"
+                    }
+                },
+                {
+                    title: "Plan Your Project Time",
+                    timeBlocks: [
+                        { id: "1:00-2:00", duration: "1 hour", icon: "fa-lightbulb", text: "Research" },
+                        { id: "2:00-3:00", duration: "1 hour", icon: "fa-pencil-ruler", text: "Planning" },
+                        { id: "3:00-4:00", duration: "1 hour", icon: "fa-hammer", text: "Building" },
+                        { id: "4:00-5:00", duration: "1 hour", icon: "fa-paint-brush", text: "Decorating" }
+                    ],
+                    tasks: [
+                        { id: "research", time: "1 hour", icon: "fa-search", title: "Online Research" },
+                        { id: "sketch", time: "45 min", icon: "fa-pencil-alt", title: "Draw Plans" },
+                        { id: "materials", time: "30 min", icon: "fa-box", title: "Gather Materials" },
+                        { id: "build", time: "1.5 hours", icon: "fa-tools", title: "Construct Project" },
+                        { id: "paint", time: "1 hour", icon: "fa-paint-roller", title: "Paint & Finish" },
+                        { id: "cleanup", time: "30 min", icon: "fa-broom", title: "Clean Up" }
+                    ],
+                    correctMatches: {
+                        "1:00-2:00": "research",
+                        "2:00-3:00": "sketch",
+                        "3:00-4:00": "build",
+                        "4:00-5:00": "paint"
+                    }
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            startNewSchedule();
+        }
+
+        function startNewSchedule() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.selectedTimeBlock = null;
+            gameState.selectedTask = null;
+            const schedule = gameState.schedules[gameState.currentRound];
+            updateScheduleDisplay(schedule);
+            hideFeedback();
+            document.getElementById('checkBtn').style.display = 'inline-flex';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updateScheduleDisplay(schedule) {
+            document.getElementById('scheduleTitle').textContent = schedule.title;
+            const timeBlocks = document.getElementById('timeBlocks');
+            timeBlocks.innerHTML = '';
+            schedule.timeBlocks.forEach(block => {
+                const blockDiv = document.createElement('div');
+                blockDiv.className = 'time-block';
+                blockDiv.onclick = () => selectTimeBlock(block.id, blockDiv);
+                blockDiv.innerHTML = `
+                    <div class="time-icon"><i class="fas ${block.icon}"></i></div>
+                    <div class="time-text">${block.text}</div>
+                    <div class="time-duration">${block.id} (${block.duration})</div>
+                `;
+                timeBlocks.appendChild(blockDiv);
+            });
+            const taskOptions = document.getElementById('taskOptions');
+            taskOptions.innerHTML = '';
+            schedule.tasks.forEach(task => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'task-option';
+                taskDiv.onclick = () => selectTask(task.id, taskDiv);
+                taskDiv.innerHTML = `
+                    <div class="task-icon"><i class="fas ${task.icon}"></i></div>
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-time">Time needed: ${task.time}</div>
+                `;
+                taskOptions.appendChild(taskDiv);
+            });
+        }
+
+        function selectTimeBlock(blockId, element) {
+            document.querySelectorAll('.time-block').forEach(b => b.classList.remove('selected'));
+            element.classList.add('selected');
+            gameState.selectedTimeBlock = blockId;
+        }
+
+        function selectTask(taskId, element) {
+            document.querySelectorAll('.task-option').forEach(t => t.classList.remove('selected'));
+            element.classList.add('selected');
+            gameState.selectedTask = taskId;
+        }
+
+        function checkSchedule() {
+            if (!gameState.selectedTimeBlock || !gameState.selectedTask) {
+                showFeedback('Please select a time block AND a task!', 'info');
+                return;
+            }
+            const schedule = gameState.schedules[gameState.currentRound];
+            const correctMatch = schedule.correctMatches[gameState.selectedTimeBlock] === gameState.selectedTask;
+            if (correctMatch) {
+                gameState.score += calculateScore();
+                showFeedback('Perfect time management! Great scheduling! 🎉', 'success');
+            } else {
+                showFeedback('Not quite right. Think about which task fits best in that time! ⏰', 'info');
+            }
+            updateStats();
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(correctMatch);
+        }
+
+        function calculateScore() {
+            return 100 + gameState.level * 20 + Math.floor(Math.random() * 30);
+        }
+
+        function nextSchedule() {
+            gameState.currentRound++;
+            if (gameState.currentRound % 2 === 0) gameState.level++;
+            updateStats();
+            startNewSchedule();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = message;
+            feedback.className = `feedback ${type} show`;
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Time Management',
+                round: gameState.currentRound + 1,
+                schedule: gameState.schedules[gameState.currentRound].title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 150)) * 100;
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Time Management Complete!</h2>
+                    <p>Excellent organizational skills!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏰</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Time Management Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Organization Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You are a time management expert!' : 
+                              accuracy >= 60 ? 'Great job! You organize time very well!' :
+                              'Good job! Time management takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Good time management helps with productivity, stress reduction, and goal achievement!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            const results = {
+                gameName: 'Time Management',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

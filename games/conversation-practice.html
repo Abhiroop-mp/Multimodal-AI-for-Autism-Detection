@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation Practice - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #48dbfb;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48dbfb, #0abde3);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Conversation Area */
+        .conversation-container {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .conversation-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .chat-window {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            min-height: 300px;
+            margin-bottom: 1.5rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .message.other {
+            justify-content: flex-start;
+        }
+
+        .message.self {
+            justify-content: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar.other {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .avatar.self {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+        }
+
+        .message-content {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 15px;
+            max-width: 70%;
+            position: relative;
+        }
+
+        .message.other .message-content {
+            background: #f7fafc;
+            border-top-left-radius: 5px;
+        }
+
+        .message.self .message-content {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: white;
+            border-top-right-radius: 5px;
+        }
+
+        .message-text {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        .message.self .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Response Options */
+        .response-container {
+            margin-bottom: 2rem;
+        }
+
+        .response-prompt {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .response-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .response-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .response-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(72, 219, 251, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .response-option:hover::before {
+            left: 100%;
+        }
+
+        .response-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #48dbfb;
+        }
+
+        .response-option.selected {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: white;
+            border-color: #48dbfb;
+            transform: scale(1.02);
+        }
+
+        .response-option.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .response-option.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .response-text {
+            font-size: 1rem;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+        }
+
+        .response-explanation {
+            font-size: 0.85rem;
+            color: #718096;
+            line-height: 1.3;
+        }
+
+        /* Conversation Tips */
+        .tips-container {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .tips-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .tips-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .tip-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tip-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+            color: #48dbfb;
+            margin-bottom: 0.5rem;
+        }
+
+        .tip-text {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.3;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(72, 219, 251, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .response-options {
+                grid-template-columns: 1fr;
+            }
+
+            .tips-list {
+                grid-template-columns: 1fr;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-comments"></i>
+            <h1>Conversation Practice</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Practice Conversations!</h2>
+                <p>Learn how to respond in different social situations</p>
+            </div>
+
+            <div class="conversation-container">
+                <div class="conversation-title" id="conversationTitle">Starting a Conversation</div>
+                
+                <div class="chat-window" id="chatWindow">
+                    <!-- Chat messages will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="tips-container">
+                <div class="tips-title">Conversation Tips</div>
+                <div class="tips-list" id="tipsList">
+                    <!-- Tips will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="response-container">
+                <div class="response-prompt">How would you respond?</div>
+                <div class="response-options" id="responseOptions">
+                    <!-- Response options will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextConversation()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Conversation
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 6,
+            currentRound: 0,
+            currentConversation: null,
+            isAnswered: false,
+            conversations: [
+                {
+                    title: "Starting a Conversation",
+                    messages: [
+                        { type: "other", text: "Hey! I haven't seen you around before. Are you new here?", time: "2:30 PM" }
+                    ],
+                    tips: [
+                        { icon: "fa-smile", text: "Be friendly and approachable" },
+                        { icon: "fa-question", text: "Ask open-ended questions" },
+                        { icon: "fa-eye", text: "Show interest in others" }
+                    ],
+                    options: [
+                        {
+                            text: "Yes, I just started this week. How about you?",
+                            explanation: "Friendly response that continues the conversation",
+                            correct: true
+                        },
+                        {
+                            text: "None of your business.",
+                            explanation: "Too defensive and unfriendly",
+                            correct: false
+                        },
+                        {
+                            text: "Maybe.",
+                            explanation: "Too brief, doesn't encourage conversation",
+                            correct: false
+                        },
+                        {
+                            text: "Why do you want to know?",
+                            explanation: "Sounds suspicious and unwelcoming",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Giving Compliments",
+                    messages: [
+                        { type: "other", text: "I really liked your presentation in class today!", time: "10:15 AM" }
+                    ],
+                    tips: [
+                        { icon: "fa-heart", text: "Be genuine and specific" },
+                        { icon: "fa-smile", text: "Accept compliments graciously" },
+                        { icon: "fa-comments", text: "Return the compliment naturally" }
+                    ],
+                    options: [
+                        {
+                            text: "Thank you so much! I worked really hard on it.",
+                            explanation: "Accepts compliment and shares effort",
+                            correct: true
+                        },
+                        {
+                            text: "It was terrible, I'm so embarrassed.",
+                            explanation: "Self-deprecating, makes others uncomfortable",
+                            correct: false
+                        },
+                        {
+                            text: "I know, I'm amazing.",
+                            explanation: "Sounds arrogant and conceited",
+                            correct: false
+                        },
+                        {
+                            text: "Whatever.",
+                            explanation: "Dismissive and rude",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Making Plans",
+                    messages: [
+                        { type: "other", text: "Do you want to hang out this weekend?", time: "4:45 PM" }
+                    ],
+                    tips: [
+                        { icon: "fa-calendar", text: "Be clear about availability" },
+                        { icon: "fa-lightbulb", text: "Suggest specific activities" },
+                        { icon: "fa-phone", text: "Follow up to confirm plans" }
+                    ],
+                    options: [
+                        {
+                            text: "That sounds fun! I'm free on Saturday. What did you have in mind?",
+                            explanation: "Enthusiastic and helps plan specifics",
+                            correct: true
+                        },
+                        {
+                            text: "I don't know, maybe.",
+                            explanation: "Vague and noncommittal",
+                            correct: false
+                        },
+                        {
+                            text: "No, I'm too busy.",
+                            explanation: "Could be honest but sounds dismissive",
+                            correct: false
+                        },
+                        {
+                            text: "Why would you want to hang out with me?",
+                            explanation: "Shows insecurity and pushes people away",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Handling Disagreements",
+                    messages: [
+                        { type: "other", text: "I disagree with your opinion about that movie. I thought it was boring.", time: "8:20 PM" }
+                    ],
+                    tips: [
+                        { icon: "fa-handshake", text: "Respect different opinions" },
+                        { icon: "fa-comments", text: "Use 'I' statements" },
+                        { icon: "fa-search", text: "Find common ground" }
+                    ],
+                    options: [
+                        {
+                            text: "I can see why you'd think that. I enjoyed the action scenes, but I understand your perspective.",
+                            explanation: "Respects their opinion while sharing your view",
+                            correct: true
+                        },
+                        {
+                            text: "You're completely wrong and have terrible taste.",
+                            explanation: "Aggressive and disrespectful",
+                            correct: false
+                        },
+                        {
+                            text: "Fine, you're right then.",
+                            explanation: "Passive-aggressive and insincere",
+                            correct: false
+                        },
+                        {
+                            text: "I never want to talk to you again.",
+                            explanation: "Overreacts and damages relationship",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Offering Help",
+                    messages: [
+                        { type: "other", text: "I'm having trouble understanding this math problem. Can you help me?", time: "3:30 PM" }
+                    ],
+                    tips: [
+                        { icon: "fa-hands-helping", text: "Be willing to help others" },
+                        { icon: "fa-graduation-cap", text: "Explain things patiently" },
+                        { icon: "fa-users", text: "Work together as a team" }
+                    ],
+                    options: [
+                        {
+                            text: "Of course! Let me show you how I solved it. We can work through it together.",
+                            explanation: "Helpful and collaborative approach",
+                            correct: true
+                        },
+                        {
+                            text: "No, figure it out yourself.",
+                            explanation: "Unhelpful and unfriendly",
+                            correct: false
+                        },
+                        {
+                            text: "This is so easy, how can you not get it?",
+                            explanation: "Makes them feel stupid",
+                            correct: false
+                        },
+                        {
+                            text: "I don't have time for your problems.",
+                            explanation: "Selfish and dismissive",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Ending Conversations",
+                    messages: [
+                        { type: "other", text: "I need to get going soon, but it was great talking to you!", time: "5:45 PM" }
+                    ],
+                    tips: [
+                        { icon: "fa-clock", text: "Recognize when to end" },
+                        { icon: "fa-smile", text: "End on a positive note" },
+                        { icon: "fa-calendar-check", text: "Make future plans if appropriate" }
+                    ],
+                    options: [
+                        {
+                            text: "It was really great talking to you too! Let's definitely do this again soon.",
+                            explanation: "Positive and suggests future connection",
+                            correct: true
+                        },
+                        {
+                            text: "Finally, I thought you'd never leave.",
+                            explanation: "Rude and hurtful",
+                            correct: false
+                        },
+                        {
+                            text: "Okay, bye.",
+                            explanation: "Too abrupt and cold",
+                            correct: false
+                        },
+                        {
+                            text: "Don't pretend you enjoyed it.",
+                            explanation: "Cynical and creates awkwardness",
+                            correct: false
+                        }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewConversation();
+        }
+
+        // Start New Conversation
+        function startNewConversation() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            gameState.isAnswered = false;
+            gameState.currentConversation = gameState.conversations[gameState.currentRound];
+            
+            // Update conversation display
+            updateConversationDisplay();
+            
+            // Generate response options
+            generateResponseOptions();
+            
+            // Hide feedback and next button
+            hideFeedback();
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // Update Conversation Display
+        function updateConversationDisplay() {
+            const conversation = gameState.currentConversation;
+            document.getElementById('conversationTitle').textContent = conversation.title;
+            
+            // Generate chat messages
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.innerHTML = '';
+            
+            conversation.messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.type}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="avatar ${message.type}">
+                        <i class="fas ${message.type === 'other' ? 'fa-user' : 'fa-user-circle'}"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">${message.text}</div>
+                        <div class="message-time">${message.time}</div>
+                    </div>
+                `;
+                
+                chatWindow.appendChild(messageDiv);
+            });
+            
+            // Generate tips
+            const tipsList = document.getElementById('tipsList');
+            tipsList.innerHTML = '';
+            
+            conversation.tips.forEach(tip => {
+                const tipDiv = document.createElement('div');
+                tipDiv.className = 'tip-item';
+                tipDiv.innerHTML = `
+                    <div class="tip-icon">
+                        <i class="fas ${tip.icon}"></i>
+                    </div>
+                    <div class="tip-text">${tip.text}</div>
+                `;
+                tipsList.appendChild(tipDiv);
+            });
+        }
+
+        // Generate Response Options
+        function generateResponseOptions() {
+            const responseOptions = document.getElementById('responseOptions');
+            responseOptions.innerHTML = '';
+            
+            // Shuffle options for variety
+            const shuffledOptions = [...gameState.currentConversation.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'response-option';
+                optionDiv.onclick = () => selectResponse(option, optionDiv);
+                
+                optionDiv.innerHTML = `
+                    <div class="response-text">${option.text}</div>
+                    <div class="response-explanation">${option.explanation}</div>
+                `;
+                
+                responseOptions.appendChild(optionDiv);
+            });
+        }
+
+        // Select Response
+        function selectResponse(option, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            
+            const isCorrect = option.correct;
+            
+            // Update option styling
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                const options = document.querySelectorAll('.response-option');
+                options.forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentConversation.options.find(o => o.correct).text)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Add user's response to chat
+            addUserResponse(option.text);
+            
+            // Show feedback
+            showFeedback(isCorrect);
+            
+            // Update stats
+            updateStats();
+            
+            // Show next button
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            
+            // Track progress
+            trackProgress(isCorrect);
+        }
+
+        // Add User Response to Chat
+        function addUserResponse(responseText) {
+            const chatWindow = document.getElementById('chatWindow');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message self';
+            
+            const currentTime = new Date().toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="avatar self">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-text">${responseText}</div>
+                    <div class="message-time">${currentTime}</div>
+                </div>
+            `;
+            
+            chatWindow.appendChild(messageDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Calculate Score
+        function calculateScore() {
+            const baseScore = 100;
+            const levelBonus = gameState.level * 20;
+            const communicationBonus = Math.floor(Math.random() * 30); // Random bonus for variety
+            return baseScore + levelBonus + communicationBonus;
+        }
+
+        // Next Conversation
+        function nextConversation() {
+            gameState.currentRound++;
+            
+            // Level up every 2 rounds
+            if (gameState.currentRound % 2 === 0) {
+                gameState.level++;
+            }
+            
+            startNewConversation();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = `
+                    <div>🎉 Excellent conversation skills!</div>
+                    <small>You chose a great way to respond in this situation.</small>
+                `;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `
+                    <div>Not the best response. Keep practicing! 💬</div>
+                    <small>The green option shows a better way to respond.</small>
+                `;
+                feedback.className = 'feedback info show';
+            }
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Conversation Practice',
+                round: gameState.currentRound + 1,
+                conversation: gameState.currentConversation.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 150)) * 100; // Max ~150 points per round
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Conversation Practice Complete!</h2>
+                    <p>Amazing communication skills!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Conversation Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Communication Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You are an excellent communicator!' : 
+                              accuracy >= 60 ? 'Great job! You communicate very effectively!' :
+                              'Good job! Communication skills take practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Good conversation skills help with relationships, confidence, and social success!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(accuracy, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(accuracy, totalTime) {
+            const results = {
+                gameName: 'Conversation Practice',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

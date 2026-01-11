@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Function - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #667eea; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 1200px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .executive-challenge { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .challenge-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1.5rem; }
+        .task-display { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem; min-height: 300px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .task-content { font-size: 1.5rem; color: #4a5568; text-align: center; line-height: 1.6; }
+        .task-timer { position: absolute; top: 1rem; right: 1rem; font-size: 1.2rem; font-weight: bold; color: #667eea; }
+        .task-steps { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .task-step { background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 1rem; min-width: 120px; text-align: center; transition: all 0.3s ease; }
+        .task-step:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .task-step.completed { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; }
+        .task-step.current { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-color: #667eea; }
+        .step-number { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .step-text { font-size: 0.9rem; color: #4a5568; }
+        .executive-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .executive-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .executive-option::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent); transition: left 0.5s ease; }
+        .executive-option:hover::before { left: 100%; }
+        .executive-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #667eea; }
+        .executive-option.selected { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-color: #667eea; transform: scale(1.02); }
+        .executive-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .executive-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .option-icon { font-size: 2rem; color: #667eea; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .executive-option:hover .option-icon { transform: scale(1.2) rotate(10deg); }
+        .option-text { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .option-description { font-size: 0.9rem; color: #4a5568; line-height: 1.4; }
+        .skills-container { background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; text-align: center; }
+        .skills-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .skill-item { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; text-align: center; transition: all 0.3s ease; }
+        .skill-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .skill-icon { font-size: 1.5rem; color: #667eea; margin-bottom: 0.5rem; }
+        .skill-name { font-size: 0.9rem; color: #4a5568; font-weight: 600; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .task-steps { flex-direction: column; gap: 0.5rem; }
+            .executive-options { grid-template-columns: repeat(2, 1fr); }
+            .skills-grid { grid-template-columns: repeat(2, 1fr); }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-brain"></i>
+            <h1>Executive Function</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Train Executive Functions!</h2>
+                <p>Plan, organize, and complete complex cognitive tasks</p>
+            </div>
+
+            <div class="executive-challenge">
+                <div class="challenge-title" id="challengeTitle">Task Planning</div>
+                <div class="task-display">
+                    <div class="task-content" id="taskContent">
+                        Loading executive challenge...
+                    </div>
+                    <div class="task-timer" id="taskTimer">30s</div>
+                </div>
+                <div class="task-steps" id="taskSteps">
+                    <!-- Task steps will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="skills-container">
+                <div class="skills-title">Executive Skills Being Trained</div>
+                <div class="skills-grid" id="skillsGrid">
+                    <!-- Skills will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="executive-options" id="executiveOptions">
+                <!-- Executive options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="startBtn" onclick="startChallenge()">
+                    <i class="fas fa-play"></i> Start Challenge
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextChallenge()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Challenge
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, currentChallenge: null, isAnswered: false,
+            challengeActive: false, currentStep: 0, completedSteps: [],
+            challenges: [
+                {
+                    title: "Task Sequencing",
+                    content: "Plan the steps to complete this project: Build a presentation",
+                    steps: [
+                        "Research topic",
+                        "Create outline",
+                        "Design slides",
+                        "Add content",
+                        "Practice presentation"
+                    ],
+                    skills: ["Planning", "Organization", "Task Initiation"],
+                    options: [
+                        { text: "Research → Outline → Design → Content → Practice", description: "Logical sequence for project completion", correct: true },
+                        { text: "Design → Research → Content → Outline → Practice", description: "Research before outline", correct: false },
+                        { text: "Content → Design → Research → Outline → Practice", description: "Design before research", correct: false },
+                        { text: "Practice → Content → Design → Research → Outline", description: "Practice before planning", correct: false }
+                    ]
+                },
+                {
+                    title: "Inhibition Control",
+                    content: "Choose the correct response in this social situation",
+                    steps: [
+                        "Friend asks you to skip homework",
+                        "You have an important test tomorrow",
+                        "You want to watch a movie",
+                        "You remember your responsibilities"
+                    ],
+                    skills: ["Inhibition", "Impulse Control", "Self-Regulation"],
+                    options: [
+                        { text: "Study first, watch movie after", description: "Prioritize important tasks", correct: true },
+                        { text: "Watch movie, study later", description: "Give in to immediate desire", correct: false },
+                        { text: "Skip homework, watch movie", description: "Ignore responsibilities", correct: false },
+                        { text: "Study while watching movie", description: "Divided attention", correct: false }
+                    ]
+                },
+                {
+                    title: "Working Memory",
+                    content: "Remember and manipulate information in your mind",
+                    steps: [
+                        "Remember these numbers: 7, 3, 9, 2, 8",
+                        "Add 5 to each number",
+                        "Subtract 3 from each result",
+                        "Recall the final numbers"
+                    ],
+                    skills: ["Working Memory", "Mental Calculation", "Information Processing"],
+                    options: [
+                        { text: "12, 6, 12, 5, 5", description: "7+5=12, 3+3=6, 9+3=12, 2+3=5, 8+3=5", correct: true },
+                        { text: "10, 6, 12, 5, 5", description: "7+3=10, incorrect calculation", correct: false },
+                        { text: "12, 6, 12, -1, 11", description: "2-3=-1, incorrect calculation", correct: false },
+                        { text: "7, 3, 9, 2, 8", description: "No calculation performed", correct: false }
+                    ]
+                },
+                {
+                    title: "Cognitive Flexibility",
+                    content: "Adapt your thinking to solve this problem",
+                    steps: [
+                        "Standard approach: Solve equation step-by-step",
+                        "Alternative approach: Look for patterns",
+                        "Creative solution: Think outside the box"
+                    ],
+                    skills: ["Cognitive Flexibility", "Adaptive Thinking", "Problem Solving"],
+                    options: [
+                        { text: "Use creative problem-solving", description: "Flexible and innovative approach", correct: true },
+                        { text: "Stick to traditional methods", description: "Rigid thinking pattern", correct: false },
+                        { text: "Only one solution possible", description: "Fixed mindset", correct: false },
+                        { text: "Avoid trying alternatives", description: "Lack of cognitive flexibility", correct: false }
+                    ]
+                },
+                {
+                    title: "Goal-Directed Persistence",
+                    content: "Complete this challenging task despite obstacles",
+                    steps: [
+                        "Initial attempt: Try the obvious solution",
+                        "Encounter difficulty: First approach fails",
+                        "Adjust strategy: Try different methods",
+                        "Persist until success"
+                    ],
+                    skills: ["Goal Persistence", "Resilience", "Adaptive Problem Solving"],
+                    options: [
+                        { text: "Keep trying different approaches", description: "Persistent effort leads to success", correct: true },
+                        { text: "Give up after first try", description: "Lack of persistence", correct: false },
+                        { text: "Try same approach repeatedly", description: "Inflexible strategy", correct: false },
+                        { text: "Blame external factors", description: "External locus of control", correct: false }
+                    ]
+                },
+                {
+                    title: "Time Management",
+                    content: "Organize your time effectively for multiple tasks",
+                    steps: [
+                        "Task 1: Write essay (30 min)",
+                        "Task 2: Solve math problems (20 min)",
+                        "Task 3: Review notes (15 min)",
+                        "Task 4: Prepare for tomorrow (10 min)"
+                    ],
+                    skills: ["Time Management", "Prioritization", "Planning"],
+                    options: [
+                        { text: "Essay → Math → Notes → Prepare", description: "Logical time allocation", correct: true },
+                        { text: "Math → Essay → Notes → Prepare", description: "Math before writing", correct: false },
+                        { text: "All tasks at once", description: "No prioritization", correct: false },
+                        { text: "Prepare → Notes → Essay → Math", description: "Preparation before urgent tasks", correct: false }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            setupChallenge();
+        }
+
+        function setupChallenge() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.isAnswered = false;
+            gameState.challengeActive = false;
+            gameState.currentChallenge = gameState.challenges[gameState.currentRound];
+            gameState.currentStep = 0;
+            gameState.completedSteps = [];
+            updateChallengeDisplay();
+            generateExecutiveOptions();
+            hideFeedback();
+            document.getElementById('startBtn').style.display = 'inline-flex';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updateChallengeDisplay() {
+            const challenge = gameState.currentChallenge;
+            document.getElementById('challengeTitle').textContent = challenge.title;
+            document.getElementById('taskContent').textContent = challenge.content;
+            
+            // Generate task steps
+            const taskSteps = document.getElementById('taskSteps');
+            taskSteps.innerHTML = '';
+            challenge.steps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'task-step';
+                if (gameState.completedSteps.includes(index)) {
+                    stepDiv.classList.add('completed');
+                }
+                if (gameState.challengeActive && index === gameState.currentStep) {
+                    stepDiv.classList.add('current');
+                }
+                stepDiv.innerHTML = `
+                    <div class="step-number">${index + 1}</div>
+                    <div class="step-text">${step}</div>
+                `;
+                taskSteps.appendChild(stepDiv);
+            });
+        }
+
+        function startChallenge() {
+            gameState.challengeActive = true;
+            document.getElementById('startBtn').style.display = 'none';
+            
+            // Start timer for time-based challenges
+            if (gameState.currentChallenge.title === "Time Management") {
+                startTimer();
+            }
+            
+            // For other challenges, show steps progressively
+            if (gameState.currentChallenge.title !== "Time Management") {
+                showNextStep();
+            }
+        }
+
+        function startTimer() {
+            const timer = document.getElementById('taskTimer');
+            let timeLeft = 30;
+            timer.textContent = `${timeLeft}s`;
+            
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timer.textContent = `${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    endChallenge();
+                }
+            }, 1000);
+        }
+
+        function showNextStep() {
+            if (gameState.currentStep < gameState.currentChallenge.steps.length) {
+                gameState.currentStep++;
+                updateChallengeDisplay();
+            }
+        }
+
+        function endChallenge() {
+            gameState.challengeActive = false;
+            gameState.currentStep = 0;
+            document.getElementById('taskTimer').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'inline-flex';
+        }
+
+        function generateExecutiveOptions() {
+            const executiveOptions = document.getElementById('executiveOptions');
+            executiveOptions.innerHTML = '';
+            const shuffledOptions = [...gameState.currentChallenge.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'executive-option';
+                optionDiv.onclick = () => selectAnswer(option, optionDiv);
+                optionDiv.innerHTML = `
+                    <div class="option-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="option-text">${option.text}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                executiveOptions.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(option, element) {
+            if (gameState.isAnswered) return;
+            gameState.isAnswered = true;
+            const isCorrect = option.correct;
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                document.querySelectorAll('.executive-option').forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentChallenge.options.find(o => o.correct).text)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            return 100 + gameState.level * 25 + Math.floor(Math.random() * 25);
+        }
+
+        function nextChallenge() {
+            gameState.currentRound++;
+            if (gameState.currentRound % 2 === 0) gameState.level++;
+            updateStats();
+            setupChallenge();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Excellent executive function!</div><small>Your cognitive control is outstanding!</small>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not quite right. Keep practicing! 🧠</div><small>The green option shows the correct answer.</small>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Executive Function',
+                round: gameState.currentRound + 1,
+                challenge: gameState.currentChallenge.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 150)) * 100;
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Executive Function Complete!</h2>
+                    <p>Amazing cognitive control and planning!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🧠</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Executive Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Executive Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You have exceptional executive functions!' : 
+                              accuracy >= 60 ? 'Excellent! Your cognitive control is very strong!' :
+                              'Good job! Executive functions take practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Good executive functions help with planning, organization, and goal achievement!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            const results = {
+                gameName: 'Executive Function',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

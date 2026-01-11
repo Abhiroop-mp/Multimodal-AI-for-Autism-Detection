@@ -39,6 +39,21 @@
             color: white;
             padding: 20px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .header-content {
+            text-align: left;
         }
 
         .header h1 {
@@ -64,6 +79,21 @@
             justify-content: center;
             align-items: center;
             padding: 30px;
+        }
+
+        .login-logo {
+            max-width: 300px;
+            max-height: 300px;
+            width: 90%;
+            height: 90%;
+            border-radius: 15px;
+            object-fit: contain;
+            box-shadow: 0 8px 25px rgba(74, 141, 183, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .login-logo:hover {
+            transform: scale(1.05);
         }
 
         .form-container {
@@ -328,23 +358,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>ASD Support Platform</h1>
-            <p>Detection, Prediction, and Development for Autism Spectrum Disorder</p>
+            <div class="header-content">
+                <h1>ASD Support Platform</h1>
+                <p>Detection, Prediction, and Development for Autism Spectrum Disorder</p>
+            </div>
         </div>
 
         <div class="content">
             <div class="illustration">
-                <svg width="300" height="300" viewBox="0 0 500 500">
-                    <circle cx="250" cy="250" r="200" fill="#bbdefb" stroke="#4a8db7" stroke-width="5" />
-                    <circle cx="180" cy="200" r="30" fill="#ffffff" />
-                    <circle cx="320" cy="200" r="30" fill="#ffffff" />
-                    <circle cx="180" cy="200" r="15" fill="#2962ff" />
-                    <circle cx="320" cy="200" r="15" fill="#2962ff" />
-                    <path d="M180 300 Q250 350 320 300" stroke="#2962ff" stroke-width="10" stroke-linecap="round"
-                        fill="none" />
-                    <path d="M150 150 Q200 100 250 120 Q300 100 350 150" stroke="#4a8db7" stroke-width="8"
-                        stroke-linecap="round" fill="none" />
-                </svg>
+                <img src="logo.png" alt="ASD Care Logo" class="login-logo">
             </div>
 
             <div class="form-container">
@@ -369,7 +391,7 @@
                         <label for="login-email">Email Address</label>
                         <div class="input-with-icon">
                             <i class="fas fa-envelope"></i>
-                            <input type="email" id="login-email" placeholder="Enter your email">
+                            <input type="email" id="login-email" placeholder="Enter your email" required>
                         </div>
                     </div>
 
@@ -377,13 +399,14 @@
                         <label for="login-password">Password</label>
                         <div class="input-with-icon">
                             <i class="fas fa-lock"></i>
-                            <input type="password" id="login-password" placeholder="Enter your password">
+                            <input type="password" id="login-password" placeholder="Enter your password" required>
                         </div>
                     </div>
 
-                    <button class="btn" onclick="requestOTP()">Login</button>
+                    <button class="btn" onclick="login()">Login</button>
 
-                    <div id="login-otp-section" class="otp-section">
+
+                    <div id="login-otp-section" class="otp-section" style="display:none;">
                         <h3>Two-Step Verification</h3>
                         <p>For your security, we've sent a verification code to your registered mobile number.</p>
 
@@ -459,6 +482,23 @@
                         </small>
                     </div>
                     <button class="btn" onclick="register()">Register</button>
+                    <!-- REGISTER EMAIL OTP -->
+                    <div id="register-otp-section" class="otp-section">
+                        <h3>Email Verification</h3>
+                        <p>Enter the OTP sent to your email.</p>
+
+                        <div class="otp-inputs">
+                            <input maxlength="1">
+                            <input maxlength="1">
+                            <input maxlength="1">
+                            <input maxlength="1">
+                            <input maxlength="1">
+                            <input maxlength="1">
+                        </div>
+
+                        <button class="btn" onclick="verifyRegisterOTP()">Verify Email</button>
+                    </div>
+
                 </div>
 
                 <div class="accessibility-options">
@@ -526,7 +566,7 @@
             currentUserType = userType;
 
             const options = element.parentElement.children;
-            for (let i = 0; i < options.length; i++) {
+            for (let i = 0; i <options.length; i++) {
                 options[i].classList.remove('selected');
             }
             element.classList.add('selected');
@@ -575,8 +615,13 @@
 
         // Initialize on page load - SINGLE EVENT LISTENER
         document.addEventListener('DOMContentLoaded', function () {
-            // Check if already logged in first
+            // Check if user is already logged in before clearing session
             checkAlreadyLoggedIn();
+
+            // Clear any existing session to ensure fresh login
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('loginTime');
 
             // Initialize parent email field - HIDDEN by default
             const parentEmailGroup = document.getElementById('parent-email-group');
@@ -588,10 +633,77 @@
                 }
             }
 
+            // Add Enter key event listeners for login form
+            const loginEmail = document.getElementById('login-email');
+            const loginPassword = document.getElementById('login-password');
+            
+            if (loginEmail && loginPassword) {
+                loginEmail.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        loginPassword.focus();
+                    }
+                });
+                
+                loginPassword.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        login();
+                    }
+                });
+            }
+
             // Load accessibility settings
             loadAccessibilitySettings();
             applyAccessibilitySettings();
         });
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            // Validation
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:5001/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, userType: currentUserType })
+                });
+
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    alert(data.message || 'Login failed. Please check your credentials.');
+                    return;
+                }
+
+                // Store authentication data
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('userData', JSON.stringify(data.user));
+                localStorage.setItem('loginTime', new Date().toISOString());
+
+                // Redirect based on user type
+                window.location.href =
+                    data.user.userType === 'parent'
+                        ? 'parent-dashboard.html'
+                        : 'dashboard.html';
+                        
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Unable to connect to the server. Please check your internet connection and try again.');
+            }
+        }
 
         async function requestOTP() {
             const email = document.getElementById('login-email').value;
@@ -603,7 +715,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:5000/api/auth/login', {
+                const response = await fetch('http://localhost:5001/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -626,13 +738,13 @@
                     storedEmail = email;
 
                     // Send OTP via email
-                    const otpResponse = await fetch('http://localhost:5000/api/auth/send-otp', {
+                    const otpResponse = await fetch('http://localhost:5001/api/auth/send-otp', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${result.token}`
                         },
-                        body: JSON.stringify({ email })
+                        body: JSON.stringify({ email: email })
                     });
 
                     const otpResult = await otpResponse.json();
@@ -689,12 +801,10 @@
             }
 
             try {
-                const token = localStorage.getItem('authToken');
-                const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+                const response = await fetch('http://localhost:5001/api/auth/verify-otp', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ email: storedEmail, otp })
                 });
@@ -736,7 +846,7 @@
 
             try {
                 const token = localStorage.getItem('authToken');
-                const response = await fetch('http://localhost:5000/api/auth/send-otp', {
+                const response = await fetch('http://localhost:5001/api/auth/send-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -798,7 +908,7 @@
             try {
                 console.log('Sending registration data:', userData);
 
-                const response = await fetch('http://localhost:5000/api/auth/register', {
+                const response = await fetch('http://localhost:5001/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -818,7 +928,7 @@
 
                     // Send OTP email (but don't auto-login)
                     try {
-                        const otpResponse = await fetch('http://localhost:5000/api/auth/send-otp', {
+                        const otpResponse = await fetch('http://localhost:5001/api/auth/send-otp', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -841,7 +951,15 @@
                         alert('Registration successful! Please login with your credentials and verify OTP.');
 
                         // Switch to login tab and pre-fill email
-                        switchTab('login');
+                        storedEmail = email;
+
+                        showDatabaseNotification(
+                            'Registration successful! Please verify the OTP sent to your email.'
+                        );
+
+                        document.getElementById('register-otp-section').classList.add('active');
+                        return; // STOP here – do not redirect yet
+
                         document.getElementById('login-email').value = email;
                         document.getElementById('login-password').value = '';
 
@@ -862,6 +980,33 @@
                 console.error('Registration error:', error);
                 alert('Registration failed. Please check your connection and try again.');
             }
+        }
+        async function verifyRegisterOTP() {
+            const inputs = document.querySelectorAll('#register-otp-section .otp-inputs input');
+            let otp = '';
+            inputs.forEach(i => otp += i.value);
+
+            if (otp.length !== 6) {
+                alert('Enter full 6-digit OTP');
+                return;
+            }
+
+            const res = await fetch('http://localhost:5001/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: storedEmail, otp })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.message);
+                return;
+            }
+
+            showDatabaseNotification('Email verified. You can now login.');
+            document.getElementById('register-otp-section').classList.remove('active');
+            switchTab('login');
+            document.getElementById('login-email').value = storedEmail;
         }
 
         // ... (keep the rest of your helper functions unchanged)

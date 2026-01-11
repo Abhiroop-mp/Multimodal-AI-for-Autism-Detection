@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Setting - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #f5576c;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Goal Setting Area */
+        .goal-container {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .goal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .goal-description {
+            font-size: 1.1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Goal Categories */
+        .goal-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .goal-category {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(240, 147, 251, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .goal-category:hover::before {
+            left: 100%;
+        }
+
+        .goal-category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #f093fb;
+        }
+
+        .goal-category.selected {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            border-color: #f093fb;
+            transform: scale(1.02);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            color: #f5576c;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .goal-category:hover .category-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* Goal Steps */
+        .goal-steps {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .steps-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .step-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #f093fb;
+        }
+
+        .step-item.selected {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #f093fb;
+            color: white;
+            border-radius: 50%;
+            line-height: 30px;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-text {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.3;
+        }
+
+        /* Goal Tracker */
+        .goal-tracker {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .tracker-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .tracker-bar {
+            width: 100%;
+            height: 30px;
+            background: #e2e8f0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tracker-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .tracker-label {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .goal-categories {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-bullseye"></i>
+            <h1>Goal Setting</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Set Goals!</h2>
+                <p>Choose a goal and plan the steps to achieve it</p>
+            </div>
+
+            <div class="goal-container">
+                <div class="goal-title" id="goalTitle">Choose Your Goal</div>
+                <div class="goal-description" id="goalDescription">
+                    Select a goal that you want to achieve and plan the steps to reach it!
+                </div>
+            </div>
+
+            <div class="goal-categories" id="goalCategories">
+                <!-- Goal categories will be generated by JavaScript -->
+            </div>
+
+            <div class="goal-steps">
+                <div class="steps-title">Plan Your Steps</div>
+                <div class="steps-container" id="stepsContainer">
+                    <!-- Steps will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="goal-tracker">
+                <div class="tracker-title">Goal Progress</div>
+                <div class="tracker-bar">
+                    <div class="tracker-fill" id="trackerFill" style="width: 0%">
+                        <span id="trackerPercent">0%</span>
+                    </div>
+                </div>
+                <div class="tracker-label" id="trackerLabel">Select a goal and plan your steps!</div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="completeBtn" onclick="completeGoal()">
+                    <i class="fas fa-check"></i> Complete Goal
+                </button>
+                <button class="btn btn-secondary" onclick="nextGoal()">
+                    <i class="fas fa-arrow-right"></i> Next Goal
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 6,
+            currentRound: 0,
+            selectedGoal: null,
+            selectedSteps: [],
+            goalProgress: 0,
+            goals: [
+                {
+                    title: "Learn New Skill",
+                    description: "Choose something new you want to learn!",
+                    icon: "fa-graduation-cap",
+                    color: "#667eea",
+                    steps: [
+                        "Choose what to learn",
+                        "Find learning resources",
+                        "Practice every day",
+                        "Ask for help when needed"
+                    ]
+                },
+                {
+                    title: "Get Better at Sports",
+                    description: "Improve your sports skills!",
+                    icon: "fa-basketball-ball",
+                    color: "#f5576c",
+                    steps: [
+                        "Choose a sport to improve",
+                        "Practice basic skills",
+                        "Join a team or class",
+                        "Play regularly"
+                    ]
+                },
+                {
+                    title: "Help Others",
+                    description: "Make a difference by helping people!",
+                    icon: "fa-hands-helping",
+                    color: "#48dbfb",
+                    steps: [
+                        "Find ways to help",
+                        "Start with small acts",
+                        "Help family and friends",
+                        "Volunteer in community"
+                    ]
+                },
+                {
+                    title: "Read More Books",
+                    description: "Become a better reader!",
+                    icon: "fa-book",
+                    color: "#feca57",
+                    steps: [
+                        "Choose interesting books",
+                        "Set reading time daily",
+                        "Visit library often",
+                        "Share what you read"
+                    ]
+                },
+                {
+                    title: "Be Healthier",
+                    description: "Take care of your body and mind!",
+                    icon: "fa-heart",
+                    color: "#ff6b6b",
+                    steps: [
+                        "Eat healthy foods",
+                        "Exercise regularly",
+                        "Get enough sleep",
+                        "Practice mindfulness"
+                    ]
+                },
+                {
+                    title: "Make New Friends",
+                    description: "Build positive relationships!",
+                    icon: "fa-user-friends",
+                    color: "#f368e0",
+                    steps: [
+                        "Be kind and friendly",
+                        "Join clubs or activities",
+                        "Listen to others",
+                        "Share your interests"
+                    ]
+                },
+                {
+                    title: "Save Money",
+                    description: "Learn to save for what you want!",
+                    icon: "fa-piggy-bank",
+                    color: "#00d2d3",
+                    steps: [
+                        "Set savings goal",
+                        "Save part of allowance",
+                        "Track your progress",
+                        "Wait for big purchases"
+                    ]
+                },
+                {
+                    title: "Be Creative",
+                    description: "Express your creativity!",
+                    icon: "fa-palette",
+                    color: "#f093fb",
+                    steps: [
+                        "Choose creative activity",
+                        "Practice regularly",
+                        "Try new techniques",
+                        "Share your creations"
+                    ]
+                },
+                {
+                    title: "Be Responsible",
+                    description: "Show you can be trusted!",
+                    icon: "fa-shield-alt",
+                    color: "#feca57",
+                    steps: [
+                        "Complete homework on time",
+                        "Help with chores",
+                        "Take care of pets",
+                        "Keep promises"
+                    ]
+                },
+                {
+                    title: "Explore Nature",
+                    description: "Learn about the natural world!",
+                    icon: "fa-tree",
+                    color: "#48dbfb",
+                    steps: [
+                        "Visit parks and forests",
+                        "Learn about plants",
+                        "Watch animals",
+                        "Protect environment"
+                    ]
+                },
+                {
+                    title: "Solve Problems",
+                    description: "Become a problem solver!",
+                    icon: "fa-puzzle-piece",
+                    color: "#667eea",
+                    steps: [
+                        "Identify problems",
+                        "Think of solutions",
+                        "Try different approaches",
+                        "Learn from mistakes"
+                    ]
+                },
+                {
+                    title: "Stay Organized",
+                    description: "Keep your life in order!",
+                    icon: "fa-tasks",
+                    color: "#f5576c",
+                    steps: [
+                        "Make daily schedules",
+                        "Keep room tidy",
+                        "Organize school work",
+                        "Plan ahead"
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewGoal();
+        }
+
+        // Start New Goal
+        function startNewGoal() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            // Reset state
+            gameState.selectedGoal = null;
+            gameState.selectedSteps = [];
+            gameState.goalProgress = 0;
+            
+            // Generate goal categories
+            generateGoalCategories();
+            
+            // Reset steps container
+            document.getElementById('stepsContainer').innerHTML = '';
+            
+            // Reset goal tracker
+            updateGoalTracker(0);
+            
+            // Reset goal display
+            document.getElementById('goalTitle').textContent = "Choose Your Goal";
+            document.getElementById('goalDescription').textContent = "Select a goal that you want to achieve and plan the steps to reach it!";
+            
+            // Hide feedback
+            hideFeedback();
+        }
+
+        // Generate Goal Categories
+        function generateGoalCategories() {
+            const goalCategories = document.getElementById('goalCategories');
+            goalCategories.innerHTML = '';
+            
+            // Shuffle goals for variety
+            const shuffledGoals = [...gameState.goals].sort(() => Math.random() - 0.5);
+            
+            // Display 4 random goals
+            const selectedGoals = shuffledGoals.slice(0, 4);
+            
+            selectedGoals.forEach(goal => {
+                const goalDiv = document.createElement('div');
+                goalDiv.className = 'goal-category';
+                goalDiv.onclick = () => selectGoal(goal, goalDiv);
+                
+                goalDiv.innerHTML = `
+                    <div class="category-icon">
+                        <i class="fas ${goal.icon}"></i>
+                    </div>
+                    <div class="category-title">${goal.title}</div>
+                    <div class="category-description">${goal.description}</div>
+                `;
+                
+                goalCategories.appendChild(goalDiv);
+            });
+        }
+
+        // Select Goal
+        function selectGoal(goal, element) {
+            // Remove previous selection
+            document.querySelectorAll('.goal-category').forEach(cat => {
+                cat.classList.remove('selected');
+            });
+            
+            // Select new goal
+            gameState.selectedGoal = goal;
+            element.classList.add('selected');
+            
+            // Update goal display
+            document.getElementById('goalTitle').textContent = goal.title;
+            document.getElementById('goalDescription').textContent = goal.description;
+            
+            // Generate steps for selected goal
+            generateGoalSteps(goal);
+            
+            // Update progress
+            updateGoalProgress();
+        }
+
+        // Generate Goal Steps
+        function generateGoalSteps(goal) {
+            const stepsContainer = document.getElementById('stepsContainer');
+            stepsContainer.innerHTML = '';
+            
+            goal.steps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step-item';
+                stepDiv.onclick = () => selectStep(step, stepDiv);
+                
+                stepDiv.innerHTML = `
+                    <div class="step-number">${index + 1}</div>
+                    <div class="step-text">${step}</div>
+                `;
+                
+                stepsContainer.appendChild(stepDiv);
+            });
+        }
+
+        // Select Step
+        function selectStep(step, element) {
+            if (gameState.selectedSteps.find(s => s === step)) {
+                // Deselect if already selected
+                gameState.selectedSteps = gameState.selectedSteps.filter(s => s !== step);
+                element.classList.remove('selected');
+            } else {
+                // Select step
+                gameState.selectedSteps.push(step);
+                element.classList.add('selected');
+            }
+            
+            // Update progress
+            updateGoalProgress();
+        }
+
+        // Update Goal Progress
+        function updateGoalProgress() {
+            let progress = 0;
+            
+            if (gameState.selectedGoal) {
+                progress += 50; // 50 points for selecting a goal
+            }
+            
+            if (gameState.selectedSteps.length > 0) {
+                progress += (gameState.selectedSteps.length / 4) * 50; // 50 points for steps
+            }
+            
+            gameState.goalProgress = Math.round(progress);
+            updateGoalTracker(gameState.goalProgress);
+        }
+
+        // Update Goal Tracker
+        function updateGoalTracker(progress) {
+            const trackerFill = document.getElementById('trackerFill');
+            const trackerPercent = document.getElementById('trackerPercent');
+            const trackerLabel = document.getElementById('trackerLabel');
+            
+            trackerFill.style.width = `${progress}%`;
+            trackerPercent.textContent = `${progress}%`;
+            
+            if (progress >= 100) {
+                trackerLabel.textContent = 'Perfect goal planning! 🎯';
+            } else if (progress >= 75) {
+                trackerLabel.textContent = 'Great planning! Almost there! 🌟';
+            } else if (progress >= 50) {
+                trackerLabel.textContent = 'Good start! Keep planning! 💪';
+            } else if (progress >= 25) {
+                trackerLabel.textContent = 'Nice start! Choose more steps! 👍';
+            } else {
+                trackerLabel.textContent = 'Select a goal and plan your steps! 📋';
+            }
+        }
+
+        // Complete Goal
+        function completeGoal() {
+            if (!gameState.selectedGoal) {
+                showFeedback('Please select a goal first!', 'info');
+                return;
+            }
+            
+            if (gameState.selectedSteps.length < 2) {
+                showFeedback('Please select at least 2 steps for your goal!', 'info');
+                return;
+            }
+            
+            // Calculate score
+            const baseScore = 100;
+            const planningBonus = gameState.goalProgress;
+            const totalScore = baseScore + planningBonus;
+            
+            gameState.score += totalScore;
+            
+            // Show feedback
+            showFeedback(`Excellent goal planning! You earned ${totalScore} points!`, 'success');
+            
+            // Update stats
+            updateStats();
+            
+            // Track progress
+            trackProgress(totalScore);
+            
+            // Hide complete button
+            document.getElementById('completeBtn').style.display = 'none';
+        }
+
+        // Next Goal
+        function nextGoal() {
+            gameState.currentRound++;
+            document.getElementById('completeBtn').style.display = 'inline-flex';
+            startNewGoal();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = message;
+            feedback.className = `feedback ${type} show`;
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 3000);
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(score) {
+            const progressData = {
+                gameName: 'Goal Setting',
+                round: gameState.currentRound + 1,
+                goal: gameState.selectedGoal ? gameState.selectedGoal.title : 'None',
+                stepsPlanned: gameState.selectedSteps.length,
+                planningProgress: gameState.goalProgress,
+                score: score,
+                totalScore: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const averagePlanning = gameState.score / (gameState.totalRounds * 150); // Max ~150 points per round
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Goal Setting Complete!</h2>
+                    <p>Amazing planning and goal-setting skills!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Goal Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(averagePlanning * 100).toFixed(1)}%</div>
+                            <div style="color: #718096;">Planning Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${averagePlanning >= 0.8 ? 'Outstanding! You are a goal-setting expert!' : 
+                              averagePlanning >= 0.6 ? 'Excellent! You plan goals very well!' :
+                              'Good job! Goal planning gets better with practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Goal setting helps with planning, organization, and achievement skills!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(averagePlanning, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(averagePlanning, totalTime) {
+            const results = {
+                gameName: 'Goal Setting',
+                finalScore: gameState.score,
+                averagePlanning: averagePlanning,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

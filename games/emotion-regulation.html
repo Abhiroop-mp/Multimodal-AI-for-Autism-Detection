@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Regulation - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #ff6b6b;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Emotion Scenario */
+        .emotion-scenario {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .scenario-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .scenario-content {
+            font-size: 1.1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            min-height: 100px;
+        }
+
+        .emotion-display {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .emotion-face {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .emotion-face.happy {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+        }
+
+        .emotion-face.sad {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+        }
+
+        .emotion-face.angry {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+
+        .emotion-face.worried {
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+        }
+
+        /* Emotion Options */
+        .emotion-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .emotion-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emotion-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 107, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .emotion-option:hover::before {
+            left: 100%;
+        }
+
+        .emotion-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #ff6b6b;
+        }
+
+        .emotion-option.selected {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            border-color: #ff6b6b;
+            transform: scale(1.02);
+        }
+
+        .emotion-option.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .emotion-option.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .option-icon {
+            font-size: 2.5rem;
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .emotion-option:hover .option-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .option-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* Regulation Strategies */
+        .strategies-container {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .strategies-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .strategies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .strategy-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .strategy-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #ff6b6b;
+        }
+
+        .strategy-item.selected {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+        }
+
+        .strategy-icon {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            margin-bottom: 0.5rem;
+        }
+
+        .strategy-text {
+            font-size: 0.85rem;
+            color: #4a5568;
+            line-height: 1.3;
+        }
+
+        /* Regulation Meter */
+        .regulation-meter {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .meter-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .regulation-bar {
+            width: 100%;
+            height: 30px;
+            background: #e2e8f0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .regulation-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .regulation-label {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .emotion-display {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .emotion-options {
+                grid-template-columns: 1fr;
+            }
+
+            .strategies-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-heart"></i>
+            <h1>Emotion Regulation</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Understand Emotions!</h2>
+                <p>Identify feelings and choose the best way to handle them</p>
+            </div>
+
+            <div class="emotion-scenario">
+                <div class="scenario-title" id="scenarioTitle">How would you feel?</div>
+                <div class="scenario-content" id="scenarioContent">
+                    You worked really hard on a drawing and someone said it looks amazing!
+                </div>
+                <div class="emotion-display" id="emotionDisplay">
+                    <div class="emotion-face happy" id="emotionFace">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="emotion-options" id="emotionOptions">
+                <!-- Emotion options will be generated by JavaScript -->
+            </div>
+
+            <div class="strategies-container">
+                <div class="strategies-title">Choose Regulation Strategies</div>
+                <div class="strategies-grid" id="strategiesGrid">
+                    <!-- Strategies will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="regulation-meter">
+                <div class="meter-title">Emotion Regulation Skill</div>
+                <div class="regulation-bar">
+                    <div class="regulation-fill" id="regulationFill" style="width: 0%">
+                        <span id="regulationPercent">0%</span>
+                    </div>
+                </div>
+                <div class="regulation-label" id="regulationLabel">Identify emotions and choose strategies!</div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="completeBtn" onclick="completeScenario()">
+                    <i class="fas fa-check"></i> Complete Scenario
+                </button>
+                <button class="btn btn-secondary" onclick="nextScenario()">
+                    <i class="fas fa-arrow-right"></i> Next Scenario
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            score: 0,
+            level: 1,
+            totalRounds: 6,
+            currentRound: 0,
+            currentScenario: null,
+            selectedEmotion: null,
+            selectedStrategies: [],
+            regulationProgress: 0,
+            scenarios: [
+                {
+                    title: "How would you feel?",
+                    content: "You worked really hard on a drawing and someone said it looks amazing!",
+                    emotion: "happy",
+                    face: "fa-smile",
+                    faceColor: "happy",
+                    options: [
+                        { title: "Happy", description: "Feeling joyful and proud", icon: "fa-smile", correct: true },
+                        { title: "Sad", description: "Feeling down or unhappy", icon: "fa-sad-tear", correct: false },
+                        { title: "Angry", description: "Feeling mad or frustrated", icon: "fa-angry", correct: false },
+                        { title: "Worried", description: "Feeling concerned or anxious", icon: "fa-meh", correct: false }
+                    ],
+                    strategies: [
+                        { icon: "fa-heart", text: "Share your joy" },
+                        { icon: "fa-star", text: "Feel proud" },
+                        { icon: "fa-camera", text: "Take a picture" },
+                        { icon: "fa-share", text: "Tell others" }
+                    ]
+                },
+                {
+                    title: "What emotion is this?",
+                    content: "Your friend promised to play with you but didn't show up. You feel disappointed.",
+                    emotion: "sad",
+                    face: "fa-sad-tear",
+                    faceColor: "sad",
+                    options: [
+                        { title: "Happy", description: "Feeling joyful and proud", icon: "fa-smile", correct: false },
+                        { title: "Sad", description: "Feeling down or unhappy", icon: "fa-sad-tear", correct: true },
+                        { title: "Angry", description: "Feeling mad or frustrated", icon: "fa-angry", correct: false },
+                        { title: "Excited", description: "Feeling very enthusiastic", icon: "fa-laugh", correct: false }
+                    ],
+                    strategies: [
+                        { icon: "fa-comments", text: "Talk to someone" },
+                        { icon: "fa-heart", text: "Be kind to yourself" },
+                        { icon: "fa-pencil-alt", text: "Draw your feelings" },
+                        { icon: "fa-phone", text: "Call another friend" }
+                    ]
+                },
+                {
+                    title: "Identify this feeling:",
+                    content: "Someone took your toy without asking and broke it. You feel upset.",
+                    emotion: "angry",
+                    face: "fa-angry",
+                    faceColor: "angry",
+                    options: [
+                        { title: "Happy", description: "Feeling joyful and proud", icon: "fa-smile", correct: false },
+                        { title: "Sad", description: "Feeling down or unhappy", icon: "fa-sad-tear", correct: false },
+                        { title: "Angry", description: "Feeling mad or frustrated", icon: "fa-angry", correct: true },
+                        { title: "Calm", description: "Feeling peaceful and relaxed", icon: "fa-smile-beam", correct: false }
+                    ],
+                    strategies: [
+                        { icon: "fa-wind", text: "Take deep breaths" },
+                        { icon: "fa-walking", text: "Take a walk" },
+                        { icon: "fa-comments", text: "Talk calmly" },
+                        { icon: "fa-countdown", text: "Count to ten" }
+                    ]
+                },
+                {
+                    title: "What emotion would you feel?",
+                    content: "You have a big test tomorrow and you haven't studied enough. You feel nervous.",
+                    emotion: "worried",
+                    face: "fa-meh",
+                    faceColor: "worried",
+                    options: [
+                        { title: "Excited", description: "Feeling very enthusiastic", icon: "fa-laugh", correct: false },
+                        { title: "Worried", description: "Feeling concerned or anxious", icon: "fa-meh", correct: true },
+                        { title: "Happy", description: "Feeling joyful and proud", icon: "fa-smile", correct: false },
+                        { title: "Angry", description: "Feeling mad or frustrated", icon: "fa-angry", correct: false }
+                    ],
+                    strategies: [
+                        { icon: "fa-book", text: "Study a little" },
+                        { icon: "fa-bed", text: "Get good sleep" },
+                        { icon: "fa-comments", text: "Ask for help" },
+                        { icon: "fa-check", text: "Make a plan" }
+                    ]
+                },
+                {
+                    title: "How would you feel?",
+                    content: "You're going to your favorite amusement park tomorrow! You can't wait!",
+                    emotion: "excited",
+                    face: "fa-laugh",
+                    faceColor: "happy",
+                    options: [
+                        { title: "Excited", description: "Feeling very enthusiastic", icon: "fa-laugh", correct: true },
+                        { title: "Worried", description: "Feeling concerned or anxious", icon: "fa-meh", correct: false },
+                        { title: "Sad", description: "Feeling down or unhappy", icon: "fa-sad-tear", correct: false },
+                        { title: "Angry", description: "Feeling mad or frustrated", icon: "fa-angry", correct: false }
+                    ],
+                    strategies: [
+                        { icon: "fa-list", text: "Make a checklist" },
+                        { icon: "fa-camera", text: "Take pictures" },
+                        { icon: "fa-users", text: "Share excitement" },
+                        { icon: "fa-bed", text: "Get good rest" }
+                    ]
+                },
+                {
+                    title: "What emotion is this?",
+                    content: "You helped someone who was hurt and they said thank you. You feel good inside.",
+                    emotion: "happy",
+                    face: "fa-smile",
+                    faceColor: "happy",
+                    options: [
+                        { title: "Happy", description: "Feeling joyful and proud", icon: "fa-smile", correct: true },
+                        { title: "Angry", description: "Feeling mad or frustrated", icon: "fa-angry", correct: false },
+                        { title: "Worried", description: "Feeling concerned or anxious", icon: "fa-meh", correct: false },
+                        { title: "Sad", description: "Feeling down or unhappy", icon: "fa-sad-tear", correct: false }
+                    ],
+                    strategies: [
+                        { icon: "fa-heart", text: "Feel proud" },
+                        { icon: "fa-hands-helping", text: "Help more people" },
+                        { icon: "fa-smile", text: "Share your joy" },
+                        { icon: "fa-star", text: "Remember the feeling" }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewScenario();
+        }
+
+        // Start New Scenario
+        function startNewScenario() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            // Reset state
+            gameState.selectedEmotion = null;
+            gameState.selectedStrategies = [];
+            gameState.regulationProgress = 0;
+            
+            // Get current scenario
+            gameState.currentScenario = gameState.scenarios[gameState.currentRound];
+            
+            // Update scenario display
+            updateScenarioDisplay();
+            
+            // Generate emotion options
+            generateEmotionOptions();
+            
+            // Generate strategies
+            generateStrategies();
+            
+            // Reset regulation meter
+            updateRegulationMeter(0);
+            
+            // Hide feedback
+            hideFeedback();
+        }
+
+        // Update Scenario Display
+        function updateScenarioDisplay() {
+            const scenario = gameState.currentScenario;
+            document.getElementById('scenarioTitle').textContent = scenario.title;
+            document.getElementById('scenarioContent').textContent = scenario.content;
+            
+            const emotionFace = document.getElementById('emotionFace');
+            emotionFace.className = `emotion-face ${scenario.faceColor}`;
+            emotionFace.innerHTML = `<i class="fas ${scenario.face}"></i>`;
+        }
+
+        // Generate Emotion Options
+        function generateEmotionOptions() {
+            const emotionOptions = document.getElementById('emotionOptions');
+            emotionOptions.innerHTML = '';
+            
+            gameState.currentScenario.options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'emotion-option';
+                optionDiv.onclick = () => selectEmotion(option, optionDiv);
+                
+                optionDiv.innerHTML = `
+                    <div class="option-icon">
+                        <i class="fas ${option.icon}"></i>
+                    </div>
+                    <div class="option-title">${option.title}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                
+                emotionOptions.appendChild(optionDiv);
+            });
+        }
+
+        // Generate Strategies
+        function generateStrategies() {
+            const strategiesGrid = document.getElementById('strategiesGrid');
+            strategiesGrid.innerHTML = '';
+            
+            gameState.currentScenario.strategies.forEach(strategy => {
+                const strategyDiv = document.createElement('div');
+                strategyDiv.className = 'strategy-item';
+                strategyDiv.onclick = () => selectStrategy(strategy, strategyDiv);
+                
+                strategyDiv.innerHTML = `
+                    <div class="strategy-icon">
+                        <i class="fas ${strategy.icon}"></i>
+                    </div>
+                    <div class="strategy-text">${strategy.text}</div>
+                `;
+                
+                strategiesGrid.appendChild(strategyDiv);
+            });
+        }
+
+        // Select Emotion
+        function selectEmotion(emotion, element) {
+            // Remove previous selection
+            document.querySelectorAll('.emotion-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Select new emotion
+            gameState.selectedEmotion = emotion;
+            element.classList.add('selected');
+            
+            // Update progress
+            updateRegulationProgress();
+        }
+
+        // Select Strategy
+        function selectStrategy(strategy, element) {
+            if (gameState.selectedStrategies.find(s => s.text === strategy.text)) {
+                // Deselect if already selected
+                gameState.selectedStrategies = gameState.selectedStrategies.filter(s => s.text !== strategy.text);
+                element.classList.remove('selected');
+            } else {
+                // Select strategy
+                gameState.selectedStrategies.push(strategy);
+                element.classList.add('selected');
+            }
+            
+            // Update progress
+            updateRegulationProgress();
+        }
+
+        // Update Regulation Progress
+        function updateRegulationProgress() {
+            let progress = 0;
+            
+            if (gameState.selectedEmotion) {
+                progress += 50; // 50 points for selecting emotion
+            }
+            
+            if (gameState.selectedStrategies.length > 0) {
+                progress += (gameState.selectedStrategies.length / 4) * 50; // 50 points for strategies
+            }
+            
+            gameState.regulationProgress = Math.round(progress);
+            updateRegulationMeter(gameState.regulationProgress);
+        }
+
+        // Update Regulation Meter
+        function updateRegulationMeter(progress) {
+            const regulationFill = document.getElementById('regulationFill');
+            const regulationPercent = document.getElementById('regulationPercent');
+            const regulationLabel = document.getElementById('regulationLabel');
+            
+            regulationFill.style.width = `${progress}%`;
+            regulationPercent.textContent = `${progress}%`;
+            
+            if (progress >= 100) {
+                regulationLabel.textContent = 'Perfect emotion regulation! 🌟';
+            } else if (progress >= 75) {
+                regulationLabel.textContent = 'Great emotional skills! 💪';
+            } else if (progress >= 50) {
+                regulationLabel.textContent = 'Good progress! Keep learning! 👍';
+            } else if (progress >= 25) {
+                regulationLabel.textContent = 'Nice start! Choose more strategies! 🎯';
+            } else {
+                regulationLabel.textContent = 'Identify emotions and choose strategies! 🧠';
+            }
+        }
+
+        // Complete Scenario
+        function completeScenario() {
+            if (!gameState.selectedEmotion) {
+                showFeedback('Please select an emotion first!', 'info');
+                return;
+            }
+            
+            if (gameState.selectedStrategies.length < 2) {
+                showFeedback('Please select at least 2 regulation strategies!', 'info');
+                return;
+            }
+            
+            // Check if emotion is correct
+            const isEmotionCorrect = gameState.selectedEmotion.correct;
+            
+            // Calculate score
+            let baseScore = 100;
+            if (isEmotionCorrect) {
+                baseScore += 50; // Bonus for correct emotion
+            }
+            
+            const regulationBonus = gameState.regulationProgress;
+            const totalScore = baseScore + regulationBonus;
+            
+            gameState.score += totalScore;
+            
+            // Show feedback
+            if (isEmotionCorrect) {
+                showFeedback(`Excellent! You identified the emotion correctly and earned ${totalScore} points!`, 'success');
+            } else {
+                showFeedback(`Good effort! The correct emotion was ${gameState.currentScenario.emotion}. You earned ${totalScore} points!`, 'info');
+            }
+            
+            // Update stats
+            updateStats();
+            
+            // Track progress
+            trackProgress(isEmotionCorrect, totalScore);
+            
+            // Hide complete button
+            document.getElementById('completeBtn').style.display = 'none';
+        }
+
+        // Next Scenario
+        function nextScenario() {
+            gameState.currentRound++;
+            document.getElementById('completeBtn').style.display = 'inline-flex';
+            startNewScenario();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Show Feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = message;
+            feedback.className = `feedback ${type} show`;
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 3000);
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+        }
+
+        // Track Progress
+        function trackProgress(isEmotionCorrect, score) {
+            const progressData = {
+                gameName: 'Emotion Regulation',
+                round: gameState.currentRound + 1,
+                scenario: gameState.currentScenario.title,
+                emotionCorrect: isEmotionCorrect,
+                strategiesSelected: gameState.selectedStrategies.length,
+                regulationProgress: gameState.regulationProgress,
+                score: score,
+                totalScore: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const averageRegulation = gameState.score / (gameState.totalRounds * 200); // Max ~200 points per round
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Emotion Regulation Complete!</h2>
+                    <p>Amazing emotional understanding and regulation skills!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💖</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Emotional Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(averageRegulation * 100).toFixed(1)}%</div>
+                            <div style="color: #718096;">Emotional Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${averageRegulation >= 0.8 ? 'Outstanding! You are an emotional regulation expert!' : 
+                              averageRegulation >= 0.6 ? 'Excellent! You understand emotions very well!' :
+                              'Good job! Emotional regulation takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Understanding and managing emotions helps with social success and well-being!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(averageRegulation, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(averageRegulation, totalTime) {
+            const results = {
+                gameName: 'Emotion Regulation',
+                finalScore: gameState.score,
+                averageRegulation: averageRegulation,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

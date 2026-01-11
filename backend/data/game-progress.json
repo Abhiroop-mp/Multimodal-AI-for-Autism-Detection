@@ -1,0 +1,20 @@
+{
+  "patient-001": {
+    "memory-match": {
+      "score": 68,
+      "accuracy": 17,
+      "duration": "15 minutes",
+      "completedAt": "2026-01-09T02:17:41.054Z",
+      "sessionId": "38d56c56-f0b6-4919-ba29-c7c41916596e"
+    }
+  },
+  "patient-002": {
+    "pattern-recognition": {
+      "score": 92,
+      "accuracy": 85,
+      "duration": "12 minutes",
+      "completedAt": "2026-01-09T02:21:51.527Z",
+      "sessionId": "2c2e72c6-aea7-4723-a4ec-730ce1c16c5d"
+    }
+  }
+}

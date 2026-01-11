@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Smiles - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-title h1 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .game-title i {
+            color: #f6ad55;
+            font-size: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Game Area */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .instruction {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .instruction h2 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction p {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        /* Emotion Display */
+        .emotion-display {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .emotion-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            margin: 0 auto 1rem;
+            font-size: 8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f7fafc;
+            border: 3px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .emotion-image.happy {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-color: #f6ad55;
+            color: #d69e2e;
+        }
+
+        .emotion-image.sad {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border-color: #6366f1;
+            color: #4f46e5;
+        }
+
+        .emotion-image.surprised {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border-color: #fb923c;
+            color: #ea580c;
+        }
+
+        .emotion-image.angry {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .emotion-question {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .emotion-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emotion-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e0;
+        }
+
+        .emotion-option.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .emotion-option.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        .emotion-face {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            position: relative;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .emotion-face.happy {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+        }
+
+        .emotion-face.sad {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+        }
+
+        .emotion-face.surprised {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+        }
+
+        .emotion-face.angry {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+        }
+
+        /* Face Features */
+        .face-eyes {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+
+        .face-eye {
+            width: 8px;
+            height: 8px;
+            background: #2d3748;
+            border-radius: 50%;
+        }
+
+        .face-mouth {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .face-mouth.happy {
+            width: 30px;
+            height: 15px;
+            border: 3px solid #2d3748;
+            border-top: none;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .face-mouth.sad {
+            width: 20px;
+            height: 10px;
+            border: 3px solid #2d3748;
+            border-bottom: none;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .face-mouth.surprised {
+            width: 15px;
+            height: 20px;
+            background: #2d3748;
+            border-radius: 50%;
+        }
+
+        .face-mouth.angry {
+            width: 25px;
+            height: 8px;
+            background: #2d3748;
+            border-radius: 4px;
+        }
+
+        .emotion-option span {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 1rem;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        /* Animations */
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Timer */
+        .timer {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .game-stats {
+                gap: 1rem;
+            }
+
+            .emotion-image {
+                width: 150px;
+                height: 150px;
+                font-size: 6rem;
+            }
+
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-smile"></i>
+            <h1>Social Smiles</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Let's Learn About Emotions!</h2>
+                <p>Look at the face and choose the correct emotion</p>
+            </div>
+
+            <div class="emotion-display">
+                <div class="emotion-image" id="emotionImage">
+                    <i class="fas fa-smile" id="emotionIcon"></i>
+                </div>
+                <div class="emotion-question">What emotion is this face showing?</div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="options-grid" id="optionsGrid">
+                <!-- Options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextRound()">
+                    <i class="fas fa-arrow-right"></i> Next
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        // Game State
+        let gameState = {
+            currentRound: 0,
+            score: 0,
+            level: 1,
+            totalRounds: 10,
+            correctAnswers: 0,
+            currentEmotion: null,
+            isAnswered: false,
+            startTime: Date.now(),
+            roundStartTime: Date.now()
+        };
+
+        // Emotions Data
+        const emotions = [
+            { name: 'happy', icon: 'fa-smile', color: 'happy' },
+            { name: 'sad', icon: 'fa-frown', color: 'sad' },
+            { name: 'surprised', icon: 'fa-surprise', color: 'surprised' },
+            { name: 'angry', icon: 'fa-angry', color: 'angry' }
+        ];
+
+        // Initialize Game
+        function initGame() {
+            updateStats();
+            startNewRound();
+        }
+
+        // Start New Round
+        function startNewRound() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+
+            gameState.isAnswered = false;
+            gameState.roundStartTime = Date.now();
+            
+            // Select random emotion
+            gameState.currentEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+            
+            // Update emotion display
+            updateEmotionDisplay();
+            
+            // Generate options
+            generateOptions();
+            
+            // Hide feedback
+            hideFeedback();
+            
+            // Hide next button
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // Update Emotion Display
+        function updateEmotionDisplay() {
+            const emotionImage = document.getElementById('emotionImage');
+            const emotionIcon = document.getElementById('emotionIcon');
+            
+            // Remove all color classes
+            emotionImage.className = 'emotion-image fade-in';
+            
+            // Add current emotion color class
+            emotionImage.classList.add(gameState.currentEmotion.color);
+            
+            // Update icon
+            emotionIcon.className = `fas ${gameState.currentEmotion.icon}`;
+        }
+
+        // Generate Options
+        function generateOptions() {
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            // Create options array with correct answer and random wrong answers
+            const options = [gameState.currentEmotion];
+            
+            // Add 3 random wrong answers
+            const wrongAnswers = emotions.filter(e => e.name !== gameState.currentEmotion.name);
+            while (options.length < 4) {
+                const randomWrong = wrongAnswers[Math.floor(Math.random() * wrongAnswers.length)];
+                if (!options.find(o => o.name === randomWrong.name)) {
+                    options.push(randomWrong);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            // Create option elements
+            options.forEach((emotion, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'emotion-option';
+                optionDiv.onclick = () => selectAnswer(emotion, optionDiv);
+                
+                // Create face structure
+                optionDiv.innerHTML = `
+                    <div class="emotion-face ${emotion.color}">
+                        <div class="face-eyes">
+                            <div class="face-eye"></div>
+                            <div class="face-eye"></div>
+                        </div>
+                        <div class="face-mouth ${emotion.name}"></div>
+                    </div>
+                    <span>${emotion.name.charAt(0).toUpperCase() + emotion.name.slice(1)}</span>
+                `;
+                
+                optionsGrid.appendChild(optionDiv);
+            });
+        }
+
+        // Select Answer
+        function selectAnswer(emotion, element) {
+            if (gameState.isAnswered) return;
+            
+            gameState.isAnswered = true;
+            
+            const isCorrect = emotion.name === gameState.currentEmotion.name;
+            const roundTime = Date.now() - gameState.roundStartTime;
+            
+            // Update option styling
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.correctAnswers++;
+                gameState.score += calculateScore(roundTime);
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                const options = document.querySelectorAll('.emotion-option');
+                options.forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentEmotion.name)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Show feedback
+            showFeedback(isCorrect);
+            
+            // Update stats
+            updateStats();
+            
+            // Show next button
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            
+            // Track progress
+            trackProgress(isCorrect, roundTime);
+        }
+
+        // Calculate Score
+        function calculateScore(timeMs) {
+            const baseScore = 100;
+            const timeBonus = Math.max(0, 50 - Math.floor(timeMs / 1000)); // Up to 50 bonus points for speed
+            return baseScore + timeBonus;
+        }
+
+        // Show Feedback
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                feedback.textContent = 'Excellent! You got it right! 🎉';
+                feedback.className = 'feedback correct show';
+            } else {
+                feedback.textContent = 'Not quite right. Keep practicing! 💪';
+                feedback.className = 'feedback incorrect show';
+            }
+        }
+
+        // Hide Feedback
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+        }
+
+        // Next Round
+        function nextRound() {
+            gameState.currentRound++;
+            startNewRound();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        // Track Progress
+        function trackProgress(isCorrect, timeMs) {
+            // This would normally save to database
+            const progressData = {
+                gameName: 'Social Smiles',
+                round: gameState.currentRound + 1,
+                emotion: gameState.currentEmotion.name,
+                isCorrect: isCorrect,
+                timeMs: timeMs,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Progress tracked:', progressData);
+            
+            // Save to localStorage for demo
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        // End Game
+        function endGame() {
+            const accuracy = (gameState.correctAnswers / gameState.totalRounds) * 100;
+            const totalTime = Date.now() - gameState.startTime;
+            
+            // Show results
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Game Complete!</h2>
+                    <p>Great job on completing Social Smiles!</p>
+                </div>
+                
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Results</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Accuracy</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Total Time</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Excellent work! You have great emotional recognition skills!' : 
+                              accuracy >= 60 ? 'Good job! Keep practicing to improve your skills!' :
+                              'Nice try! Emotional recognition takes practice, keep working on it!'}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            
+            // Save final results
+            saveGameResults(accuracy, totalTime);
+        }
+
+        // Save Game Results
+        function saveGameResults(accuracy, totalTime) {
+            const results = {
+                gameName: 'Social Smiles',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                correctAnswers: gameState.correctAnswers,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            
+            console.log('Game results saved:', results);
+            
+            // Save to localStorage for demo
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        // Go to Dashboard
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>

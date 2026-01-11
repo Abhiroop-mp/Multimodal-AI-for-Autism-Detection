@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Making - Spectra Care</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); min-height: 100vh; display: flex; flex-direction: column; }
+        .game-header { background: rgba(255,255,255,0.95); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .game-title { display: flex; align-items: center; gap: 1rem; }
+        .game-title h1 { color: #4a5568; font-size: 1.5rem; }
+        .game-title i { color: #f5576c; font-size: 2rem; }
+        .game-stats { display: flex; gap: 2rem; align-items: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #4a5568; }
+        .stat-label { font-size: 0.8rem; color: #718096; }
+        .progress-bar { width: 150px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb, #f5576c); transition: width 0.3s ease; }
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .game-board { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 1000px; width: 100%; }
+        .instruction { text-align: center; margin-bottom: 2rem; }
+        .instruction h2 { color: #2d3748; margin-bottom: 0.5rem; }
+        .instruction p { color: #4a5568; font-size: 1.1rem; }
+        .scenario-container { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 2px solid #e2e8f0; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .scenario-title { font-size: 1.3rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .scenario-content { font-size: 1.1rem; color: #4a5568; line-height: 1.6; margin-bottom: 1.5rem; min-height: 100px; }
+        .scenario-visual { margin: 1.5rem 0; font-size: 3rem; color: #f5576c; }
+        .decision-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .decision-option { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .decision-option::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(240,147,251,0.1), transparent); transition: left 0.5s ease; }
+        .decision-option:hover::before { left: 100%; }
+        .decision-option:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #f5576c; }
+        .decision-option.selected { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-color: #f5576c; transform: scale(1.02); }
+        .decision-option.correct { background: linear-gradient(135deg, #d4edda, #c3e6cb); border-color: #28a745; animation: correctPulse 0.6s ease; }
+        .decision-option.incorrect { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-color: #dc3545; animation: shake 0.5s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .option-icon { font-size: 2rem; color: #f5576c; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .decision-option:hover .option-icon { transform: scale(1.2) rotate(10deg); }
+        .option-text { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .option-consequence { font-size: 0.9rem; color: #4a5568; line-height: 1.4; }
+        .consequences-container { background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; text-align: center; }
+        .consequences-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; }
+        .consequences-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .consequence-item { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; text-align: center; transition: all 0.3s ease; }
+        .consequence-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .consequence-icon { font-size: 1.5rem; color: #f5576c; margin-bottom: 0.5rem; }
+        .consequence-text { font-size: 0.9rem; color: #4a5568; line-height: 1.3; }
+        .feedback { text-align: center; padding: 1rem; border-radius: 15px; margin-bottom: 1rem; font-weight: 600; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .feedback.show { opacity: 1; transform: translateY(0); }
+        .feedback.success { background: linear-gradient(135deg, #d4edda, #c3e6cb); color: #155724; }
+        .feedback.info { background: linear-gradient(135deg, #d1ecf1, #bee5eb); color: #0c5460; }
+        .game-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem 2rem; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(240,147,251,0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .game-header { flex-direction: column; gap: 1rem; }
+            .game-stats { gap: 1rem; }
+            .decision-options { grid-template-columns: 1fr; }
+            .consequences-grid { grid-template-columns: 1fr; }
+            .game-controls { flex-direction: column; align-items: center; }
+            .btn { width: 200px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="game-header">
+        <div class="game-title">
+            <i class="fas fa-balance-scale"></i>
+            <h1>Decision Making</h1>
+        </div>
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 0%"></div>
+                </div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <div class="game-board">
+            <div class="instruction">
+                <h2>Make Smart Decisions!</h2>
+                <p>Think about consequences and choose the best option</p>
+            </div>
+
+            <div class="scenario-container">
+                <div class="scenario-title" id="scenarioTitle">Decision Scenario</div>
+                <div class="scenario-content" id="scenarioContent">
+                    Loading scenario...
+                </div>
+                <div class="scenario-visual" id="scenarioVisual">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+            </div>
+
+            <div class="consequences-container">
+                <div class="consequences-title">Consider These Factors</div>
+                <div class="consequences-grid" id="consequencesGrid">
+                    <!-- Consequences will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="decision-options" id="decisionOptions">
+                <!-- Decision options will be generated by JavaScript -->
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-primary" id="nextBtn" onclick="nextScenario()" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Next Decision
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            if (!token || !userData.id) {
+                console.log('No valid authentication found, redirecting to login');
+                window.location.replace('../loginpage.html');
+                return false;
+            }
+
+            console.log('Authentication valid for game:', userData.name);
+            return true;
+        }
+        let gameState = {
+            score: 0, level: 1, totalRounds: 6, currentRound: 0, currentScenario: null, isAnswered: false,
+            scenarios: [
+                {
+                    title: "Study vs. Social Time",
+                    content: "You have a big test tomorrow, but your friends want to hang out tonight. You need to decide what to do.",
+                    visual: "<i class='fas fa-graduation-cap'></i>",
+                    consequences: [
+                        { icon: "fa-book", text: "Academic performance" },
+                        { icon: "fa-users", text: "Friendship" },
+                        { icon: "fa-clock", text: "Time management" },
+                        { icon: "fa-brain", text: "Stress level" }
+                    ],
+                    options: [
+                        {
+                            text: "Study for 2 hours, then join friends briefly",
+                            consequence: "Balanced approach - good grades and social time",
+                            icon: "fa-balance-scale",
+                            correct: true
+                        },
+                        {
+                            text: "Go out with friends all night",
+                            consequence: "Fun night but may fail the test",
+                            icon: "fa-laugh",
+                            correct: false
+                        },
+                        {
+                            text: "Cancel plans and study all night",
+                            consequence: "Good grades but friends might feel rejected",
+                            icon: "fa-book-reader",
+                            correct: false
+                        },
+                        {
+                            text: "Try to do both at the same time",
+                            consequence: "Neither activity gets proper attention",
+                            icon: "fa-random",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Money Decision",
+                    content: "You received $100 for your birthday. You can spend it now or save it for something bigger later.",
+                    visual: "<i class='fas fa-wallet'></i>",
+                    consequences: [
+                        { icon: "fa-piggy-bank", text: "Future savings" },
+                        { icon: "fa-shopping-bag", text: "Immediate wants" },
+                        { icon: "fa-chart-line", text: "Financial habits" },
+                        { icon: "fa-gift", text: "Long-term goals" }
+                    ],
+                    options: [
+                        {
+                            text: "Save $80, spend $20 on something small",
+                            consequence: "Builds savings while enjoying some now",
+                            icon: "fa-piggy-bank",
+                            correct: true
+                        },
+                        {
+                            text: "Spend all $100 immediately",
+                            consequence: "Immediate gratification but no savings",
+                            icon: "fa-shopping-cart",
+                            correct: false
+                        },
+                        {
+                            text: "Save all $100, spend nothing",
+                            consequence: "Great savings but might feel deprived",
+                            icon: "fa-lock",
+                            correct: false
+                        },
+                        {
+                            text: "Lend money to friends",
+                            consequence: "Risky - might not get paid back",
+                            icon: "fa-hand-holding-usd",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Honesty Challenge",
+                    content: "You accidentally broke your neighbor's window while playing ball. No one saw you. What do you do?",
+                    visual: "<i class='fas fa-exclamation-triangle'></i>",
+                    consequences: [
+                        { icon: "fa-heart", text: "Integrity" },
+                        { icon: "fa-users", text: "Relationships" },
+                        { icon: "fa-dollar-sign", text: "Responsibility" },
+                        { icon: "fa-shield-alt", text: "Trust" }
+                    ],
+                    options: [
+                        {
+                            text: "Tell the neighbor and offer to help pay for repairs",
+                            consequence: "Builds trust and shows responsibility",
+                            icon: "fa-handshake",
+                            correct: true
+                        },
+                        {
+                            text: "Pretend it didn't happen and hide",
+                            consequence: "Guilt and risk of discovery later",
+                            icon: "fa-eye-slash",
+                            correct: false
+                        },
+                        {
+                            text: "Blame someone else",
+                            consequence: "Damages relationships and integrity",
+                            icon: "fa-user-slash",
+                            correct: false
+                        },
+                        {
+                            text: "Run away and avoid the neighbor",
+                            consequence: "Problem unresolved and creates anxiety",
+                            icon: "fa-running",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Peer Pressure",
+                    content: "Your friends want you to skip school to go to the beach. You know your parents would be upset.",
+                    visual: "<i class='fas fa-school'></i>",
+                    consequences: [
+                        { icon: "fa-graduation-cap", text: "Education" },
+                        { icon: "fa-users", text: "Friendship" },
+                        { icon: "fa-home", text: "Family trust" },
+                        { icon: "fa-beach", text: "Fun experiences" }
+                    ],
+                    options: [
+                        {
+                            text: "Go to school, suggest beach for weekend",
+                            consequence: "Responsible and still gets fun experience",
+                            icon: "fa-calendar-check",
+                            correct: true
+                        },
+                        {
+                            text: "Skip school and go to beach",
+                            consequence: "Fun day but consequences from school and parents",
+                            icon: "fa-umbrella-beach",
+                            correct: false
+                        },
+                        {
+                            text: "Tell friends you're sick, stay home",
+                            consequence: "Lies and misses both school and fun",
+                            icon: "fa-bed",
+                            correct: false
+                        },
+                        {
+                            text: "Go to school but be angry at friends",
+                            consequence: "Responsible but damages friendships",
+                            icon: "fa-angry",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Health Choice",
+                    content: "You're tired and stressed from exams. You can stay up late studying or get good sleep.",
+                    visual: "<i class='fas fa-bed'></i>",
+                    consequences: [
+                        { icon: "fa-brain", text: "Mental health" },
+                        { icon: "fa-book", text: "Academic performance" },
+                        { icon: "fa-heart", text: "Physical health" },
+                        { icon: "fa-battery-full", text: "Energy levels" }
+                    ],
+                    options: [
+                        {
+                            text: "Study efficiently for 2 hours, then get 8 hours sleep",
+                            consequence: "Balanced approach supports both learning and health",
+                            icon: "fa-balance-scale",
+                            correct: true
+                        },
+                        {
+                            text: "Pull all-nighter to study more",
+                            consequence: "More study time but exhausted during test",
+                            icon: "fa-moon",
+                            correct: false
+                        },
+                        {
+                            text: "Skip studying to sleep early",
+                            consequence: "Well-rested but unprepared for test",
+                            icon: "fa-bed",
+                            correct: false
+                        },
+                        {
+                            text: "Study while watching TV and checking phone",
+                            consequence: "Distracted studying, poor retention",
+                            icon: "fa-tv",
+                            correct: false
+                        }
+                    ]
+                },
+                {
+                    title: "Online Safety",
+                    content: "A stranger online sends you a friend request and asks for personal information and photos.",
+                    visual: "<i class='fas fa-laptop'></i>",
+                    consequences: [
+                        { icon: "fa-shield-alt", text: "Personal safety" },
+                        { icon: "fa-lock", text: "Privacy" },
+                        { icon: "fa-user-shield", text: "Digital citizenship" },
+                        { icon: "fa-info-circle", text: "Critical thinking" }
+                    ],
+                    options: [
+                        {
+                            text: "Don't accept request, tell trusted adult",
+                            consequence: "Prioritizes safety and follows best practices",
+                            icon: "fa-shield-alt",
+                            correct: true
+                        },
+                        {
+                            text: "Accept and share requested information",
+                            consequence: "Dangerous - compromises safety and privacy",
+                            icon: "fa-user-check",
+                            correct: false
+                        },
+                        {
+                            text: "Accept but lie about personal info",
+                            consequence: "Still risky, encourages more contact",
+                            icon: "fa-user-secret",
+                            correct: false
+                        },
+                        {
+                            text: "Block and ignore completely",
+                            consequence: "Safe but could miss legitimate connection",
+                            icon: "fa-ban",
+                            correct: false
+                        }
+                    ]
+                }
+            ],
+            startTime: Date.now()
+        };
+
+        function initGame() {
+            updateStats();
+            startNewScenario();
+        }
+
+        function startNewScenario() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            gameState.isAnswered = false;
+            gameState.currentScenario = gameState.scenarios[gameState.currentRound];
+            updateScenarioDisplay();
+            generateDecisionOptions();
+            hideFeedback();
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function updateScenarioDisplay() {
+            const scenario = gameState.currentScenario;
+            document.getElementById('scenarioTitle').textContent = scenario.title;
+            document.getElementById('scenarioContent').textContent = scenario.content;
+            document.getElementById('scenarioVisual').innerHTML = scenario.visual;
+            
+            const consequencesGrid = document.getElementById('consequencesGrid');
+            consequencesGrid.innerHTML = '';
+            scenario.consequences.forEach(consequence => {
+                const consequenceDiv = document.createElement('div');
+                consequenceDiv.className = 'consequence-item';
+                consequenceDiv.innerHTML = `
+                    <div class="consequence-icon">
+                        <i class="fas ${consequence.icon}"></i>
+                    </div>
+                    <div class="consequence-text">${consequence.text}</div>
+                `;
+                consequencesGrid.appendChild(consequenceDiv);
+            });
+        }
+
+        function generateDecisionOptions() {
+            const decisionOptions = document.getElementById('decisionOptions');
+            decisionOptions.innerHTML = '';
+            const shuffledOptions = [...gameState.currentScenario.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'decision-option';
+                optionDiv.onclick = () => selectDecision(option, optionDiv);
+                optionDiv.innerHTML = `
+                    <div class="option-icon">
+                        <i class="fas ${option.icon}"></i>
+                    </div>
+                    <div class="option-text">${option.text}</div>
+                    <div class="option-consequence">${option.consequence}</div>
+                `;
+                decisionOptions.appendChild(optionDiv);
+            });
+        }
+
+        function selectDecision(option, element) {
+            if (gameState.isAnswered) return;
+            gameState.isAnswered = true;
+            const isCorrect = option.correct;
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                gameState.score += calculateScore();
+            } else {
+                element.classList.add('incorrect');
+                document.querySelectorAll('.decision-option').forEach(opt => {
+                    if (opt.innerHTML.includes(gameState.currentScenario.options.find(o => o.correct).text)) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            showFeedback(isCorrect);
+            updateStats();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            trackProgress(isCorrect);
+        }
+
+        function calculateScore() {
+            return 100 + gameState.level * 25 + Math.floor(Math.random() * 25);
+        }
+
+        function nextScenario() {
+            gameState.currentRound++;
+            if (gameState.currentRound % 2 === 0) gameState.level++;
+            updateStats();
+            startNewScenario();
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            const progress = (gameState.currentRound / gameState.totalRounds) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = `<div>🎉 Excellent decision-making skills!</div><small>You considered all factors and made a wise choice!</small>`;
+                feedback.className = 'feedback success show';
+            } else {
+                feedback.innerHTML = `<div>Not the best choice. Think about consequences! 🤔</div><small>The green option shows a better decision.</small>`;
+                feedback.className = 'feedback info show';
+            }
+            setTimeout(() => feedback.classList.remove('show'), 3000);
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.remove('show');
+        }
+
+        function trackProgress(isCorrect) {
+            const progressData = {
+                gameName: 'Decision Making',
+                round: gameState.currentRound + 1,
+                scenario: gameState.currentScenario.title,
+                isCorrect: isCorrect,
+                score: gameState.score,
+                timestamp: new Date().toISOString()
+            };
+            let savedProgress = JSON.parse(localStorage.getItem('gameProgress') || '[]');
+            savedProgress.push(progressData);
+            localStorage.setItem('gameProgress', JSON.stringify(savedProgress));
+        }
+
+        function endGame() {
+            const totalTime = Date.now() - gameState.startTime;
+            const accuracy = (gameState.score / (gameState.totalRounds * 150)) * 100;
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = `
+                <div class="instruction">
+                    <h2>🎉 Decision Making Complete!</h2>
+                    <p>Amazing critical thinking and judgment!</p>
+                </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⚖️</div>
+                    <h3 style="color: #2d3748; margin-bottom: 2rem;">Your Decision Results</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${gameState.score}</div>
+                            <div style="color: #718096;">Total Score</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${accuracy.toFixed(1)}%</div>
+                            <div style="color: #718096;">Decision Skill</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #4a5568;">${(totalTime/1000).toFixed(0)}s</div>
+                            <div style="color: #718096;">Time</div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #155724; font-weight: 600;">
+                            ${accuracy >= 80 ? 'Outstanding! You make excellent decisions!' : 
+                              accuracy >= 60 ? 'Great job! You think through choices well!' :
+                              'Good job! Decision making takes practice!'}
+                        </p>
+                        <p style="color: #155724; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Good decision making helps with responsibility, consequences, and life success!
+                        </p>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToDashboard()">
+                        <i class="fas fa-home"></i> Dashboard
+                    </button>
+                </div>
+            `;
+            const results = {
+                gameName: 'Decision Making',
+                finalScore: gameState.score,
+                accuracy: accuracy,
+                totalTime: totalTime,
+                roundsCompleted: gameState.totalRounds,
+                level: gameState.level,
+                completedAt: new Date().toISOString()
+            };
+            let savedResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            savedResults.push(results);
+            localStorage.setItem('gameResults', JSON.stringify(savedResults));
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if redirecting
+            }
+            
+            // Initialize game
+            initGame();
+        });
+    </script>
+</body>
+</html>
