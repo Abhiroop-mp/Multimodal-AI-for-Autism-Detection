@@ -1,0 +1,16 @@
+{
+  "name": "auto-commit-watcher",
+  "version": "1.0.0",
+  "description": "Auto-commit and push changes to GitHub",
+  "main": "auto-commit.js",
+  "scripts": {
+    "start": "node auto-commit.js",
+    "watch": "node auto-commit-advanced.js"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3"
+  },
+  "keywords": ["git", "auto-commit", "github", "watcher"],
+  "author": "",
+  "license": "ISC"
+}
