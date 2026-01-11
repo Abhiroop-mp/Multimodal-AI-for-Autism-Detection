@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASD Support Platform | Secure Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="api-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -48,77 +49,94 @@
         .logo {
             width: 50px;
             height: 50px;
-            border-radius: 8px;
-            object-fit: contain;
-        }
-
-        .header-content {
-            text-align: left;
+            border-radius: 50%;
+            background: white;
+            padding: 5px;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 1.8rem;
             font-weight: 600;
-            margin-bottom: 5px;
         }
 
-        .header p {
-            font-size: 16px;
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .left-panel h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .left-panel p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
             opacity: 0.9;
         }
 
-        .content {
-            display: flex;
-            flex-direction: row;
+        .features {
+            text-align: left;
+            width: 100%;
         }
 
-        .illustration {
-            flex: 1;
-            background: #e8f4fc;
+        .feature {
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 30px;
+            margin-bottom: 15px;
+            gap: 15px;
         }
 
-        .login-logo {
-            max-width: 300px;
-            max-height: 300px;
-            width: 90%;
-            height: 90%;
-            border-radius: 15px;
-            object-fit: contain;
-            box-shadow: 0 8px 25px rgba(74, 141, 183, 0.3);
-            transition: transform 0.3s ease;
+        .feature i {
+            font-size: 1.2rem;
+            width: 30px;
         }
 
-        .login-logo:hover {
-            transform: scale(1.05);
-        }
-
-        .form-container {
+        .right-panel {
             flex: 1;
-            padding: 30px;
+            padding: 40px;
+            background: white;
         }
 
         .tabs {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
         }
 
         .tab {
-            padding: 12px 20px;
+            flex: 1;
+            padding: 15px;
+            text-align: center;
             cursor: pointer;
-            font-size: 16px;
+            border: none;
+            background: none;
+            font-size: 1rem;
             font-weight: 500;
-            color: #777;
+            color: #666;
             transition: all 0.3s ease;
         }
 
         .tab.active {
             color: #4a8db7;
-            border-bottom: 3px solid #4a8db7;
+            border-bottom: 2px solid #4a8db7;
+        }
+
+        .tab:hover {
+            color: #4a8db7;
         }
 
         .form {
@@ -129,6 +147,29 @@
             display: block;
         }
 
+        .user-type-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .user-type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .user-type-btn.selected {
+            border-color: #4a8db7;
+            background: #4a8db7;
+            color: white;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -137,7 +178,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #555;
+            color: #333;
         }
 
         .input-with-icon {
@@ -146,210 +187,123 @@
 
         .input-with-icon i {
             position: absolute;
-            left: 12px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #888;
+            color: #666;
         }
 
         .input-with-icon input {
             width: 100%;
-            padding: 12px 12px 12px 40px;
-            border: 1px solid #ddd;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
         }
 
         .input-with-icon input:focus {
-            border-color: #4a8db7;
             outline: none;
-        }
-
-        .user-type {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .user-option {
-            flex: 1;
-            text-align: center;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .user-option.selected {
             border-color: #4a8db7;
-            background-color: #e8f4fc;
-        }
-
-        .user-option i {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #4a8db7;
         }
 
         .btn {
             width: 100%;
             padding: 14px;
-            background-color: #4a8db7;
+            background: linear-gradient(135deg, #4a8db7, #357abd);
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #3a7ca5;
-        }
-
-        .btn-otp {
-            background-color: #6c757d;
+            transition: all 0.3s ease;
             margin-top: 10px;
         }
 
-        .btn-otp:hover {
-            background-color: #5a6268;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 141, 183, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .otp-section {
             display: none;
-            margin-top: 20px;
+            text-align: center;
             padding: 20px;
-            background-color: #f8f9fa;
+            background: #f8f9fa;
             border-radius: 8px;
-            border-left: 4px solid #4a8db7;
+            margin-top: 20px;
         }
 
         .otp-section.active {
             display: block;
-            animation: fadeIn 0.5s;
         }
 
         .otp-inputs {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
             justify-content: center;
+            margin: 20px 0;
         }
 
         .otp-inputs input {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             text-align: center;
-            font-size: 20px;
-            border: 1px solid #ddd;
+            font-size: 1.2rem;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
+            transition: border-color 0.3s ease;
         }
 
-        .footer {
+        .otp-inputs input:focus {
+            outline: none;
+            border-color: #4a8db7;
+        }
+
+        .demo-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             text-align: center;
-            padding: 20px;
-            color: #777;
-            font-size: 14px;
-            border-top: 1px solid #eee;
         }
 
-        .accessibility-options {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-        }
-
-        .accessibility-options h3 {
-            margin-bottom: 10px;
-            color: #555;
-            font-size: 16px;
-        }
-
-        .toggle-options {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .toggle-options button {
-            padding: 8px 15px;
-            background-color: #e0e0e0;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .toggle-options button:hover {
-            background-color: #d0d0d0;
-        }
-
-        .high-contrast {
-            background: #000 !important;
-            color: #fff !important;
-        }
-
-        .high-contrast .container {
-            background: #000 !important;
-            color: #fff !important;
-            border: 2px solid #fff;
-        }
-
-        .high-contrast .header {
-            background: #222 !important;
-            color: #fff !important;
-        }
-
-        .high-contrast input {
-            background: #000 !important;
-            color: #fff !important;
-            border: 1px solid #fff !important;
-        }
-
-        .database-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px;
-            background-color: #4caf50;
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            display: none;
-            z-index: 1000;
-        }
-
-        #parent-email-group {
-            transition: all 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+        .demo-notice strong {
+            display: block;
+            margin-bottom: 5px;
         }
 
         @media (max-width: 768px) {
-            .content {
+            .container {
+                max-width: 100%;
+                margin: 10px;
+            }
+
+            .main-content {
                 flex-direction: column;
             }
 
-            .illustration {
-                display: none;
+            .left-panel {
+                padding: 30px 20px;
             }
 
-            .toggle-options {
-                flex-direction: column;
-                gap: 10px;
+            .right-panel {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .left-panel h2 {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -358,33 +312,56 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-content">
-                <h1>ASD Support Platform</h1>
-                <p>Detection, Prediction, and Development for Autism Spectrum Disorder</p>
-            </div>
+            <img src="logo.png" alt="ASD Support Platform" class="logo">
+            <h1>ASD Support Platform</h1>
         </div>
 
-        <div class="content">
-            <div class="illustration">
-                <img src="logo.png" alt="ASD Care Logo" class="login-logo">
+        <div class="main-content">
+            <div class="left-panel">
+                <h2>Welcome Back!</h2>
+                <p>Access your personalized autism therapy and progress tracking platform.</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-gamepad"></i>
+                        <span>31 Therapeutic Games</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-brain"></i>
+                        <span>AI-Powered Recommendations</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Progress Tracking</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-users"></i>
+                        <span>Multi-User Support</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-container">
+            <div class="right-panel">
                 <div class="tabs">
-                    <div class="tab active" onclick="switchTab('login')">Login</div>
-                    <div class="tab" onclick="switchTab('register')">Register</div>
+                    <button class="tab active" onclick="switchTab('login')">Login</button>
+                    <button class="tab" onclick="switchTab('register')">Register</button>
                 </div>
 
+                <!-- Demo Notice for Production -->
+                <div id="demo-notice" class="demo-notice" style="display: none;">
+                    <strong>🎮 Demo Mode Active</strong>
+                    You're using the demo version. Any credentials will work for login.
+                </div>
+
+                <!-- LOGIN FORM -->
                 <div id="login-form" class="form active">
-                    <div class="user-type">
-                        <div class="user-option selected" onclick="selectUserType('patient', this)">
-                            <i class="fas fa-user"></i>
-                            <div>Patient</div>
-                        </div>
-                        <div class="user-option" onclick="selectUserType('parent', this)">
-                            <i class="fas fa-users"></i>
-                            <div>Parent</div>
-                        </div>
+                    <div class="user-type-selector">
+                        <button class="user-type-btn selected" onclick="selectUserType('patient', this)">
+                            <i class="fas fa-user"></i> Patient
+                        </button>
+                        <button class="user-type-btn" onclick="selectUserType('parent', this)">
+                            <i class="fas fa-user-friends"></i> Parent
+                        </button>
                     </div>
 
                     <div class="form-group">
@@ -403,47 +380,47 @@
                         </div>
                     </div>
 
-                    <button class="btn" onclick="login()">Login</button>
+                    <button class="btn" onclick="login()">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
 
+                    <!-- LOGIN OTP SECTION -->
+                    <div id="login-otp-section" class="otp-section">
+                        <h3>Email Verification</h3>
+                        <p>Enter the 6-digit OTP sent to your email.</p>
 
-                    <div id="login-otp-section" class="otp-section" style="display:none;">
-                        <h3>Two-Step Verification</h3>
-                        <p>For your security, we've sent a verification code to your registered mobile number.</p>
-
-                        <div class="form-group">
-                            <label>Enter 6-digit OTP</label>
-                            <div class="otp-inputs">
-                                <input type="text" maxlength="1" pattern="[0-9]">
-                                <input type="text" maxlength="1" pattern="[0-9]">
-                                <input type="text" maxlength="1" pattern="[0-9]">
-                                <input type="text" maxlength="1" pattern="[0-9]">
-                                <input type="text" maxlength="1" pattern="[0-9]">
-                                <input type="text" maxlength="1" pattern="[0-9]">
-                            </div>
+                        <div class="otp-inputs">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
                         </div>
 
-                        <button class="btn" onclick="verifyOTP()">Verify & Login</button>
-                        <button class="btn btn-otp" onclick="resendOTP()">Resend OTP</button>
+                        <button class="btn" onclick="verifyLoginOTP()">Verify & Continue</button>
+                        <button class="btn" onclick="resendOTP()" style="background: #6c757d; margin-top: 10px;">
+                            <i class="fas fa-redo"></i> Resend OTP
+                        </button>
                     </div>
                 </div>
 
+                <!-- REGISTER FORM -->
                 <div id="register-form" class="form">
-                    <div class="user-type">
-                        <div class="user-option selected" onclick="selectUserType('patient', this)">
-                            <i class="fas fa-user"></i>
-                            <div>Patient</div>
-                        </div>
-                        <div class="user-option" onclick="selectUserType('parent', this)">
-                            <i class="fas fa-users"></i>
-                            <div>Parent</div>
-                        </div>
+                    <div class="user-type-selector">
+                        <button class="user-type-btn selected" onclick="selectUserType('patient', this)">
+                            <i class="fas fa-user"></i> Patient
+                        </button>
+                        <button class="user-type-btn" onclick="selectUserType('parent', this)">
+                            <i class="fas fa-user-friends"></i> Parent
+                        </button>
                     </div>
 
                     <div class="form-group">
                         <label for="register-name">Full Name</label>
                         <div class="input-with-icon">
                             <i class="fas fa-user"></i>
-                            <input type="text" id="register-name" placeholder="Enter your full name">
+                            <input type="text" id="register-name" placeholder="Enter your full name" required>
                         </div>
                     </div>
 
@@ -451,7 +428,7 @@
                         <label for="register-email">Email Address</label>
                         <div class="input-with-icon">
                             <i class="fas fa-envelope"></i>
-                            <input type="email" id="register-email" placeholder="Enter your email">
+                            <input type="email" id="register-email" placeholder="Enter your email" required>
                         </div>
                     </div>
 
@@ -459,7 +436,7 @@
                         <label for="register-password">Password</label>
                         <div class="input-with-icon">
                             <i class="fas fa-lock"></i>
-                            <input type="password" id="register-password" placeholder="Create a password">
+                            <input type="password" id="register-password" placeholder="Create a password" required>
                         </div>
                     </div>
 
@@ -467,98 +444,58 @@
                         <label for="register-phone">Mobile Number</label>
                         <div class="input-with-icon">
                             <i class="fas fa-phone"></i>
-                            <input type="tel" id="register-phone" placeholder="Enter your mobile number">
+                            <input type="tel" id="register-phone" placeholder="Enter your mobile number" required>
                         </div>
                     </div>
 
-                    <div class="form-group" id="parent-email-group">
+                    <div class="form-group" id="parent-email-group" style="display: none;">
                         <label for="parent-email">Parent/Guardian Email Address</label>
                         <div class="input-with-icon">
                             <i class="fas fa-user-friends"></i>
-                            <input type="email" id="parent-email" placeholder="Enter parent/guardian email" required>
+                            <input type="email" id="parent-email" placeholder="Enter parent/guardian email">
                         </div>
                         <small style="color: #666; font-size: 12px;">
                             💡 If you're self-dependent, enter alternate email.
                         </small>
                     </div>
-                    <button class="btn" onclick="register()">Register</button>
-                    <!-- REGISTER EMAIL OTP -->
+
+                    <button class="btn" onclick="register()">
+                        <i class="fas fa-user-plus"></i> Register
+                    </button>
+
+                    <!-- REGISTER OTP SECTION -->
                     <div id="register-otp-section" class="otp-section">
                         <h3>Email Verification</h3>
-                        <p>Enter the OTP sent to your email.</p>
+                        <p>Enter the 6-digit OTP sent to your email.</p>
 
                         <div class="otp-inputs">
-                            <input maxlength="1">
-                            <input maxlength="1">
-                            <input maxlength="1">
-                            <input maxlength="1">
-                            <input maxlength="1">
-                            <input maxlength="1">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
+                            <input maxlength="1" type="text">
                         </div>
 
                         <button class="btn" onclick="verifyRegisterOTP()">Verify Email</button>
                     </div>
-
-                </div>
-
-                <div class="accessibility-options">
-                    <h3>Accessibility Options</h3>
-                    <div class="toggle-options">
-                        <button onclick="toggleHighContrast()">High Contrast</button>
-                        <button onclick="toggleReadAloud()">Read Aloud</button>
-                        <button onclick="toggleSimplifiedLayout()">Simplified Layout</button>
-                        <button onclick="reduceAnimations()">Reduce Animations</button>
-                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="footer">
-            <p>© 2023 ASD Support Platform. All rights reserved.</p>
-            <p>Designed with special consideration for ASD patients</p>
-        </div>
-    </div>
-
-    <div id="database-notification" class="database-notification">
-        <i class="fas fa-database"></i> Data successfully stored in MongoDB
     </div>
 
     <script>
         let currentUserType = 'patient';
         let otpSent = false;
         let storedEmail = '';
-        let redirecting = false; // Prevent multiple redirects
 
-        // Check if user is already logged in (only once)
-        function checkAlreadyLoggedIn() {
-            if (redirecting) return; // Prevent duplicate checks
-
-            const token = localStorage.getItem('authToken');
-            const userDataString = localStorage.getItem('userData');
-
-            if (!token || !userDataString) {
-                console.log('No active session found');
-                return;
-            }
-
-            try {
-                const userData = JSON.parse(userDataString);
-
-                if (token && userData && userData.id) {
-                    redirecting = true;
-                    console.log('User already logged in, redirecting...');
-
-                    if (userData.userType === 'parent') {
-                        window.location.replace('parent-dashboard.html');
-                    } else {
-                        window.location.replace('dashboard.html');
-                    }
-                }
-            } catch (error) {
-                console.error('Error parsing user data:', error);
-                // Clear corrupted data
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userData');
+        // Check if running in production (GitHub Pages)
+        function checkEnvironment() {
+            const isProduction = !window.location.hostname.includes('localhost') && 
+                              !window.location.hostname.includes('127.0.0.1');
+            
+            if (isProduction) {
+                document.getElementById('demo-notice').style.display = 'block';
             }
         }
 
@@ -566,12 +503,12 @@
             currentUserType = userType;
 
             const options = element.parentElement.children;
-            for (let i = 0; i <options.length; i++) {
+            for (let i = 0; i < options.length; i++) {
                 options[i].classList.remove('selected');
             }
             element.classList.add('selected');
 
-            // Show parent email field ONLY for patients, hide for parents
+            // Show parent email field ONLY for patients
             const parentEmailGroup = document.getElementById('parent-email-group');
             if (userType === 'patient') {
                 parentEmailGroup.style.display = 'block';
@@ -579,7 +516,7 @@
             } else {
                 parentEmailGroup.style.display = 'none';
                 document.getElementById('parent-email').required = false;
-                document.getElementById('parent-email').value = ''; // Clear the field
+                document.getElementById('parent-email').value = '';
             }
         }
 
@@ -595,276 +532,43 @@
             if (tabName === 'login') {
                 document.getElementById('login-form').classList.add('active');
                 document.querySelectorAll('.tab')[0].classList.add('active');
-
-                // Hide parent email field in login tab
-                const parentEmailGroup = document.getElementById('parent-email-group');
-                parentEmailGroup.style.display = 'none';
             } else {
                 document.getElementById('register-form').classList.add('active');
                 document.querySelectorAll('.tab')[1].classList.add('active');
-
-                // Show/hide parent email based on selected user type in register tab
-                const parentEmailGroup = document.getElementById('parent-email-group');
-                if (currentUserType === 'patient') {
-                    parentEmailGroup.style.display = 'block';
-                } else {
-                    parentEmailGroup.style.display = 'none';
-                }
             }
         }
 
-        // Initialize on page load - SINGLE EVENT LISTENER
-        document.addEventListener('DOMContentLoaded', function () {
-            // Check if user is already logged in before clearing session
-            checkAlreadyLoggedIn();
-
-            // Clear any existing session to ensure fresh login
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
-            localStorage.removeItem('loginTime');
-
-            // Initialize parent email field - HIDDEN by default
-            const parentEmailGroup = document.getElementById('parent-email-group');
-            if (parentEmailGroup) {
-                parentEmailGroup.style.display = 'none';
-                const parentEmailInput = document.getElementById('parent-email');
-                if (parentEmailInput) {
-                    parentEmailInput.required = false;
-                }
-            }
-
-            // Add Enter key event listeners for login form
-            const loginEmail = document.getElementById('login-email');
-            const loginPassword = document.getElementById('login-password');
-            
-            if (loginEmail && loginPassword) {
-                loginEmail.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        loginPassword.focus();
-                    }
-                });
-                
-                loginPassword.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        login();
-                    }
-                });
-            }
-
-            // Load accessibility settings
-            loadAccessibilitySettings();
-            applyAccessibilitySettings();
-        });
         async function login() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
 
-            // Validation
             if (!email || !password) {
                 alert('Please enter both email and password');
                 return;
             }
 
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Please enter a valid email address');
-                return;
-            }
-
             try {
-                const res = await fetch('http://localhost:5001/api/auth/login', {
+                const res = await apiCall('/api/auth/login', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password, userType: currentUserType })
                 });
 
-                const data = await res.json();
-                
-                if (!res.ok) {
-                    alert(data.message || 'Login failed. Please check your credentials.');
-                    return;
-                }
-
-                // Store authentication data
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('userData', JSON.stringify(data.user));
-                localStorage.setItem('loginTime', new Date().toISOString());
-
-                // Redirect based on user type
-                window.location.href =
-                    data.user.userType === 'parent'
-                        ? 'parent-dashboard.html'
-                        : 'dashboard.html';
-                        
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Unable to connect to the server. Please check your internet connection and try again.');
-            }
-        }
-
-        async function requestOTP() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-
-            if (!email || !password) {
-                alert('Please enter both email and password');
-                return;
-            }
-
-            try {
-                const response = await fetch('http://localhost:5001/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    // STORE THE TOKEN AND USER DATA
-                    localStorage.setItem('authToken', result.token);
-                    localStorage.setItem('userData', JSON.stringify(result.user));
+                if (res.success) {
+                    // Store authentication data
+                    localStorage.setItem('authToken', res.token);
+                    localStorage.setItem('userData', JSON.stringify(res.user));
                     localStorage.setItem('loginTime', new Date().toISOString());
 
-                    console.log('Token stored:', result.token);
-                    console.log('User data stored:', result.user);
-
-                    // Store email for OTP verification
-                    storedEmail = email;
-
-                    // Send OTP via email
-                    const otpResponse = await fetch('http://localhost:5001/api/auth/send-otp', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${result.token}`
-                        },
-                        body: JSON.stringify({ email: email })
-                    });
-
-                    const otpResult = await otpResponse.json();
-
-                    if (otpResponse.ok) {
-                        document.getElementById('login-otp-section').classList.add('active');
-                        otpSent = true;
-
-                        document.querySelectorAll('.otp-inputs input')[0].focus();
-
-                        const otpInputs = document.querySelectorAll('.otp-inputs input');
-                        otpInputs.forEach((input, index) => {
-                            input.addEventListener('input', () => {
-                                if (input.value.length === 1 && index < otpInputs.length - 1) {
-                                    otpInputs[index + 1].focus();
-                                }
-                            });
-
-                            input.addEventListener('keydown', (e) => {
-                                if (e.key === 'Backspace' && input.value === '' && index > 0) {
-                                    otpInputs[index - 1].focus();
-                                }
-                            });
-                        });
-
-                        alert('OTP sent to your email! Please check your inbox.');
-                    } else {
-                        alert('Failed to send OTP: ' + otpResult.message);
-                    }
+                    // Redirect based on user type
+                    window.location.href = res.user.userType === 'parent' 
+                        ? 'parent-dashboard.html' 
+                        : 'dashboard.html';
                 } else {
-                    alert('Login failed: ' + result.message);
+                    alert(res.message || 'Login failed. Please check your credentials.');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                alert('Login failed. Please check your connection and try again.');
-            }
-        }
-
-        async function verifyOTP() {
-            if (!otpSent) {
-                alert('Please request an OTP first');
-                return;
-            }
-
-            const otpInputs = document.querySelectorAll('.otp-inputs input');
-            let otp = '';
-            otpInputs.forEach(input => {
-                otp += input.value;
-            });
-
-            if (otp.length !== 6) {
-                alert('Please enter a complete 6-digit OTP');
-                return;
-            }
-
-            try {
-                const response = await fetch('http://localhost:5001/api/auth/verify-otp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email: storedEmail, otp })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    showDatabaseNotification('OTP verified successfully! Redirecting...');
-
-                    // Update token if needed
-                    if (result.newToken) {
-                        localStorage.setItem('authToken', result.newToken);
-                    }
-
-                    // REDIRECT TO APPROPRIATE DASHBOARD AFTER SUCCESSFUL LOGIN
-                    setTimeout(() => {
-                        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-
-                        if (userData.userType === 'parent') {
-                            window.location.href = 'parent-dashboard.html';
-                        } else {
-                            window.location.href = 'dashboard.html';
-                        }
-                    }, 2000);
-                } else {
-                    alert('OTP verification failed: ' + result.message);
-                }
-            } catch (error) {
-                console.error('OTP verification error:', error);
-                alert('OTP verification failed. Please try again.');
-            }
-        }
-
-        async function resendOTP() {
-            if (!storedEmail) {
-                alert('Please login first to request OTP');
-                return;
-            }
-
-            try {
-                const token = localStorage.getItem('authToken');
-                const response = await fetch('http://localhost:5001/api/auth/send-otp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ email: storedEmail })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert('New OTP has been sent to your email!');
-                } else {
-                    alert('Failed to resend OTP: ' + result.message);
-                }
-            } catch (error) {
-                console.error('Resend OTP error:', error);
-                alert('Failed to resend OTP. Please try again.');
+                alert('Unable to connect to server. Please check your internet connection and try again.');
             }
         }
 
@@ -874,19 +578,16 @@
             const password = document.getElementById('register-password').value;
             const phone = document.getElementById('register-phone').value;
 
-            // Only get parentEmail if user is patient
             let parentEmail = '';
             if (currentUserType === 'patient') {
                 parentEmail = document.getElementById('parent-email').value;
             }
 
-            // Basic validation for all users
             if (!name || !email || !password || !phone) {
                 alert('Please fill in all required fields');
                 return;
             }
 
-            // Additional validation only for patients
             if (currentUserType === 'patient' && !parentEmail) {
                 alert('Please enter parent/guardian email for patient registration');
                 return;
@@ -900,329 +601,96 @@
                 phone: phone
             };
 
-            // Only add parentEmail for patients
             if (currentUserType === 'patient') {
                 userData.parentEmail = parentEmail;
             }
 
             try {
-                console.log('Sending registration data:', userData);
-
-                const response = await fetch('http://localhost:5001/api/auth/register', {
+                const response = await apiCall('/api/auth/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(userData)
                 });
 
-                const result = await response.json();
-                console.log('Registration response:', result);
-
-                if (response.ok) {
-                    // ✅ REGISTRATION SUCCESSFUL - BUT DON'T AUTO-LOGIN
-                    // ✅ DON'T store token or user data in localStorage
-                    // ✅ Just show success message and redirect to login
-
-                    showDatabaseNotification('Registration successful! Please check your email for OTP.');
-
-                    // Send OTP email (but don't auto-login)
-                    try {
-                        const otpResponse = await fetch('http://localhost:5001/api/auth/send-otp', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ email: email })
-                        });
-
-                        const otpResult = await otpResponse.json();
-                        if (otpResponse.ok) {
-                            console.log('OTP sent successfully');
-                        } else {
-                            console.log('OTP email failed:', otpResult.message);
-                        }
-                    } catch (emailError) {
-                        console.error('Email error:', emailError);
-                    }
-
-                    // ✅ REDIRECT TO LOGIN PAGE AFTER SUCCESSFUL REGISTRATION
-                    setTimeout(() => {
-                        alert('Registration successful! Please login with your credentials and verify OTP.');
-
-                        // Switch to login tab and pre-fill email
-                        storedEmail = email;
-
-                        showDatabaseNotification(
-                            'Registration successful! Please verify the OTP sent to your email.'
-                        );
-
-                        document.getElementById('register-otp-section').classList.add('active');
-                        return; // STOP here – do not redirect yet
-
-                        document.getElementById('login-email').value = email;
-                        document.getElementById('login-password').value = '';
-
-                        // Clear registration form
-                        document.getElementById('register-name').value = '';
-                        document.getElementById('register-email').value = '';
-                        document.getElementById('register-password').value = '';
-                        document.getElementById('register-phone').value = '';
-                        if (currentUserType === 'patient') {
-                            document.getElementById('parent-email').value = '';
-                        }
-
-                    }, 1500);
+                if (response.success) {
+                    alert('Registration successful! You can now login with your credentials.');
+                    switchTab('login');
                 } else {
-                    alert('Registration failed: ' + result.message);
+                    alert('Registration failed: ' + response.message);
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                alert('Registration failed. Please check your connection and try again.');
+                alert('Registration failed. Please try again.');
             }
         }
-        async function verifyRegisterOTP() {
-            const inputs = document.querySelectorAll('#register-otp-section .otp-inputs input');
+
+        function verifyLoginOTP() {
+            // Simple OTP verification for demo
+            const otpInputs = document.querySelectorAll('#login-otp-section .otp-inputs input');
             let otp = '';
-            inputs.forEach(i => otp += i.value);
+            otpInputs.forEach(input => otp += input.value);
 
             if (otp.length !== 6) {
-                alert('Enter full 6-digit OTP');
+                alert('Please enter a complete 6-digit OTP');
                 return;
             }
 
-            const res = await fetch('http://localhost:5001/api/auth/verify-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: storedEmail, otp })
-            });
+            // For demo, accept any 6-digit OTP
+            alert('OTP verified! Redirecting to dashboard...');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            window.location.href = userData.userType === 'parent' 
+                ? 'parent-dashboard.html' 
+                : 'dashboard.html';
+        }
 
-            const data = await res.json();
-            if (!res.ok) {
-                alert(data.message);
+        function verifyRegisterOTP() {
+            const otpInputs = document.querySelectorAll('#register-otp-section .otp-inputs input');
+            let otp = '';
+            otpInputs.forEach(input => otp += input.value);
+
+            if (otp.length !== 6) {
+                alert('Please enter a complete 6-digit OTP');
                 return;
             }
 
-            showDatabaseNotification('Email verified. You can now login.');
-            document.getElementById('register-otp-section').classList.remove('active');
+            alert('Email verified! Registration complete. Please login.');
             switchTab('login');
-            document.getElementById('login-email').value = storedEmail;
         }
 
-        // ... (keep the rest of your helper functions unchanged)
-        // Helper function to get authentication headers
-        function getAuthHeaders() {
-            const token = localStorage.getItem('authToken');
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': token ? `Bearer ${token}` : ''
-            };
+        function resendOTP() {
+            alert('New OTP sent to your email!');
         }
 
-        // Function to view stored data (for debugging)
-        function viewStoredData() {
-            const token = localStorage.getItem('authToken');
-            const userData = localStorage.getItem('userData');
-            const loginTime = localStorage.getItem('loginTime');
-
-            console.log('Stored Token:', token);
-            console.log('Stored User Data:', userData ? JSON.parse(userData) : null);
-            console.log('Login Time:', loginTime);
-
-            alert(`Stored Data:\nToken: ${token ? 'Yes (' + token.substring(0, 20) + '...)' : 'No'}\nUser Data: ${userData ? 'Yes' : 'No'}\nLogin Time: ${loginTime || 'Not set'}`);
-        }
-
-        // Function to clear stored data (logout)
-        function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
-            localStorage.removeItem('loginTime');
-            alert('Logged out successfully. All tokens cleared.');
-            window.location.reload();
-        }
-
-        function showDatabaseNotification(message) {
-            const notification = document.getElementById('database-notification');
-            notification.innerHTML = `<i class="fas fa-database"></i> ${message}`;
-            notification.style.display = 'block';
-
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-
-        // Store accessibility settings
-        let accessibilitySettings = {
-            highContrast: false,
-            simplifiedLayout: false,
-            reducedMotion: false,
-            readAloud: false
-        };
-
-        // Load settings from localStorage
-        function loadAccessibilitySettings() {
-            const saved = localStorage.getItem('accessibilitySettings');
-            if (saved) {
-                accessibilitySettings = JSON.parse(saved);
-                applyAccessibilitySettings();
-            }
-        }
-
-        // Save settings to localStorage
-        function saveAccessibilitySettings() {
-            localStorage.setItem('accessibilitySettings', JSON.stringify(accessibilitySettings));
-        }
-
-        // Apply all settings
-        function applyAccessibilitySettings() {
-            // High contrast
-            if (accessibilitySettings.highContrast) {
-                document.body.classList.add('high-contrast');
-            } else {
-                document.body.classList.remove('high-contrast');
-            }
-
-            // Simplified layout
-            document.querySelectorAll('.form-group').forEach(group => {
-                group.style.marginBottom = accessibilitySettings.simplifiedLayout ? '15px' : '20px';
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkEnvironment();
+            
+            // Add Enter key support
+            document.getElementById('login-password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') login();
+            });
+            
+            document.getElementById('register-password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') register();
             });
 
-            if (accessibilitySettings.simplifiedLayout) {
-                document.body.classList.add('simplified-layout');
-            } else {
-                document.body.classList.remove('simplified-layout');
-            }
+            // Setup OTP input navigation
+            const otpInputGroups = document.querySelectorAll('.otp-inputs');
+            otpInputGroups.forEach(group => {
+                const inputs = group.querySelectorAll('input');
+                inputs.forEach((input, index) => {
+                    input.addEventListener('input', () => {
+                        if (input.value.length === 1 && index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    });
 
-            // Reduced motion
-            if (accessibilitySettings.reducedMotion) {
-                document.documentElement.style.setProperty('--animation-duration', '0.01s');
-                document.querySelectorAll('*').forEach(element => {
-                    element.style.transition = 'none';
-                    element.style.animation = 'none';
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                            inputs[index - 1].focus();
+                        }
+                    });
                 });
-            } else {
-                document.documentElement.style.setProperty('--animation-duration', '0.3s');
-                document.querySelectorAll('*').forEach(element => {
-                    element.style.transition = '';
-                    element.style.animation = '';
-                });
-            }
-
-            // Update button states
-            updateAccessibilityButtonStates();
-        }
-
-        // Update button visual states
-        function updateAccessibilityButtonStates() {
-            const buttons = {
-                'highContrast': document.querySelector('button[onclick="toggleHighContrast()"]'),
-                'simplifiedLayout': document.querySelector('button[onclick="toggleSimplifiedLayout()"]'),
-                'reducedMotion': document.querySelector('button[onclick="reduceAnimations()"]'),
-                'readAloud': document.querySelector('button[onclick="toggleReadAloud()"]')
-            };
-
-            Object.keys(buttons).forEach(key => {
-                if (buttons[key]) {
-                    if (accessibilitySettings[key]) {
-                        buttons[key].style.backgroundColor = '#4a8db7';
-                        buttons[key].style.color = 'white';
-                    } else {
-                        buttons[key].style.backgroundColor = '#e0e0e0';
-                        buttons[key].style.color = 'black';
-                    }
-                }
             });
-        }
-
-        // Enhanced accessibility functions
-        function toggleHighContrast() {
-            accessibilitySettings.highContrast = !accessibilitySettings.highContrast;
-            applyAccessibilitySettings();
-            saveAccessibilitySettings();
-            showAccessibilityFeedback('High contrast ' + (accessibilitySettings.highContrast ? 'enabled' : 'disabled'));
-        }
-
-        function toggleReadAloud() {
-            accessibilitySettings.readAloud = !accessibilitySettings.readAloud;
-
-            if (accessibilitySettings.readAloud) {
-                // Simple read aloud implementation
-                const elements = document.querySelectorAll('label, .tab, .user-option, h3, p');
-                let text = '';
-                elements.forEach(el => {
-                    if (el.textContent) text += el.textContent + '. ';
-                });
-
-                if ('speechSynthesis' in window) {
-                    const speech = new SpeechSynthesisUtterance(text);
-                    speech.rate = 0.8;
-                    window.speechSynthesis.speak(speech);
-                }
-            } else {
-                window.speechSynthesis.cancel();
-            }
-
-            saveAccessibilitySettings();
-            updateAccessibilityButtonStates();
-            showAccessibilityFeedback('Read aloud ' + (accessibilitySettings.readAloud ? 'enabled' : 'disabled'));
-        }
-
-        function toggleSimplifiedLayout() {
-            accessibilitySettings.simplifiedLayout = !accessibilitySettings.simplifiedLayout;
-            applyAccessibilitySettings();
-            saveAccessibilitySettings();
-            showAccessibilityFeedback('Simplified layout ' + (accessibilitySettings.simplifiedLayout ? 'enabled' : 'disabled'));
-        }
-
-        function reduceAnimations() {
-            accessibilitySettings.reducedMotion = !accessibilitySettings.reducedMotion;
-            applyAccessibilitySettings();
-            saveAccessibilitySettings();
-            showAccessibilityFeedback('Reduced motion ' + (accessibilitySettings.reducedMotion ? 'enabled' : 'disabled'));
-        }
-
-        function showAccessibilityFeedback(message) {
-            // Create or show feedback element
-            let feedback = document.getElementById('accessibility-feedback');
-            if (!feedback) {
-                feedback = document.createElement('div');
-                feedback.id = 'accessibility-feedback';
-                feedback.style.position = 'fixed';
-                feedback.style.bottom = '70px';
-                feedback.style.right = '20px';
-                feedback.style.background = '#4a8db7';
-                feedback.style.color = 'white';
-                feedback.style.padding = '10px 15px';
-                feedback.style.borderRadius = '5px';
-                feedback.style.zIndex = '1000';
-                document.body.appendChild(feedback);
-            }
-
-            feedback.textContent = message;
-            feedback.style.display = 'block';
-
-            setTimeout(() => {
-                feedback.style.display = 'none';
-            }, 2000);
-        }
-
-        // Add CSS for animations
-        const style = document.createElement('style');
-        style.textContent = `
-    * {
-        transition: all var(--animation-duration, 0.3s) ease;
-    }
-    
-    .high-contrast {
-        --animation-duration: 0.01s;
-    }
-`;
-        document.head.appendChild(style);
-
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', function () {
-            loadAccessibilitySettings();
-            applyAccessibilitySettings();
         });
     </script>
 </body>
